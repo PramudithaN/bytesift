@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ByteSift - Content-Aware Offline File Organizer</title>
+  <meta name="description" content="High-speed, 100% offline file organizer that inspects file binary signatures and contents directly without artificial intelligence or internet.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            },
+            surface: {
+              base: '#080c14',
+              card: '#0f172a',
+              cardHover: '#131f37',
+              border: 'rgba(255, 255, 255, 0.08)',
+              borderHover: 'rgba(56, 189, 248, 0.3)',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Motion (motion.dev) Library -->
+  <script src="https://cdn.jsdelivr.net/npm/motion@11.11.17/dist/motion.js"></script>
+
+  <style>
+    body {
+      background-color: #080c14;
+      color: #f1f5f9;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+    
+    /* Subtle Background Grid */
+    .bg-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    
+    /* Radial Glow Accents */
+    .radial-glow-blue {
+      background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 60%);
+    }
+    .radial-glow-cyan {
+      background: radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.12) 0%, transparent 50%);
+    }
+
+    /* Scroll progress indicator */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #38bdf8, #0284c7);
+      width: 0%;
+      z-index: 100;
+      transition: width 0.1s ease-out;
+    }
+
+    /* Fade-in animation initial state for Motion */
+    .reveal-item {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  </style>
+</head>
+<body class="bg-surface-base antialiased selection:bg-brand-500/20 selection:text-brand-400">
+
+  <!-- Top Scroll Progress Bar -->
+  <div id="scroll-progress"></div>
+
+  <!-- Navigation Bar -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-surface-base/80 border-b border-surface-border transition-colors">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center space-x-3 group">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 4h4l2 2h8a2 2 0 0 1 2 2v2H6a2 2 0 0 0-2 2V4z" opacity="0.6"/>
+            <path d="M6 8h4l2 2h8a2 2 0 0 1 2 2v2H8a2 2 0 0 0-2 2V8z" opacity="0.8"/>
+            <path d="M4 12h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
+          </svg>
+        </div>
+        <span class="font-bold text-lg tracking-tight text-white group-hover:text-brand-400 transition-colors">ByteSift</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
+        <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
+        <a href="#preview" class="hover:text-white transition-colors">Interactive Demo</a>
+        <a href="#benchmarks" class="hover:text-white transition-colors">Performance</a>
+        <a href="#download" class="hover:text-white transition-colors">Download</a>
+      </nav>
+
+      <!-- Right CTAs -->
+      <div class="flex items-center space-x-4">
+        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-2 text-sm font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-surface-border hover:border-slate-600 transition">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <a href="#download" class="text-sm font-semibold text-white bg-brand-600 hover:bg-brand-500 px-4 py-1.5 rounded-lg transition shadow-md shadow-brand-500/20">
+          Get App
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-24 pb-20 px-6 overflow-hidden bg-grid radial-glow-blue">
+    <div class="max-w-5xl mx-auto text-center space-y-8">
+      
+      <!-- Pill Badge -->
+      <div class="inline-flex items-center space-x-2 bg-brand-500/10 border border-brand-500/30 px-3.5 py-1.5 rounded-full text-xs font-medium text-brand-400 reveal-item">
+        <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
+        <span>Version 0.1.0 Released</span>
+        <span class="text-slate-500">•</span>
+        <span class="text-slate-300">100% Offline • Zero AI Dependencies</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] reveal-item">
+        File organization that <br class="hidden sm:inline">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-sky-300 to-blue-500">
+          inspects content, not extensions.
+        </span>
+      </h1>
+
+      <!-- Description -->
+      <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed reveal-item">
+        ByteSift bypasses misleading or missing file extensions by reading binary magic signatures and bounded text heuristics. Categorize, deduplicate, and sort thousands of messy files in milliseconds with complete offline privacy and reversible undo safety.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 reveal-item">
+        <a href="#download" class="w-full sm:w-auto flex items-center justify-center space-x-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-brand-600/25 transition-all hover:-translate-y-0.5">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2v14m0 0l-4-4m4 4l4-4M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Download for Windows & Mac</span>
+        </a>
+        <a href="#how-it-works" class="w-full sm:w-auto flex items-center justify-center space-x-2 bg-surface-card hover:bg-surface-cardHover text-slate-300 hover:text-white border border-surface-border font-medium text-sm px-6 py-3.5 rounded-xl transition">
+          <span>Read Process Guide</span>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Key Metadata Row -->
+      <div class="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto text-center border-t border-surface-border/60 reveal-item">
+        <div class="p-3">
+          <div class="text-xl sm:text-2xl font-bold text-white font-mono">0.04s</div>
+          <div class="text-xs text-slate-500 font-medium">Scan Latency</div>
+        </div>
+        <div class="p-3">
+          <div class="text-xl sm:text-2xl font-bold text-white font-mono">&lt; 25 MB</div>
+          <div class="text-xs text-slate-500 font-medium">RAM Footprint</div>
+        </div>
+        <div class="p-3">
+          <div class="text-xl sm:text-2xl font-bold text-white font-mono">0 Bytes</div>
+          <div class="text-xs text-slate-500 font-medium">Network Calls</div>
+        </div>
+        <div class="p-3">
+          <div class="text-xl sm:text-2xl font-bold text-white font-mono">100%</div>
+          <div class="text-xs text-slate-500 font-medium">Reversible Undo</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Software Preview Section -->
+  <section id="preview" class="py-20 px-6 max-w-6xl mx-auto reveal-item">
+    <div class="text-center space-y-3 mb-10">
+      <h2 class="text-xs font-bold uppercase tracking-widest text-brand-400">Software Interface</h2>
+      <h3 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Engineered for your platform.</h3>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto">Toggle between modern Windows Fluent styling and macOS Aqua styling with automatic Dark/Light mode synchronization.</p>
+      
+      <!-- Platform Switcher Buttons -->
+      <div class="inline-flex p-1 bg-surface-card border border-surface-border rounded-xl mt-4">
+        <button id="btn-tab-win" onclick="switchPreview('windows')" class="px-5 py-2 text-xs font-semibold rounded-lg bg-brand-600 text-white transition shadow-sm">
+          Windows 11 Fluent
+        </button>
+        <button id="btn-tab-mac" onclick="switchPreview('macos')" class="px-5 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+          macOS Aqua HIG
+        </button>
+      </div>
+    </div>
+
+    <!-- Simulated Desktop Window Frame -->
+    <div id="preview-frame" class="rounded-2xl border border-surface-border bg-[#1a1a1a] shadow-2xl overflow-hidden transition-all duration-300">
+      
+      <!-- Titlebar -->
+      <div id="preview-titlebar" class="px-5 py-3.5 bg-[#242424] border-b border-[#333333] flex items-center justify-between">
+        
+        <!-- Window Controls -->
+        <div id="preview-controls" class="flex items-center space-x-2">
+          <!-- Windows Controls by default -->
+          <div class="flex items-center space-x-2 text-xs text-slate-400">
+            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 4h4l2 2h8a2 2 0 0 1 2 2v2H6a2 2 0 0 0-2 2V4z" opacity="0.6"/>
+              <path d="M6 8h4l2 2h8a2 2 0 0 1 2 2v2H8a2 2 0 0 0-2 2V8z" opacity="0.8"/>
+              <path d="M4 12h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
+            </svg>
+            <span class="font-semibold text-slate-200" id="preview-app-title">ByteSift - Offline Content-Aware File Organizer</span>
+          </div>
+        </div>
+
+        <!-- Window Action Buttons (Minimize/Maximize/Close) -->
+        <div id="preview-window-buttons" class="flex items-center space-x-3 text-slate-400 text-xs">
+          <span class="hover:text-white cursor-pointer"><svg class="w-2.5 h-2.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/></svg></span>
+          <span class="hover:text-white cursor-pointer">□</span>
+          <span class="hover:text-red-400 cursor-pointer">✕</span>
+        </div>
+      </div>
+
+      <!-- App Body Preview -->
+      <div class="p-6 space-y-5 bg-[#1a1a1a]">
+        
+        <!-- Target Directory Row -->
+        <div class="bg-[#242424] p-4 rounded-xl border border-[#333333] space-y-2">
+          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Target Directory</div>
+          <div class="flex items-center space-x-3">
+            <div class="flex-1 bg-[#1b1b1b] border border-[#3a3a3a] rounded-lg px-3.5 py-2 text-xs text-slate-200 font-mono">
+              C:\Users\User\Downloads
+            </div>
+            <button class="bg-[#2e2e2e] hover:bg-[#383838] text-white text-xs px-4 py-2 rounded-lg font-medium border border-[#3a3a3a]">
+              Browse Folder
+            </button>
+            <button id="preview-open-btn" class="bg-[#2e2e2e] hover:bg-[#383838] text-white text-xs px-4 py-2 rounded-lg font-medium border border-[#3a3a3a]">
+              Open in File Explorer
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters & Actions Row -->
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center space-x-4 text-xs">
+            <span class="text-slate-400 font-medium">Strategy:</span>
+            <span class="bg-[#1b1b1b] border border-[#3a3a3a] px-3 py-1.5 rounded-lg text-white font-medium">Smart Content Inspection</span>
+            <span class="text-slate-500">•</span>
+            <span class="text-slate-300">✓ Detect Duplicates</span>
+            <span class="text-slate-300">✓ Group Media by Date</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="bg-[#2e2e2e] text-white text-xs font-medium px-4 py-2 rounded-lg border border-[#3a3a3a]">
+              Refresh Preview
+            </button>
+            <button class="bg-[#60cdff] text-slate-950 text-xs font-bold px-5 py-2 rounded-lg shadow-sm">
+              Organize Files
+            </button>
+            <button class="bg-[#2e2e2e] text-white text-xs font-medium px-4 py-2 rounded-lg border border-[#3a3a3a]">
+              Undo Last Session
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Grid -->
+        <div class="bg-[#202020] rounded-xl border border-[#2d2d2d] overflow-hidden text-xs">
+          <div class="grid grid-cols-12 bg-[#292929] text-slate-300 font-semibold px-4 py-2.5 border-b border-[#333333]">
+            <div class="col-span-5">File Name</div>
+            <div class="col-span-2 text-right">Size</div>
+            <div class="col-span-3">Target Folder</div>
+            <div class="col-span-2">Detected By</div>
+          </div>
+          <div class="divide-y divide-[#262626]">
+            <div class="grid grid-cols-12 px-4 py-2.5 items-center hover:bg-[#2b2b2b] transition">
+              <div class="col-span-5 font-medium text-slate-200">INV-89104-April.pdf</div>
+              <div class="col-span-2 text-right font-mono text-slate-400">420.5 KB</div>
+              <div class="col-span-3 text-slate-300 font-medium">Documents/Invoices_Receipts</div>
+              <div class="col-span-2 text-brand-400">Content Text Scan</div>
+            </div>
+            <div class="grid grid-cols-12 px-4 py-2.5 items-center hover:bg-[#2b2b2b] transition bg-[#262626]/50">
+              <div class="col-span-5 font-medium text-slate-200">photo_vacation_001.jpg</div>
+              <div class="col-span-2 text-right font-mono text-slate-400">3.8 MB</div>
+              <div class="col-span-3 text-slate-300 font-medium">Images/JPEG/2026-04</div>
+              <div class="col-span-2 text-slate-400">File Content Header</div>
+            </div>
+            <div class="grid grid-cols-12 px-4 py-2.5 items-center bg-[#3d2d00]/40 text-[#ffd358]">
+              <div class="col-span-5 font-medium">photo_vacation_copy.jpg</div>
+              <div class="col-span-2 text-right font-mono">3.8 MB</div>
+              <div class="col-span-3 font-semibold">Duplicates</div>
+              <div class="col-span-2 font-medium">Duplicate (Exact Match)</div>
+            </div>
+            <div class="grid grid-cols-12 px-4 py-2.5 items-center hover:bg-[#2b2b2b] transition">
+              <div class="col-span-5 font-medium text-slate-200">main_controller.py</div>
+              <div class="col-span-2 text-right font-mono text-slate-400">18.4 KB</div>
+              <div class="col-span-3 text-slate-300 font-medium">Code/Python</div>
+              <div class="col-span-2 text-brand-400">Content Text Scan</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Process Guideline (Step-by-step Scroll Section) -->
+  <section id="how-it-works" class="py-24 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base to-[#0b101b]">
+    <div class="max-w-5xl mx-auto space-y-16">
+      
+      <div class="text-center space-y-3">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-brand-400">Workflow Pipeline</h2>
+        <h3 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">How ByteSift inspects your files.</h3>
+        <p class="text-slate-400 text-sm max-w-xl mx-auto">Deterministic, multi-tiered content examination operating 100% locally on your computer.</p>
+      </div>
+
+      <!-- Step Cards Grid -->
+      <div class="grid md:grid-cols-2 gap-8">
+        
+        <!-- Step 1 -->
+        <div class="bg-surface-card border border-surface-border hover:border-surface-borderHover p-8 rounded-2xl space-y-4 reveal-item transition duration-300">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center font-mono font-bold text-brand-400 text-lg">
+            01
+          </div>
+          <h4 class="text-xl font-bold text-white tracking-tight">Binary Magic Signature Sniffing</h4>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            ByteSift reads the first 16 to 64 bytes of the binary header directly from disk. Even if a file is missing its extension or was renamed from <code class="text-slate-300 font-mono text-xs">.dat</code>, its immutable signature (e.g. <code class="text-brand-400 font-mono text-xs">%PDF-</code>, <code class="text-brand-400 font-mono text-xs">\xFF\xD8\xFF</code>, <code class="text-brand-400 font-mono text-xs">PK\x03\x04</code>) accurately determines whether it is an Image, Document, Video, or Archive.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-surface-card border border-surface-border hover:border-surface-borderHover p-8 rounded-2xl space-y-4 reveal-item transition duration-300">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center font-mono font-bold text-brand-400 text-lg">
+            02
+          </div>
+          <h4 class="text-xl font-bold text-white tracking-tight">Bounded Text & Keyword Heuristics</h4>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            For plain text, code, and documents, ByteSift scans a bounded 4 to 8 KB sample against deterministic keyword and regex rules. Invoices, receipts, resumes, software code (Python, JS, HTML, SQL), and server logs are cleanly identified without language models or cloud APIs.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-surface-card border border-surface-border hover:border-surface-borderHover p-8 rounded-2xl space-y-4 reveal-item transition duration-300">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center font-mono font-bold text-brand-400 text-lg">
+            03
+          </div>
+          <h4 class="text-xl font-bold text-white tracking-tight">Collision-Proof Safe Relocation</h4>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Files are never overwritten. When multiple files share the same filename in a destination directory, ByteSift automatically suffixes collisions with <code class="text-slate-300 font-mono text-xs">filename (1).ext</code>. Exact duplicates are isolated into a dedicated <code class="text-slate-300 font-mono text-xs">Duplicates/</code> folder via size-grouped SHA-256 hashing.
+          </p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="bg-surface-card border border-surface-border hover:border-surface-borderHover p-8 rounded-2xl space-y-4 reveal-item transition duration-300">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center font-mono font-bold text-brand-400 text-lg">
+            04
+          </div>
+          <h4 class="text-xl font-bold text-white tracking-tight">Session Journal & 1-Click Rollback</h4>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Every file movement is recorded in a transactional history manifest (<code class="text-slate-300 font-mono text-xs">.bytesift_history.json</code>). If you ever change your mind or need to restore your directory layout, a single click or running <code class="text-brand-400 font-mono text-xs">bytesift undo</code> restores every file to its exact origin and prunes empty folders.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Performance Comparison Benchmark Section -->
+  <section id="benchmarks" class="py-20 px-6 border-t border-surface-border bg-surface-base">
+    <div class="max-w-5xl mx-auto space-y-12">
+      
+      <div class="text-center space-y-3">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-brand-400">Architecture Comparison</h2>
+        <h3 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Why offline heuristics beat AI models.</h3>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left border border-surface-border rounded-xl overflow-hidden">
+          <thead class="bg-surface-card text-xs font-semibold text-slate-300 uppercase tracking-wider border-b border-surface-border">
+            <tr>
+              <th class="py-4 px-6">Metric</th>
+              <th class="py-4 px-6 text-brand-400 font-bold">ByteSift (Offline Heuristics)</th>
+              <th class="py-4 px-6 text-slate-400">AI / LLM Cloud Organizers</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-surface-border bg-surface-base">
+            <tr class="hover:bg-surface-card/40 transition">
+              <td class="py-4 px-6 font-medium text-white">Execution Speed</td>
+              <td class="py-4 px-6 font-mono text-brand-400 font-semibold">&lt; 0.05 seconds (instant)</td>
+              <td class="py-4 px-6 text-slate-400">10 to 45 seconds (network latency)</td>
+            </tr>
+            <tr class="hover:bg-surface-card/40 transition">
+              <td class="py-4 px-6 font-medium text-white">Data Privacy</td>
+              <td class="py-4 px-6 text-brand-400 font-semibold">100% Local (0 bytes leave device)</td>
+              <td class="py-4 px-6 text-slate-400">Files uploaded to third-party servers</td>
+            </tr>
+            <tr class="hover:bg-surface-card/40 transition">
+              <td class="py-4 px-6 font-medium text-white">Operating Cost</td>
+              <td class="py-4 px-6 text-brand-400 font-semibold">$0.00 (Zero API tokens or subscriptions)</td>
+              <td class="py-4 px-6 text-slate-400">$10 to $30 / month API subscriptions</td>
+            </tr>
+            <tr class="hover:bg-surface-card/40 transition">
+              <td class="py-4 px-6 font-medium text-white">Reliability</td>
+              <td class="py-4 px-6 text-brand-400 font-semibold">Deterministic rules (0 hallucinations)</td>
+              <td class="py-4 px-6 text-slate-400">Unpredictable statistical models</td>
+            </tr>
+            <tr class="hover:bg-surface-card/40 transition">
+              <td class="py-4 px-6 font-medium text-white">System Footprint</td>
+              <td class="py-4 px-6 text-brand-400 font-semibold">&lt; 25 MB RAM (Zero external dependencies)</td>
+              <td class="py-4 px-6 text-slate-400">400+ MB Electron / PyTorch runtimes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Download & Installation Section -->
+  <section id="download" class="py-24 px-6 border-t border-surface-border bg-gradient-to-b from-[#090e18] to-surface-base">
+    <div class="max-w-4xl mx-auto space-y-12">
+      
+      <div class="text-center space-y-3">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-brand-400">Get Started</h2>
+        <h3 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Download ByteSift.</h3>
+        <p class="text-slate-400 text-sm max-w-lg mx-auto">Available as an interactive desktop GUI and cross-platform CLI tool for Windows, macOS, and Linux.</p>
+      </div>
+
+      <!-- OS Tabs -->
+      <div class="bg-surface-card border border-surface-border rounded-2xl overflow-hidden p-6 sm:p-8 space-y-6">
+        
+        <div class="flex items-center space-x-3 border-b border-surface-border pb-4">
+          <button id="dl-win-tab" onclick="switchDownloadTab('windows')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-brand-600 text-white transition">
+            Windows 10 / 11
+          </button>
+          <button id="dl-mac-tab" onclick="switchDownloadTab('macos')" class="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition">
+            macOS (Apple Silicon &amp; Intel)
+          </button>
+        </div>
+
+        <!-- Windows Tab Content -->
+        <div id="dl-win-content" class="space-y-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-surface-base/80 p-5 rounded-xl border border-surface-border">
+            <div>
+              <div class="font-bold text-white text-base">ByteSift for Windows</div>
+              <div class="text-slate-400 text-xs">Version 0.1.0 • Portable • Zero Installation Required</div>
+            </div>
+            <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs px-5 py-2.5 rounded-lg transition shadow-md shadow-brand-500/20">
+              Download Installer / Release
+            </a>
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quick Install via Terminal</div>
+            <div class="bg-surface-base p-4 rounded-xl border border-surface-border font-mono text-xs text-slate-300 flex items-center justify-between overflow-x-auto">
+              <span>git clone https://github.com/PramudithaN/bytesift.git &amp;&amp; cd bytesift &amp;&amp; python -m bytesift.cli gui</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- macOS Tab Content (Hidden by default) -->
+        <div id="dl-mac-content" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-surface-base/80 p-5 rounded-xl border border-surface-border">
+            <div>
+              <div class="font-bold text-white text-base">ByteSift for macOS</div>
+              <div class="text-slate-400 text-xs">Version 0.1.0 • Universal Binary (M1/M2/M3 &amp; Intel)</div>
+            </div>
+            <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs px-5 py-2.5 rounded-lg transition shadow-md shadow-brand-500/20">
+              Download DMG / Release
+            </a>
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quick Run via Terminal (macOS)</div>
+            <div class="bg-surface-base p-4 rounded-xl border border-surface-border font-mono text-xs text-slate-300 flex items-center justify-between overflow-x-auto">
+              <span>git clone https://github.com/PramudithaN/bytesift.git &amp;&amp; cd bytesift &amp;&amp; python3 -m bytesift.cli gui</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-surface-border py-12 px-6 bg-surface-base text-slate-500 text-xs">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center space-x-3">
+        <div class="w-6 h-6 rounded bg-brand-600 flex items-center justify-center text-white font-bold text-xs">
+          B
+        </div>
+        <span class="font-semibold text-slate-300">ByteSift</span>
+        <span>•</span>
+        <span>Open Source MIT License</span>
+      </div>
+
+      <div class="flex items-center space-x-6">
+        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">GitHub Repository</a>
+        <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">Releases</a>
+        <a href="https://github.com/PramudithaN/bytesift/issues" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">Issue Tracker</a>
+        <a href="https://github.com/PramudithaN/bytesift/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">License</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Scripts: Motion.dev Scroll Animations & Interactive Logic -->
+  <script>
+    // 1. Scroll Progress Bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('scroll-progress').style.width = scrolled + '%';
+    });
+
+    // 2. Motion.dev / IntersectionObserver Scroll-in Animation
+    if (window.Motion) {
+      const { animate, inView } = window.Motion;
+      inView('.reveal-item', ({ target }) => {
+        animate(target, { opacity: [0, 1], y: [24, 0] }, { duration: 0.6, easing: [0.16, 1, 0.3, 1] });
+      });
+    } else {
+      // Graceful fallback observer
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
+    }
+
+    // 3. Interactive Platform Switcher (Windows / macOS)
+    function switchPreview(platform) {
+      const btnWin = document.getElementById('btn-tab-win');
+      const btnMac = document.getElementById('btn-tab-mac');
+      const titlebar = document.getElementById('preview-titlebar');
+      const controls = document.getElementById('preview-controls');
+      const winBtns = document.getElementById('preview-window-buttons');
+      const openBtn = document.getElementById('preview-open-btn');
+      const appTitle = document.getElementById('preview-app-title');
+
+      if (platform === 'macos') {
+        btnMac.className = 'px-5 py-2 text-xs font-semibold rounded-lg bg-brand-600 text-white transition shadow-sm';
+        btnWin.className = 'px-5 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+
+        // macOS Window Chrome
+        controls.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block border border-[#e0443e]"></span>
+            <span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block border border-[#dea123]"></span>
+            <span class="w-3 h-3 rounded-full bg-[#27c93f] inline-block border border-[#1aab29]"></span>
+          </div>
+          <span class="text-xs font-semibold text-slate-300 ml-3">ByteSift (macOS Edition)</span>
+        `;
+        winBtns.innerHTML = '';
+        openBtn.innerText = 'Reveal in Finder';
+      } else {
+        btnWin.className = 'px-5 py-2 text-xs font-semibold rounded-lg bg-brand-600 text-white transition shadow-sm';
+        btnMac.className = 'px-5 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+
+        // Windows Window Chrome
+        controls.innerHTML = `
+          <div class="flex items-center space-x-2 text-xs text-slate-400">
+            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 4h4l2 2h8a2 2 0 0 1 2 2v2H6a2 2 0 0 0-2 2V4z" opacity="0.6"/>
+              <path d="M6 8h4l2 2h8a2 2 0 0 1 2 2v2H8a2 2 0 0 0-2 2V8z" opacity="0.8"/>
+              <path d="M4 12h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
+            </svg>
+            <span class="font-semibold text-slate-200" id="preview-app-title">ByteSift - Offline Content-Aware File Organizer</span>
+          </div>
+        `;
+        winBtns.innerHTML = `
+          <span class="hover:text-white cursor-pointer"><svg class="w-2.5 h-2.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/></svg></span>
+          <span class="hover:text-white cursor-pointer">□</span>
+          <span class="hover:text-red-400 cursor-pointer">✕</span>
+        `;
+        openBtn.innerText = 'Open in File Explorer';
+      }
+    }
+
+    // 4. Download OS Switcher
+    function switchDownloadTab(os) {
+      const winTab = document.getElementById('dl-win-tab');
+      const macTab = document.getElementById('dl-mac-tab');
+      const winContent = document.getElementById('dl-win-content');
+      const macContent = document.getElementById('dl-mac-content');
+
+      if (os === 'macos') {
+        macTab.className = 'px-4 py-2 text-sm font-semibold rounded-lg bg-brand-600 text-white transition';
+        winTab.className = 'px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition';
+        macContent.classList.remove('hidden');
+        winContent.classList.add('hidden');
+      } else {
+        winTab.className = 'px-4 py-2 text-sm font-semibold rounded-lg bg-brand-600 text-white transition';
+        macTab.className = 'px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition';
+        winContent.classList.remove('hidden');
+        macContent.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
