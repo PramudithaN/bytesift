@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth bg-[#080c14] text-slate-100 selection:bg-sky-500/25 selection:text-sky-300">
+<html lang="en" class="bg-[#06090e] text-slate-100 selection:bg-sky-500/25 selection:text-sky-300">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ByteSift - Clean Up Messy Folders in Seconds</title>
-  <meta name="description" content="ByteSift checks what is actually inside each file to sort invoices, photos, and resumes into clean folders. 100% private, works offline with one-click undo.">
+  <meta name="description" content="ByteSift inspects what is actually inside each file to sort invoices, photos, and resumes into clean folders. 100% private, works offline with one-click undo.">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,6 +15,7 @@
         extend: {
           colors: {
             brand: {
+              300: '#7dd3fc',
               400: '#38bdf8',
               500: '#0ea5e9',
               600: '#0284c7',
@@ -25,9 +26,9 @@
               600: '#059669',
             },
             surface: {
-              base: '#080c14',
-              card: '#0f172a',
-              cardHover: '#131f37',
+              base: '#06090e',
+              card: '#0c121e',
+              cardHover: '#111a2b',
               border: 'rgba(255, 255, 255, 0.08)',
               borderHover: 'rgba(56, 189, 248, 0.3)',
             }
@@ -46,14 +47,34 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
+  <!-- GSAP & ScrollTrigger (Awwwards Industry Standard Engine) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Lenis Smooth Inertial Scrolling Engine -->
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  
   <style>
+    html.lenis, html.lenis body {
+      height: auto;
+    }
+    .lenis.lenis-smooth {
+      scroll-behavior: auto !important;
+    }
+    .lenis.lenis-smooth [data-lenis-prevent] {
+      overscroll-behavior: contain;
+    }
+    .lenis.lenis-stopped {
+      overflow: hidden;
+    }
+
     body {
-      background-color: #080c14;
+      background-color: #06090e;
       color: #f1f5f9;
       font-family: 'Inter', -apple-system, sans-serif;
     }
 
-    /* Technical Grid Background */
+    /* Subtle Grid Background */
     .bg-grid-dark {
       background-size: 40px 40px;
       background-image: 
@@ -83,17 +104,15 @@
       opacity: 0.85;
     }
 
-    /* Smooth Floating Transition for Scattered File Cards */
-    .scatter-file-chip {
-      transition: transform 0.85s cubic-bezier(0.25, 1, 0.5, 1), 
-                  opacity 0.7s ease-out, 
-                  box-shadow 0.7s ease-out;
-      will-change: transform, opacity;
+    /* Layer Card Stack Effect */
+    .layer-card {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 -20px 40px -10px rgba(0, 0, 0, 0.8);
     }
 
     /* Subtle Laser Glow */
     .subtle-laser-glow {
-      box-shadow: 0 0 45px -10px rgba(14, 165, 233, 0.22);
+      box-shadow: 0 0 50px -10px rgba(14, 165, 233, 0.22);
     }
 
     /* Hide scrollbars */
@@ -107,9 +126,9 @@
   <div id="global-progress"></div>
 
   <!-- ========================================================================= -->
-  <!-- PERSISTENT TOP NAVIGATION BAR (STRICT 3 COLORS, ZERO EMOJIS)              -->
+  <!-- PERSISTENT TOP NAVIGATION BAR                                             -->
   <!-- ========================================================================= -->
-  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#080c14]/85 border-b border-surface-border">
+  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#06090e]/85 border-b border-surface-border">
     <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
       
       <!-- Brand Logo -->
@@ -124,10 +143,10 @@
         <span class="font-bold text-base text-white tracking-tight group-hover:text-brand-400 transition-colors">ByteSift</span>
       </a>
 
-      <!-- Seamless Nav Links -->
+      <!-- Nav Links -->
       <nav class="hidden md:flex items-center space-x-8 text-xs uppercase tracking-wider font-semibold text-slate-400">
-        <a href="#transformation-section" class="hover:text-white transition-colors">01 // Chaos to Order</a>
-        <a href="#how-it-works-track" class="hover:text-white transition-colors">02 // Live Workflow</a>
+        <a href="#scatter-runway" class="hover:text-white transition-colors">01 // Chaos To Order</a>
+        <a href="#app-workflow-runway" class="hover:text-white transition-colors">02 // Live App</a>
         <a href="#why-bytesift" class="hover:text-white transition-colors">03 // Why ByteSift</a>
         <a href="#download" class="hover:text-white transition-colors">04 // Downloads</a>
       </nav>
@@ -149,7 +168,7 @@
   <!-- ========================================================================= -->
   <!-- HERO SECTION: JUMBLED-TO-ORGANIZED HEADLINE ANIMATION                     -->
   <!-- ========================================================================= -->
-  <section class="relative min-h-[90vh] flex items-center justify-center pt-24 pb-16 px-6 text-center">
+  <section class="relative min-h-screen flex items-center justify-center pt-20 pb-16 px-6 text-center z-10">
     <div class="max-w-4xl mx-auto space-y-6 my-auto">
       
       <!-- Top Tag Badge -->
@@ -158,7 +177,7 @@
         <span>100% Private • Works Offline • Zero AI Dependency</span>
       </div>
 
-      <!-- ANIMATED HEADING: Begins jumbled in the wrong order and organizes in place -->
+      <!-- ANIMATED HEADING: Characters begin in the wrong jumbled order and sort into place -->
       <div class="py-2">
         <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
           <div id="anim-headline-line1" class="font-mono tracking-tight text-white">
@@ -177,11 +196,11 @@
 
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-        <a href="#download" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-semibold text-xs uppercase tracking-wider shadow-lg shadow-brand-500/25 transition-all hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+        <a href="#download" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-semibold text-xs uppercase tracking-wider shadow-lg shadow-brand-500/25 transition-all hover:-translate-y-0.5 flex items-center justify-center space-x-2">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Download Free for Windows</span>
         </a>
-        <a href="#transformation-section" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-surface-card hover:bg-surface-cardHover text-slate-300 hover:text-white border border-surface-border font-semibold text-xs uppercase tracking-wider transition flex items-center justify-center space-x-2">
+        <a href="#scatter-runway" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-surface-card hover:bg-surface-cardHover text-slate-300 hover:text-white border border-surface-border font-semibold text-xs uppercase tracking-wider transition flex items-center justify-center space-x-2">
           <span>Scroll to Watch Transformation</span>
           <span class="text-brand-400">↓</span>
         </a>
@@ -211,345 +230,349 @@
   </section>
 
   <!-- ========================================================================= -->
-  <!-- NEW SECTION: SCATTERED FILES ORGANIZING INTO FOLDERS ON SCROLL            -->
+  <!-- SECTION 01: PINNED FULL-VIEWPORT SCATTERED FILES TRANSFORMATION RUNWAY    -->
   <!-- ========================================================================= -->
-  <section id="transformation-section" class="relative py-28 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base via-[#090e1c] to-surface-base overflow-hidden">
-    <div class="max-w-5xl mx-auto space-y-10">
+  <div id="scatter-runway" class="relative h-[240vh] z-20">
+    
+    <!-- Pinned 100vh Full Screen Stage -->
+    <div id="scatter-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-6 py-20 overflow-hidden bg-gradient-to-b from-[#06090e] via-[#090f1d] to-[#06090e]">
       
-      <!-- Section Title -->
-      <div class="text-center space-y-2">
+      <!-- Stage Header -->
+      <div class="max-w-4xl mx-auto w-full text-center space-y-2 z-20">
         <div class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full inline-block border border-brand-500/20">
-          Real-Time Visual Transformation
+          01 // Chaos To Order
         </div>
         <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Watch messy chaos organize itself.
+          Watch messy files fly into place.
         </h2>
-        <p class="text-slate-400 text-sm max-w-xl mx-auto">
-          Scroll down to watch random, scattered downloads automatically fly and slot into clean category folders.
+        <p class="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto">
+          As you scroll, random downloads across your computer untangle and glide smoothly into organized category folders.
         </p>
-
-        <!-- Toggle Button for Immediate Visual Preview -->
-        <div class="pt-2">
-          <button id="btn-toggle-organize" onclick="toggleScatterAnimation()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-semibold text-xs uppercase tracking-wider shadow-md shadow-brand-500/20 transition">
-            <span id="btn-toggle-text">Click to Organize Files</span>
-          </button>
-        </div>
       </div>
 
-      <!-- The Transformation Stage Arena -->
-      <div class="relative min-h-[380px] p-6 sm:p-8 rounded-2xl bg-surface-card/90 border border-surface-border overflow-hidden subtle-laser-glow">
+      <!-- Full-Section Scattered Arena -->
+      <div id="scatter-arena" class="relative flex-1 w-full max-w-6xl mx-auto my-2 z-10 flex flex-col justify-end pb-8">
         
-        <!-- Target Destination Folders (Down below in neat grid) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-32 pb-4">
+        <!-- 4 Destination Category Folders at the bottom -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 z-20">
           
           <!-- Folder 1: Documents -->
-          <div id="folder-box-docs" class="p-4 rounded-xl bg-[#131d33] border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-500">
+          <div id="target-folder-docs" class="p-4 rounded-xl bg-surface-card border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
             <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
             </div>
             <div class="text-xs font-bold text-white uppercase tracking-wider">Documents</div>
-            <div class="text-[10px] text-slate-400 font-mono" id="count-docs">0 files</div>
+            <div id="counter-docs" class="text-[10px] text-slate-400 font-mono">0 files</div>
           </div>
 
           <!-- Folder 2: Images -->
-          <div id="folder-box-imgs" class="p-4 rounded-xl bg-[#131d33] border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-500">
+          <div id="target-folder-imgs" class="p-4 rounded-xl bg-surface-card border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
             <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
             </div>
             <div class="text-xs font-bold text-white uppercase tracking-wider">Images</div>
-            <div class="text-[10px] text-slate-400 font-mono" id="count-imgs">0 files</div>
+            <div id="counter-imgs" class="text-[10px] text-slate-400 font-mono">0 files</div>
           </div>
 
           <!-- Folder 3: Code -->
-          <div id="folder-box-code" class="p-4 rounded-xl bg-[#131d33] border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-500">
+          <div id="target-folder-code" class="p-4 rounded-xl bg-surface-card border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
             <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
             </div>
             <div class="text-xs font-bold text-white uppercase tracking-wider">Code</div>
-            <div class="text-[10px] text-slate-400 font-mono" id="count-code">0 files</div>
+            <div id="counter-code" class="text-[10px] text-slate-400 font-mono">0 files</div>
           </div>
 
           <!-- Folder 4: Duplicates -->
-          <div id="folder-box-dups" class="p-4 rounded-xl bg-[#131d33] border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-500">
+          <div id="target-folder-dups" class="p-4 rounded-xl bg-surface-card border border-accent-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
             <div class="w-8 h-8 rounded-lg bg-accent-500/20 text-accent-400 flex items-center justify-center">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
             </div>
             <div class="text-xs font-bold text-white uppercase tracking-wider">Duplicates</div>
-            <div class="text-[10px] text-slate-400 font-mono" id="count-dups">0 files</div>
+            <div id="counter-dups" class="text-[10px] text-slate-400 font-mono">0 files</div>
           </div>
 
         </div>
 
-        <!-- 8 Scattered File Chips that Fly into the Folders -->
-        <div id="scatter-chips-container" class="absolute inset-0 pointer-events-none p-6">
+        <!-- 10 Scattered File Chips Taking Up The Full Section Canvas -->
+        <div id="chips-flight-layer" class="absolute inset-0 pointer-events-none">
           
-          <!-- Chip 1: Invoice PDF -> Documents -->
-          <div id="chip-1" class="scatter-file-chip absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+          <div id="chip-1" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
             <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">PDF</span>
-            <span>invoice_2026.pdf</span>
+            <span>invoice_march_2026.pdf</span>
           </div>
 
-          <!-- Chip 2: Vacation Photo -> Images -->
-          <div id="chip-2" class="scatter-file-chip absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+          <div id="chip-2" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
             <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">IMG</span>
-            <span>photo_beach.heic</span>
+            <span>photo_beach_9041.heic</span>
           </div>
 
-          <!-- Chip 3: Resume DOCX -> Documents -->
-          <div id="chip-3" class="scatter-file-chip absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+          <div id="chip-3" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
             <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">DOC</span>
-            <span>resume_final.docx</span>
+            <span>resume_pramuditha.docx</span>
           </div>
 
-          <!-- Chip 4: Backend Code -> Code -->
-          <div id="chip-4" class="scatter-file-chip absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+          <div id="chip-4" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
             <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">PY</span>
             <span>backend_server.py</span>
           </div>
 
-          <!-- Chip 5: Tax Receipt -> Documents -->
-          <div id="chip-5" class="scatter-file-chip absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+          <div id="chip-5" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
             <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">PDF</span>
-            <span>tax_receipt_09.pdf</span>
+            <span>tax_receipt_2026.pdf</span>
           </div>
 
-          <!-- Chip 6: Duplicate Photo -> Duplicates -->
-          <div id="chip-6" class="scatter-file-chip absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-accent-500/40 text-xs font-mono text-accent-300 shadow-xl flex items-center space-x-2">
+          <div id="chip-6" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-accent-500/40 text-xs font-mono text-accent-300 shadow-xl flex items-center space-x-2">
             <span class="text-[9px] px-1 py-0.5 rounded bg-accent-500/20 text-accent-400 font-bold">DUP</span>
-            <span>photo_copy.heic</span>
+            <span>photo_beach_copy.heic</span>
           </div>
 
-          <!-- Chip 7: Data CSV -> Documents -->
-          <div id="chip-7" class="scatter-file-chip absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+          <div id="chip-7" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
             <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">CSV</span>
-            <span>export_data.csv</span>
+            <span>export_data_q1.csv</span>
           </div>
 
-          <!-- Chip 8: Database Query -> Code -->
-          <div id="chip-8" class="scatter-file-chip absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+          <div id="chip-8" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
             <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">SQL</span>
             <span>schema_setup.sql</span>
           </div>
 
+          <div id="chip-9" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">PDF</span>
+            <span>contract_signed.pdf</span>
+          </div>
+
+          <div id="chip-10" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
+            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">IMG</span>
+            <span>sunset_hawaii.heic</span>
+          </div>
+
         </div>
 
       </div>
 
+      <!-- Bottom Hint -->
+      <div class="text-center text-[11px] text-slate-500 z-20">
+        <span>Scroll smoothly</span>
+        <span class="text-brand-400 font-mono mx-1">↓</span>
+        <span>Watch the files glide into destination folders</span>
+      </div>
+
     </div>
-  </section>
+  </div>
 
   <!-- ========================================================================= -->
-  <!-- PINNED SCROLL WORKFLOW: SEAMLESS 4-PHASE APP DEMONSTRATION                -->
+  <!-- SECTION 02: PINNED FULL-VIEWPORT WINDOWS 11 APP WORKFLOW RUNWAY           -->
   <!-- ========================================================================= -->
-  <section id="how-it-works-track" class="relative py-28 px-6 border-t border-surface-border bg-surface-base">
-    <div class="max-w-4xl mx-auto space-y-8">
+  <div id="app-workflow-runway" class="relative h-[280vh] z-30 layer-card">
+    
+    <!-- Pinned 100vh Full Screen Stage -->
+    <div id="app-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-6 py-16 overflow-hidden bg-gradient-to-b from-[#080c14] via-[#090f1d] to-[#080c14]">
       
-      <!-- Top Title & Explainer -->
-      <div class="text-center space-y-2">
-        <div class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full inline-block border border-brand-500/20">
-          Interactive Windows Workflow
+      <!-- Workflow Header & Live Explainer -->
+      <div class="max-w-3xl mx-auto w-full text-center space-y-2 z-20">
+        <div class="flex items-center justify-center space-x-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full border border-brand-500/20">
+            02 // Live Windows Workflow
+          </span>
+          <span id="wf-phase-badge" class="text-xs font-mono text-slate-400 bg-surface-card px-2.5 py-1 rounded-full border border-surface-border">
+            Phase 1 of 4
+          </span>
         </div>
-        <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-          See the software in action.
-        </h2>
-        <p class="text-slate-400 text-sm max-w-xl mx-auto">
-          Click the steps or scroll naturally to watch ByteSift detect files, identify duplicates, and execute safe relocations.
-        </p>
 
-        <!-- Seamless Step Navigation Bar -->
-        <div class="flex flex-wrap items-center justify-center gap-2 pt-3">
-          <button onclick="setWorkflowStep(1)" id="wf-step-btn-1" class="px-4 py-1.5 text-xs font-mono rounded-lg bg-brand-500 text-white font-semibold shadow-sm transition">1. Empty UI</button>
-          <button onclick="setWorkflowStep(2)" id="wf-step-btn-2" class="px-4 py-1.5 text-xs font-mono rounded-lg bg-surface-card hover:bg-slate-800 text-slate-400 border border-surface-border transition">2. Select Folder</button>
-          <button onclick="setWorkflowStep(3)" id="wf-step-btn-3" class="px-4 py-1.5 text-xs font-mono rounded-lg bg-surface-card hover:bg-slate-800 text-slate-400 border border-surface-border transition">3. Sift Content</button>
-          <button onclick="setWorkflowStep(4)" id="wf-step-btn-4" class="px-4 py-1.5 text-xs font-mono rounded-lg bg-surface-card hover:bg-slate-800 text-slate-400 border border-surface-border transition">4. Organize & Undo</button>
-        </div>
-      </div>
-
-      <!-- Dynamic Explainer Banner -->
-      <div id="workflow-banner" class="p-3.5 rounded-xl bg-surface-card border border-brand-500/30 text-left flex items-center space-x-3.5 subtle-laser-glow transition-all duration-300">
-        <div id="workflow-step-badge" class="w-9 h-9 rounded-lg bg-brand-500 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30">
-          1
-        </div>
-        <div>
-          <div id="workflow-banner-title" class="font-bold text-white text-sm">
-            Step 1: ByteSift opens clean and ready.
+        <div id="wf-status-banner" class="p-3 rounded-xl bg-surface-card border border-brand-500/30 text-left flex items-center space-x-3 subtle-laser-glow transition-all duration-300">
+          <div id="wf-banner-num" class="w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30">
+            1
           </div>
-          <div id="workflow-banner-desc" class="text-xs text-slate-400">
-            No files are opened yet. Zero computer memory bloat. Select a folder to begin.
+          <div>
+            <div id="wf-banner-title" class="font-bold text-white text-xs sm:text-sm">
+              Step 1: ByteSift opens clean and ready.
+            </div>
+            <div id="wf-banner-desc" class="text-[11px] text-slate-400">
+              No files are opened yet. Zero computer memory bloat. Scroll down to choose a folder.
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- The Windows 11 App Stage (Compact, Visible, Zero Emojis) -->
-      <div class="rounded-xl bg-[#1c1c1c] border border-slate-700/80 shadow-2xl overflow-hidden subtle-laser-glow">
-        
-        <!-- Titlebar -->
-        <div class="h-8 px-3 bg-[#252526] border-b border-[#333333] flex items-center justify-between select-none">
-          <div class="flex items-center space-x-2 text-xs font-medium text-slate-300">
-            <svg class="w-3.5 h-3.5 text-brand-400 fill-current" viewBox="0 0 24 24">
-              <path d="M4 4h4l2 2h8a2 2 0 0 1 2 2v2H6a2 2 0 0 0-2 2V4z" opacity="0.6"/>
-              <path d="M6 8h4l2 2h8a2 2 0 0 1 2 2v2H8a2 2 0 0 0-2 2V8z" opacity="0.8"/>
-              <path d="M4 12h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
-            </svg>
-            <span class="text-[11px]">ByteSift - Offline Content-Aware File Organizer</span>
-          </div>
-          <div class="flex items-center space-x-3 text-slate-400 text-[10px]">
-            <span class="hover:text-white px-1.5 py-0.5 cursor-pointer">
-              <svg class="w-2.5 h-2.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
-            </span>
-            <span class="hover:text-white px-1.5 py-0.5 cursor-pointer">□</span>
-            <span class="hover:bg-red-500 hover:text-white px-2 py-0.5 rounded cursor-pointer transition-colors">✕</span>
-          </div>
-        </div>
-
-        <!-- Windows Menu Bar -->
-        <div class="h-6 px-3 bg-[#2b2b2b] text-slate-400 text-[10px] flex items-center space-x-3 border-b border-[#333333] select-none">
-          <span class="hover:text-white cursor-pointer">File</span>
-          <span class="hover:text-white cursor-pointer">Edit</span>
-          <span class="hover:text-white cursor-pointer">View</span>
-          <span class="hover:text-white cursor-pointer">Help</span>
-        </div>
-
-        <!-- App Interior -->
-        <div class="p-4 space-y-3 bg-[#181818]">
+      <!-- The Windows 11 App Stage (Centered, High-Impact, Zero Emojis) -->
+      <div class="max-w-3xl w-full mx-auto my-auto z-10">
+        <div class="rounded-xl bg-[#1c1c1c] border border-slate-700/80 shadow-2xl overflow-hidden subtle-laser-glow">
           
-          <!-- Folder Path Row -->
-          <div id="wf-folder-box" class="p-2.5 rounded-lg bg-[#222222] border border-[#333333] space-y-1 transition-all">
-            <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              <span>Folder To Organize:</span>
-              <span id="wf-folder-status" class="text-slate-500 font-normal">None selected yet</span>
+          <!-- Titlebar -->
+          <div class="h-7 px-3 bg-[#252526] border-b border-[#333333] flex items-center justify-between select-none">
+            <div class="flex items-center space-x-2 text-xs font-medium text-slate-300">
+              <svg class="w-3.5 h-3.5 text-brand-400 fill-current" viewBox="0 0 24 24">
+                <path d="M4 4h4l2 2h8a2 2 0 0 1 2 2v2H6a2 2 0 0 0-2 2V4z" opacity="0.6"/>
+                <path d="M6 8h4l2 2h8a2 2 0 0 1 2 2v2H8a2 2 0 0 0-2 2V8z" opacity="0.8"/>
+                <path d="M4 12h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
+              </svg>
+              <span class="text-[11px]">ByteSift - Offline Content-Aware File Organizer</span>
             </div>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <input id="wf-folder-input" type="text" readonly value="" placeholder="Click 'Browse Folder' to select your messy Downloads folder..." class="flex-1 bg-[#121212] border border-[#383838] rounded-md px-2.5 py-1 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none transition-all">
-              <button id="wf-btn-browse" onclick="setWorkflowStep(2)" class="px-3 py-1 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-md border border-[#444444] transition flex items-center justify-center space-x-1.5">
-                <svg class="w-3 h-3 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                <span>Browse Folder</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Buttons Row -->
-          <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5 border-t border-[#2b2b2b]">
-            <div class="flex flex-wrap items-center gap-2">
-              <button id="wf-btn-organize" onclick="setWorkflowStep(4)" class="px-3 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 cursor-not-allowed">
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span>Organize Files (Ctrl+Enter)</span>
-              </button>
-              <button id="wf-btn-undo" onclick="setWorkflowStep(1)" class="px-3 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5">
-                <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
-                <span>Undo Last Session (Ctrl+Z)</span>
-              </button>
-            </div>
-            <div id="wf-badge-count" class="text-xs font-mono text-slate-500">
-              0 files
+            <div class="flex items-center space-x-3 text-slate-400 text-[10px]">
+              <span class="hover:text-white px-1.5 py-0.5 cursor-pointer">
+                <svg class="w-2.5 h-2.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+              </span>
+              <span class="hover:text-white px-1.5 py-0.5 cursor-pointer">□</span>
+              <span class="hover:bg-red-500 hover:text-white px-2 py-0.5 rounded cursor-pointer transition-colors">✕</span>
             </div>
           </div>
 
-          <!-- Content Canvas Area -->
-          <div class="relative min-h-[185px] rounded-lg border border-[#333333] overflow-hidden bg-[#1c1c1c]">
+          <!-- Windows Menu Bar -->
+          <div class="h-5 px-3 bg-[#2b2b2b] text-slate-400 text-[10px] flex items-center space-x-3 border-b border-[#333333] select-none">
+            <span class="hover:text-white cursor-pointer">File</span>
+            <span class="hover:text-white cursor-pointer">Edit</span>
+            <span class="hover:text-white cursor-pointer">View</span>
+            <span class="hover:text-white cursor-pointer">Help</span>
+          </div>
+
+          <!-- App Interior -->
+          <div class="p-3.5 space-y-2.5 bg-[#181818]">
             
-            <!-- Empty View -->
-            <div id="wf-view-empty" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center space-y-1.5 transition-opacity duration-300">
-              <div class="w-9 h-9 rounded-lg bg-white/[0.03] border border-dashed border-white/10 flex items-center justify-center text-slate-500">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            <!-- Folder Path Row -->
+            <div id="live-folder-box" class="p-2 rounded-lg bg-[#222222] border border-[#333333] space-y-1 transition-all">
+              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <span>Folder To Organize:</span>
+                <span id="live-folder-status" class="text-slate-500 font-normal">None selected yet</span>
               </div>
-              <div class="text-xs font-semibold text-slate-300">No folder opened yet</div>
-              <div class="text-[11px] text-slate-500">Click Step 2 or Browse Folder to reveal folder ingest!</div>
-            </div>
-
-            <!-- Table View -->
-            <div id="wf-view-table" class="opacity-0 transition-opacity duration-300">
-              <div class="grid grid-cols-12 px-3 py-1 font-semibold text-slate-400 bg-[#252525] border-b border-[#333333] text-[10px] select-none">
-                <div class="col-span-5">File Name</div>
-                <div class="col-span-2 text-right">Size</div>
-                <div class="col-span-3 pl-3">Sorts Into</div>
-                <div class="col-span-2 text-right">Detected As</div>
-              </div>
-
-              <div class="divide-y divide-[#262626] text-[11px] font-mono">
-                
-                <!-- Row 1: Invoice PDF -->
-                <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
-                  <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
-                    <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-bold">PDF</span>
-                    <span class="truncate">invoice_march_2026.pdf</span>
-                  </div>
-                  <div class="col-span-2 text-right text-slate-400">420 KB</div>
-                  <div id="wf-target-1" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                  <div id="wf-type-1" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                </div>
-
-                <!-- Row 2: Vacation Photo -->
-                <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
-                  <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
-                    <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-bold">IMG</span>
-                    <span class="truncate">IMG_9041_hawaii.heic</span>
-                  </div>
-                  <div class="col-span-2 text-right text-slate-400">3.2 MB</div>
-                  <div id="wf-target-2" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                  <div id="wf-type-2" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                </div>
-
-                <!-- Row 3: Resume -->
-                <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
-                  <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
-                    <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-bold">DOC</span>
-                    <span class="truncate">resume_pramuditha.docx</span>
-                  </div>
-                  <div class="col-span-2 text-right text-slate-400">128 KB</div>
-                  <div id="wf-target-3" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                  <div id="wf-type-3" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                </div>
-
-                <!-- Row 4: Duplicate Copy -->
-                <div id="wf-row-dup" class="grid grid-cols-12 px-3 py-1.5 items-center transition">
-                  <div class="col-span-5 flex items-center space-x-2 font-sans truncate font-medium">
-                    <span id="wf-dup-icon" class="text-[9px] px-1 py-0.5 rounded bg-slate-800 text-slate-400 font-mono font-bold">DUP</span>
-                    <span class="truncate">IMG_9041_copy.heic</span>
-                  </div>
-                  <div class="col-span-2 text-right">3.2 MB</div>
-                  <div id="wf-target-4" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                  <div id="wf-type-4" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                </div>
-
-                <!-- Row 5: Code Script -->
-                <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
-                  <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
-                    <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-bold">PY</span>
-                    <span class="truncate">backend_server.py</span>
-                  </div>
-                  <div class="col-span-2 text-right text-slate-400">15 KB</div>
-                  <div id="wf-target-5" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                  <div id="wf-type-5" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                </div>
-
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input id="live-folder-input" type="text" readonly value="" placeholder="Click 'Browse Folder' to select your messy Downloads folder..." class="flex-1 bg-[#121212] border border-[#383838] rounded-md px-2.5 py-1 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none transition-all">
+                <button class="px-3 py-1 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-md border border-[#444444] transition flex items-center justify-center space-x-1.5">
+                  <svg class="w-3 h-3 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                  <span>Browse Folder</span>
+                </button>
               </div>
             </div>
 
-          </div>
+            <!-- Buttons Row -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5 border-t border-[#2b2b2b]">
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="live-btn-organize" class="px-3 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 cursor-not-allowed">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Organize Files (Ctrl+Enter)</span>
+                </button>
+                <button id="live-btn-undo" class="px-3 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5">
+                  <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                  <span>Undo Last Session (Ctrl+Z)</span>
+                </button>
+              </div>
+              <div id="live-badge-count" class="text-xs font-mono text-slate-500">
+                0 files
+              </div>
+            </div>
 
-          <!-- Footer Bar -->
-          <div class="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 border-t border-[#2a2a2a] select-none">
-            <span id="wf-footer-msg">Standby. Awaiting user directory.</span>
-            <span class="text-slate-600">Windows 11 Fluent Engine • 100% Offline</span>
+            <!-- Content Area Container -->
+            <div class="relative min-h-[170px] rounded-lg border border-[#333333] overflow-hidden bg-[#1c1c1c]">
+              
+              <!-- Empty State -->
+              <div id="live-view-empty" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center space-y-1.5 transition-opacity duration-300">
+                <div class="w-9 h-9 rounded-lg bg-white/[0.03] border border-dashed border-white/10 flex items-center justify-center text-slate-500">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                </div>
+                <div class="text-xs font-semibold text-slate-300">No folder opened yet</div>
+                <div class="text-[11px] text-slate-500">Scroll down to reveal folder ingest and sorting!</div>
+              </div>
+
+              <!-- Table State -->
+              <div id="live-view-table" class="opacity-0 transition-opacity duration-300">
+                <div class="grid grid-cols-12 px-3 py-1 font-semibold text-slate-400 bg-[#252525] border-b border-[#333333] text-[10px] select-none">
+                  <div class="col-span-5">File Name</div>
+                  <div class="col-span-2 text-right">Size</div>
+                  <div class="col-span-3 pl-3">Sorts Into</div>
+                  <div class="col-span-2 text-right">Detected As</div>
+                </div>
+
+                <div class="divide-y divide-[#262626] text-[11px] font-mono">
+                  
+                  <!-- Row 1: Invoice PDF -->
+                  <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
+                    <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
+                      <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-bold">PDF</span>
+                      <span class="truncate">invoice_march_2026.pdf</span>
+                    </div>
+                    <div class="col-span-2 text-right text-slate-400">420 KB</div>
+                    <div id="live-target-1" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                    <div id="live-type-1" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                  </div>
+
+                  <!-- Row 2: Vacation Photo -->
+                  <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
+                    <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
+                      <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-bold">IMG</span>
+                      <span class="truncate">IMG_9041_hawaii.heic</span>
+                    </div>
+                    <div class="col-span-2 text-right text-slate-400">3.2 MB</div>
+                    <div id="live-target-2" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                    <div id="live-type-2" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                  </div>
+
+                  <!-- Row 3: Resume -->
+                  <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
+                    <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
+                      <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-bold">DOC</span>
+                      <span class="truncate">resume_pramuditha.docx</span>
+                    </div>
+                    <div class="col-span-2 text-right text-slate-400">128 KB</div>
+                    <div id="live-target-3" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                    <div id="live-type-3" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                  </div>
+
+                  <!-- Row 4: Duplicate Copy -->
+                  <div id="live-row-dup" class="grid grid-cols-12 px-3 py-1.5 items-center transition">
+                    <div class="col-span-5 flex items-center space-x-2 font-sans truncate font-medium">
+                      <span id="live-dup-icon" class="text-[9px] px-1 py-0.5 rounded bg-slate-800 text-slate-400 font-mono font-bold">DUP</span>
+                      <span class="truncate">IMG_9041_copy.heic</span>
+                    </div>
+                    <div class="col-span-2 text-right">3.2 MB</div>
+                    <div id="live-target-4" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                    <div id="live-type-4" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                  </div>
+
+                  <!-- Row 5: Code Script -->
+                  <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
+                    <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
+                      <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-bold">PY</span>
+                      <span class="truncate">backend_server.py</span>
+                    </div>
+                    <div class="col-span-2 text-right text-slate-400">15 KB</div>
+                    <div id="live-target-5" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                    <div id="live-type-5" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Footer Bar -->
+            <div class="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 border-t border-[#2a2a2a] select-none">
+              <span id="live-footer-msg">Standby. Awaiting user directory.</span>
+              <span class="text-slate-600">Windows 11 Fluent Engine • 100% Offline</span>
+            </div>
+
           </div>
 
         </div>
+      </div>
 
+      <!-- Bottom Hint -->
+      <div class="text-center text-[11px] text-slate-500 z-20">
+        <span>Scroll through to watch the live sort</span>
+        <span class="text-brand-400 font-mono mx-1">↓</span>
       </div>
 
     </div>
-  </section>
+  </div>
 
   <!-- ========================================================================= -->
-  <!-- 4 FRIENDLY REASONS TO USE BYTESIFT (STRICT 3 COLORS, ZERO EMOJIS)         -->
+  <!-- SECTION 03: WHY BYTESIFT (4 CLEAR BENEFITS, STRICT 3 COLORS)              -->
   <!-- ========================================================================= -->
-  <section id="why-bytesift" class="py-24 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base via-[#090e1c] to-surface-base">
+  <section id="why-bytesift" class="relative py-28 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base via-[#090e1c] to-surface-base z-30 layer-card">
     <div class="max-w-5xl mx-auto space-y-12">
       
       <div class="text-center space-y-2">
         <h2 class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full inline-block border border-brand-500/20">
-          Built For Everyone
+          03 // Built For Everyone
         </h2>
         <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
           Why you will love ByteSift.
@@ -603,14 +626,14 @@
   </section>
 
   <!-- ========================================================================= -->
-  <!-- DOWNLOAD HUB (SEPARATED FROM DEVELOPER CLI CODE)                          -->
+  <!-- SECTION 04: DOWNLOAD HUB (SEPARATED FROM DEVELOPER CLI CODE)              -->
   <!-- ========================================================================= -->
-  <section id="download" class="py-24 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base to-[#0b101c]">
+  <section id="download" class="py-24 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base to-[#0b101c] z-30 layer-card">
     <div class="max-w-4xl mx-auto space-y-8">
       
       <div class="text-center space-y-2">
         <h2 class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full inline-block border border-brand-500/20">
-          Get Started Free
+          04 // Get Started Free
         </h2>
         <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
           Download ByteSift for your PC or Mac.
@@ -620,7 +643,7 @@
         </p>
       </div>
 
-      <!-- Main Download Cards (Clean, User-Friendly) -->
+      <!-- Main Download Cards -->
       <div class="grid sm:grid-cols-2 gap-5">
         
         <!-- Windows Download Card -->
@@ -717,11 +740,38 @@
   </footer>
 
   <!-- ========================================================================= -->
-  <!-- JAVASCRIPT: HEADLINE SOLVER, SCATTER-TO-ORGANIZED ANIMATION & WORKFLOW    -->
+  <!-- JAVASCRIPT: LENIS SMOOTH SCROLL, GSAP SCROLLTRIGGER PINNED ENGINE         -->
   <!-- ========================================================================= -->
   <script>
     // -----------------------------------------------------------------
-    // 1. GENUINE JUMBLED-TO-ORGANIZED HEADLINE ANIMATION
+    // 1. LENIS SMOOTH INERTIAL SCROLL ENGINE (Awwwards Standard)
+    // -----------------------------------------------------------------
+    gsap.registerPlugin(ScrollTrigger);
+
+    const lenis = new Lenis({
+      duration: 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1.0
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+
+    // Global scroll progress bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('global-progress').style.width = scrolled + '%';
+    }, { passive: true });
+
+    // -----------------------------------------------------------------
+    // 2. GENUINE JUMBLED-TO-ORGANIZED HEADLINE ANIMATION
     // -----------------------------------------------------------------
     function scrambleString(str) {
       const chars = str.split("");
@@ -774,312 +824,329 @@
 
     function runHeadlineSolver() {
       animateJumbledToOrganized("anim-headline-line1", "Clean up your messy folders", 200);
-      animateJumbledToOrganized("anim-headline-line2", "in just one click.", 700);
+      animateJumbledToOrganized("anim-headline-line2", "in just one click.", 650);
     }
 
     // -----------------------------------------------------------------
-    // 2. SCATTERED FILES ORGANIZING INTO FOLDERS ANIMATION
+    // 3. FULL SECTION SCATTERED FILES GLIDING INTO FOLDERS (GSAP PINNED SCRUB)
     // -----------------------------------------------------------------
-    let isFilesOrganized = false;
+    function setupScatterPinAnimation() {
+      const arena = document.getElementById('scatter-arena');
+      if (!arena) return;
 
-    // Scattered initial offsets (Messy state)
-    const scatterOffsets = [
-      { id: "chip-1", x: 25, y: 15, rot: -14 },
-      { id: "chip-2", x: 280, y: 30, rot: 12 },
-      { id: "chip-3", x: 540, y: 18, rot: -8 },
-      { id: "chip-4", x: 740, y: 40, rot: 16 },
-      { id: "chip-5", x: 80, y: 75, rot: 10 },
-      { id: "chip-6", x: 380, y: 90, rot: -16 },
-      { id: "chip-7", x: 620, y: 80, rot: 9 },
-      { id: "chip-8", x: 820, y: 100, rot: -11 }
-    ];
+      const fDocs = document.getElementById('target-folder-docs');
+      const fImgs = document.getElementById('target-folder-imgs');
+      const fCode = document.getElementById('target-folder-code');
+      const fDups = document.getElementById('target-folder-dups');
 
-    function applyScatterPositions(organized) {
-      isFilesOrganized = organized;
-      const btnText = document.getElementById("btn-toggle-text");
-      if (btnText) {
-        btnText.innerText = organized ? "Reset to Scattered State" : "Click to Organize Files";
-      }
+      // Initial scattered coordinates (random messy spread across the 100vh canvas)
+      const initialScatter = [
+        { id: '#chip-1', x: 20, y: 30, rot: -14 },
+        { id: '#chip-2', x: 260, y: 15, rot: 12 },
+        { id: '#chip-3', x: 520, y: 40, rot: -8 },
+        { id: '#chip-4', x: 780, y: 20, rot: 15 },
+        { id: '#chip-5', x: 80, y: 95, rot: 9 },
+        { id: '#chip-6', x: 340, y: 110, rot: -16 },
+        { id: '#chip-7', x: 600, y: 90, rot: 10 },
+        { id: '#chip-8', x: 840, y: 120, rot: -12 },
+        { id: '#chip-9', x: 180, y: 170, rot: -6 },
+        { id: '#chip-10', x: 480, y: 165, rot: 14 }
+      ];
 
-      // Update folder counts
-      const cDocs = document.getElementById("count-docs");
-      const cImgs = document.getElementById("count-imgs");
-      const cCode = document.getElementById("count-code");
-      const cDups = document.getElementById("count-dups");
-
-      if (cDocs) cDocs.innerText = organized ? "3 files" : "0 files";
-      if (cImgs) cImgs.innerText = organized ? "1 file" : "0 files";
-      if (cCode) cCode.innerText = organized ? "2 files" : "0 files";
-      if (cDups) cDups.innerText = organized ? "1 file" : "0 files";
-
-      // Folder cards highlight on organize
-      const fDocs = document.getElementById("folder-box-docs");
-      const fImgs = document.getElementById("folder-box-imgs");
-      const fCode = document.getElementById("folder-box-code");
-      const fDups = document.getElementById("folder-box-dups");
-
-      if (organized) {
-        if (fDocs) fDocs.style.borderColor = "#0ea5e9";
-        if (fImgs) fImgs.style.borderColor = "#0ea5e9";
-        if (fCode) fCode.style.borderColor = "#0ea5e9";
-        if (fDups) fDups.style.borderColor = "#10b981";
-      } else {
-        if (fDocs) fDocs.style.borderColor = "rgba(56, 189, 248, 0.3)";
-        if (fImgs) fImgs.style.borderColor = "rgba(56, 189, 248, 0.3)";
-        if (fCode) fCode.style.borderColor = "rgba(56, 189, 248, 0.3)";
-        if (fDups) fDups.style.borderColor = "rgba(56, 189, 248, 0.3)";
-      }
-
-      // Move chips
-      scatterOffsets.forEach((item, index) => {
-        const chip = document.getElementById(item.id);
-        if (!chip) return;
-
-        if (organized) {
-          // Calculate target folder coordinates
-          let targetFolderEl;
-          if ([0, 2, 4, 6].includes(index)) targetFolderEl = fDocs; // Documents
-          else if (index === 1) targetFolderEl = fImgs; // Images
-          else if ([3, 7].includes(index)) targetFolderEl = fCode; // Code
-          else targetFolderEl = fDups; // Duplicates
-
-          const arenaRect = document.getElementById("scatter-chips-container").getBoundingClientRect();
-          const targetRect = targetFolderEl.getBoundingClientRect();
-
-          const targetX = (targetRect.left - arenaRect.left) + 12;
-          const targetY = (targetRect.top - arenaRect.top) - 10;
-
-          chip.style.transform = `translate(${targetX}px, ${targetY}px) scale(0.92) rotate(0deg)`;
-          chip.style.opacity = "0.9";
-          chip.style.borderColor = index === 5 ? "#10b981" : "#0ea5e9";
-        } else {
-          // Return to scattered position
-          chip.style.transform = `translate(${item.x}px, ${item.y}px) scale(1) rotate(${item.rot}deg)`;
-          chip.style.opacity = "1";
-          chip.style.borderColor = index === 5 ? "rgba(16, 185, 129, 0.4)" : "#334155";
-        }
+      // Set initial scatter positions
+      initialScatter.forEach(item => {
+        gsap.set(item.id, { x: item.x, y: item.y, rotation: item.rot, scale: 1 });
       });
-    }
 
-    function toggleScatterAnimation() {
-      applyScatterPositions(!isFilesOrganized);
-    }
-
-    // Scroll trigger for scatter section
-    let hasScrolledOrganized = false;
-    window.addEventListener('scroll', () => {
-      const transSec = document.getElementById('transformation-section');
-      if (!transSec) return;
-
-      const rect = transSec.getBoundingClientRect();
-      const inView = rect.top <= window.innerHeight * 0.6 && rect.bottom >= window.innerHeight * 0.3;
-
-      if (inView && !hasScrolledOrganized) {
-        hasScrolledOrganized = true;
-        applyScatterPositions(true);
-      } else if (!inView && rect.top > window.innerHeight * 0.8 && hasScrolledOrganized) {
-        hasScrolledOrganized = false;
-        applyScatterPositions(false);
+      // Calculate target folder landing positions relative to arena
+      function getFolderPos(folderEl) {
+        const aRect = arena.getBoundingClientRect();
+        const fRect = folderEl.getBoundingClientRect();
+        return {
+          x: fRect.left - aRect.left + (fRect.width / 2) - 80,
+          y: fRect.top - aRect.top + 10
+        };
       }
-    }, { passive: true });
 
-    // -----------------------------------------------------------------
-    // 3. TOP GLOBAL PROGRESS LINE
-    // -----------------------------------------------------------------
-    window.addEventListener('scroll', () => {
-      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      document.getElementById('global-progress').style.width = scrolled + '%';
-    }, { passive: true });
+      // Create seamless ScrollTrigger timeline scrubbed directly to user's scroll
+      const scatterTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#scatter-runway',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.0,
+          onUpdate: (self) => {
+            const p = self.progress;
+            const cDocs = document.getElementById('counter-docs');
+            const cImgs = document.getElementById('counter-imgs');
+            const cCode = document.getElementById('counter-code');
+            const cDups = document.getElementById('counter-dups');
 
-    // -----------------------------------------------------------------
-    // 4. WINDOWS 11 WORKFLOW STEPPING
-    // -----------------------------------------------------------------
-    const wfStepBadge = document.getElementById('workflow-step-badge');
-    const wfBannerTitle = document.getElementById('workflow-banner-title');
-    const wfBannerDesc = document.getElementById('workflow-banner-desc');
-
-    const wfFolderInput = document.getElementById('wf-folder-input');
-    const wfFolderStatus = document.getElementById('wf-folder-status');
-    const wfFolderBox = document.getElementById('wf-folder-box');
-    const wfBtnBrowse = document.getElementById('wf-btn-browse');
-    const wfBtnOrganize = document.getElementById('wf-btn-organize');
-    const wfBtnUndo = document.getElementById('wf-btn-undo');
-    const wfBadgeCount = document.getElementById('wf-badge-count');
-    const wfFooterMsg = document.getElementById('wf-footer-msg');
-
-    const wfViewEmpty = document.getElementById('wf-view-empty');
-    const wfViewTable = document.getElementById('wf-view-table');
-
-    const wfTarget1 = document.getElementById('wf-target-1');
-    const wfTarget2 = document.getElementById('wf-target-2');
-    const wfTarget3 = document.getElementById('wf-target-3');
-    const wfTarget4 = document.getElementById('wf-target-4');
-    const wfTarget5 = document.getElementById('wf-target-5');
-
-    const wfType1 = document.getElementById('wf-type-1');
-    const wfType2 = document.getElementById('wf-type-2');
-    const wfType3 = document.getElementById('wf-type-3');
-    const wfType4 = document.getElementById('wf-type-4');
-    const wfType5 = document.getElementById('wf-type-5');
-
-    const wfRowDup = document.getElementById('wf-row-dup');
-    const wfDupIcon = document.getElementById('wf-dup-icon');
-
-    function setWorkflowStep(step) {
-      [1, 2, 3, 4].forEach(n => {
-        const btn = document.getElementById(`wf-step-btn-${n}`);
-        if (btn) {
-          if (n === step) {
-            btn.className = "px-4 py-1.5 text-xs font-mono rounded-lg bg-brand-500 text-white font-semibold shadow-sm transition";
-          } else {
-            btn.className = "px-4 py-1.5 text-xs font-mono rounded-lg bg-surface-card hover:bg-slate-800 text-slate-400 border border-surface-border transition";
+            if (p > 0.6) {
+              if (cDocs) cDocs.innerText = '4 files';
+              if (cImgs) cImgs.innerText = '2 files';
+              if (cCode) cCode.innerText = '2 files';
+              if (cDups) cDups.innerText = '1 file';
+              if (fDups) fDups.style.borderColor = '#10b981';
+            } else {
+              if (cDocs) cDocs.innerText = '0 files';
+              if (cImgs) cImgs.innerText = '0 files';
+              if (cCode) cCode.innerText = '0 files';
+              if (cDups) cDups.innerText = '0 files';
+              if (fDups) fDups.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+            }
           }
         }
       });
 
-      if (step === 1) {
+      // Animate chips landing into their folders
+      const pDocs = getFolderPos(fDocs);
+      const pImgs = getFolderPos(fImgs);
+      const pCode = getFolderPos(fCode);
+      const pDups = getFolderPos(fDups);
+
+      // Documents: Chips 1, 3, 5, 7, 9
+      scatterTL.to(['#chip-1', '#chip-3', '#chip-5', '#chip-7', '#chip-9'], {
+        x: pDocs.x,
+        y: pDocs.y,
+        rotation: 0,
+        scale: 0.88,
+        opacity: 0.85,
+        stagger: 0.05,
+        ease: 'power2.inOut'
+      }, 0);
+
+      // Images: Chips 2, 10
+      scatterTL.to(['#chip-2', '#chip-10'], {
+        x: pImgs.x,
+        y: pImgs.y,
+        rotation: 0,
+        scale: 0.88,
+        opacity: 0.85,
+        stagger: 0.05,
+        ease: 'power2.inOut'
+      }, 0);
+
+      // Code: Chips 4, 8
+      scatterTL.to(['#chip-4', '#chip-8'], {
+        x: pCode.x,
+        y: pCode.y,
+        rotation: 0,
+        scale: 0.88,
+        opacity: 0.85,
+        stagger: 0.05,
+        ease: 'power2.inOut'
+      }, 0);
+
+      // Duplicates: Chip 6
+      scatterTL.to('#chip-6', {
+        x: pDups.x,
+        y: pDups.y,
+        rotation: 0,
+        scale: 0.88,
+        opacity: 0.85,
+        borderColor: '#10b981',
+        ease: 'power2.inOut'
+      }, 0);
+    }
+
+    // -----------------------------------------------------------------
+    // 4. WINDOWS 11 APP WORKFLOW (GSAP PINNED SCRUBBED SEQUENCE)
+    // -----------------------------------------------------------------
+    const wfBannerNum = document.getElementById('wf-banner-num');
+    const wfBannerTitle = document.getElementById('wf-banner-title');
+    const wfBannerDesc = document.getElementById('wf-banner-desc');
+    const wfPhaseBadge = document.getElementById('wf-phase-badge');
+
+    const liveFolderInput = document.getElementById('live-folder-input');
+    const liveFolderStatus = document.getElementById('live-folder-status');
+    const liveBtnOrganize = document.getElementById('live-btn-organize');
+    const liveBtnUndo = document.getElementById('live-btn-undo');
+    const liveBadgeCount = document.getElementById('live-badge-count');
+    const liveFooterMsg = document.getElementById('live-footer-msg');
+
+    const liveViewEmpty = document.getElementById('live-view-empty');
+    const liveViewTable = document.getElementById('live-view-table');
+
+    const liveTarget1 = document.getElementById('live-target-1');
+    const liveTarget2 = document.getElementById('live-target-2');
+    const liveTarget3 = document.getElementById('live-target-3');
+    const liveTarget4 = document.getElementById('live-target-4');
+    const liveTarget5 = document.getElementById('live-target-5');
+
+    const liveType1 = document.getElementById('live-type-1');
+    const liveType2 = document.getElementById('live-type-2');
+    const liveType3 = document.getElementById('live-type-3');
+    const liveType4 = document.getElementById('live-type-4');
+    const liveType5 = document.getElementById('live-type-5');
+
+    const liveRowDup = document.getElementById('live-row-dup');
+    const liveDupIcon = document.getElementById('live-dup-icon');
+
+    let currentWorkflowPhase = 1;
+
+    function applyWorkflowPhase(phase) {
+      if (currentWorkflowPhase === phase) return;
+      currentWorkflowPhase = phase;
+
+      wfPhaseBadge.innerText = `Phase ${phase} of 4`;
+
+      if (phase === 1) {
         // STEP 1: EMPTY
-        wfStepBadge.innerText = "1";
-        wfStepBadge.className = "w-9 h-9 rounded-lg bg-brand-500 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
+        wfBannerNum.innerText = "1";
+        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
         wfBannerTitle.innerText = "Step 1: ByteSift opens clean and ready.";
-        wfBannerDesc.innerText = "No files are opened yet. Zero computer memory bloat. Select a folder to begin.";
+        wfBannerDesc.innerText = "No files are opened yet. Zero computer memory bloat. Scroll down to choose a folder.";
 
-        wfFolderInput.value = "";
-        wfFolderStatus.innerText = "None selected yet";
-        wfFolderStatus.className = "text-slate-500 font-normal";
-        wfFolderBox.className = "p-2.5 rounded-lg bg-[#222222] border border-[#333333] space-y-1 transition-all";
-        wfBtnBrowse.className = "px-3 py-1 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-md border border-[#444444] transition flex items-center justify-center space-x-1.5";
+        liveFolderInput.value = "";
+        liveFolderStatus.innerText = "None selected yet";
+        liveFolderStatus.className = "text-slate-500 font-normal";
 
-        wfBtnOrganize.className = "px-3 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 cursor-not-allowed";
-        wfBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
-        wfBadgeCount.innerText = "0 files";
+        liveBtnOrganize.className = "px-3 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 cursor-not-allowed";
+        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
+        liveBadgeCount.innerText = "0 files";
 
-        wfViewEmpty.style.opacity = "1";
-        wfViewEmpty.style.pointerEvents = "auto";
-        wfViewTable.style.opacity = "0";
+        liveViewEmpty.style.opacity = "1";
+        liveViewEmpty.style.pointerEvents = "auto";
+        liveViewTable.style.opacity = "0";
 
-        wfFooterMsg.innerText = "Standby. Awaiting user directory.";
+        liveFooterMsg.innerText = "Standby. Awaiting user directory.";
 
-      } else if (step === 2) {
+      } else if (phase === 2) {
         // STEP 2: SELECT FOLDER
-        wfStepBadge.innerText = "2";
-        wfStepBadge.className = "w-9 h-9 rounded-lg bg-brand-500 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
+        wfBannerNum.innerText = "2";
+        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
         wfBannerTitle.innerText = "Step 2: You pick a messy folder (e.g. Downloads).";
-        wfBannerDesc.innerText = "Click 'Browse Folder'. ByteSift immediately discovers the files without altering anything.";
+        wfBannerDesc.innerText = "ByteSift instantly discovers the files without altering or moving anything.";
 
-        wfFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
-        wfFolderStatus.innerText = "✓ Downloads Folder Selected";
-        wfFolderStatus.className = "text-brand-400 font-semibold";
-        wfFolderBox.className = "p-2.5 rounded-lg bg-brand-500/10 border border-brand-500/30 space-y-1 transition-all";
-        wfBtnBrowse.className = "px-3 py-1 bg-brand-500 text-white text-xs font-semibold rounded-md border border-brand-400 shadow-sm transition flex items-center justify-center space-x-1.5";
+        liveFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
+        liveFolderStatus.innerText = "✓ Downloads Folder Selected";
+        liveFolderStatus.className = "text-brand-400 font-semibold";
 
-        wfBtnOrganize.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-sm";
-        wfBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
-        wfBadgeCount.innerText = "5 files found";
+        liveBtnOrganize.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-sm";
+        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
+        liveBadgeCount.innerText = "5 files found";
 
-        wfViewEmpty.style.opacity = "0";
-        wfViewEmpty.style.pointerEvents = "none";
-        wfViewTable.style.opacity = "1";
+        liveViewEmpty.style.opacity = "0";
+        liveViewEmpty.style.pointerEvents = "none";
+        liveViewTable.style.opacity = "1";
 
-        wfTarget1.innerText = "Scanning bytes..."; wfType1.innerText = "Reading...";
-        wfTarget2.innerText = "Scanning bytes..."; wfType2.innerText = "Reading...";
-        wfTarget3.innerText = "Scanning bytes..."; wfType3.innerText = "Reading...";
-        wfTarget4.innerText = "Scanning bytes..."; wfType4.innerText = "Reading...";
-        wfTarget5.innerText = "Scanning bytes..."; wfType5.innerText = "Reading...";
+        liveTarget1.innerText = "Scanning bytes..."; liveType1.innerText = "Reading...";
+        liveTarget2.innerText = "Scanning bytes..."; liveType2.innerText = "Reading...";
+        liveTarget3.innerText = "Scanning bytes..."; liveType3.innerText = "Reading...";
+        liveTarget4.innerText = "Scanning bytes..."; liveType4.innerText = "Reading...";
+        liveTarget5.innerText = "Scanning bytes..."; liveType5.innerText = "Reading...";
 
-        wfTarget1.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-        wfTarget2.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-        wfTarget3.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-        wfTarget4.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-        wfTarget5.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        liveTarget1.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        liveTarget2.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        liveTarget3.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        liveTarget4.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        liveTarget5.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
 
-        wfRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center transition";
-        wfDupIcon.innerText = "DUP";
+        liveRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center transition";
+        liveDupIcon.innerText = "DUP";
 
-        wfFooterMsg.innerText = "5 files loaded. Ready to inspect.";
+        liveFooterMsg.innerText = "5 files loaded. Ready to inspect.";
 
-      } else if (step === 3) {
+      } else if (phase === 3) {
         // STEP 3: SIFT
-        wfStepBadge.innerText = "3";
-        wfStepBadge.className = "w-9 h-9 rounded-lg bg-brand-500 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
+        wfBannerNum.innerText = "3";
+        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
         wfBannerTitle.innerText = "Step 3: ByteSift checks what each file actually is.";
         wfBannerDesc.innerText = "Invoices, photos, and resumes are recognized. Exact duplicates are cleanly highlighted!";
 
-        wfFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
-        wfFolderStatus.innerText = "✓ Analysis Complete (1 duplicate found)";
-        wfFolderStatus.className = "text-brand-400 font-semibold";
-        wfFolderBox.className = "p-2.5 rounded-lg bg-[#222222] border border-[#333333] space-y-1 transition-all";
-        wfBtnBrowse.className = "px-3 py-1 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-md border border-[#444444] transition flex items-center justify-center space-x-1.5";
+        liveFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
+        liveFolderStatus.innerText = "✓ Analysis Complete (1 duplicate found)";
+        liveFolderStatus.className = "text-brand-400 font-semibold";
 
-        wfBtnOrganize.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-lg shadow-brand-500/30 animate-pulse";
-        wfBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
-        wfBadgeCount.innerText = "5 items ready";
+        liveBtnOrganize.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-lg shadow-brand-500/30 animate-pulse";
+        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
+        liveBadgeCount.innerText = "5 items ready";
 
-        wfViewEmpty.style.opacity = "0";
-        wfViewTable.style.opacity = "1";
+        liveViewEmpty.style.opacity = "0";
+        liveViewTable.style.opacity = "1";
 
-        wfTarget1.innerText = "Documents/Invoices"; wfType1.innerText = "Invoice / Receipt";
-        wfTarget2.innerText = "Images/Photos"; wfType2.innerText = "Photo File";
-        wfTarget3.innerText = "Documents/Resumes"; wfType3.innerText = "Resume / CV";
-        wfTarget4.innerText = "Duplicates Folder"; wfType4.innerText = "Exact Duplicate";
-        wfTarget5.innerText = "Code/Python"; wfType5.innerText = "Python Script";
+        liveTarget1.innerText = "Documents/Invoices"; liveType1.innerText = "Invoice / Receipt";
+        liveTarget2.innerText = "Images/Photos"; liveType2.innerText = "Photo File";
+        liveTarget3.innerText = "Documents/Resumes"; liveType3.innerText = "Resume / CV";
+        liveTarget4.innerText = "Duplicates Folder"; liveType4.innerText = "Exact Duplicate";
+        liveTarget5.innerText = "Code/Python"; liveType5.innerText = "Python Script";
 
-        wfTarget1.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
-        wfTarget2.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
-        wfTarget3.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
-        wfTarget4.className = "col-span-3 pl-3 truncate font-sans text-brand-400 font-bold";
-        wfTarget5.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
+        liveTarget1.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
+        liveTarget2.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
+        liveTarget3.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
+        liveTarget4.className = "col-span-3 pl-3 truncate font-sans text-brand-400 font-bold";
+        liveTarget5.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
 
-        wfRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-brand-500/10 text-brand-300 border-l-2 border-brand-400 transition";
-        wfDupIcon.innerText = "DUP";
+        liveRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-brand-500/10 text-brand-300 border-l-2 border-brand-400 transition";
+        liveDupIcon.innerText = "DUP";
 
-        wfFooterMsg.innerText = "Inspection done in 0.04s. Click 'Organize Files' to sort them.";
+        liveFooterMsg.innerText = "Inspection done in 0.04s. Click 'Organize Files' to sort them.";
 
-      } else if (step === 4) {
+      } else if (phase === 4) {
         // STEP 4: ORGANIZE & UNDO
-        wfStepBadge.innerText = "4";
-        wfStepBadge.className = "w-9 h-9 rounded-lg bg-accent-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-accent-500/30";
+        wfBannerNum.innerText = "4";
+        wfBannerNum.className = "w-8 h-8 rounded-lg bg-accent-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-accent-500/30";
         wfBannerTitle.innerText = "Step 4: All files neatly organized. Undo anytime!";
         wfBannerDesc.innerText = "Everything is now sorted into neat folders. Hit Ctrl+Z if you ever want to revert back!";
 
-        wfFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
-        wfFolderStatus.innerText = "✓ 5 Files Successfully Organized";
-        wfFolderStatus.className = "text-accent-400 font-bold";
-        wfFolderBox.className = "p-2.5 rounded-lg bg-accent-500/10 border border-accent-500/30 space-y-1 transition-all";
+        liveFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
+        liveFolderStatus.innerText = "✓ 5 Files Successfully Organized";
+        liveFolderStatus.className = "text-accent-400 font-bold";
 
-        wfBtnOrganize.className = "px-3 py-1.5 bg-accent-500 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-sm";
-        wfBtnUndo.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md shadow-lg shadow-brand-500/30 transition-all flex items-center space-x-1.5 animate-bounce";
-        wfBadgeCount.innerText = "5/5 sorted";
+        liveBtnOrganize.className = "px-3 py-1.5 bg-accent-500 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-sm";
+        liveBtnUndo.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md shadow-lg shadow-brand-500/30 transition-all flex items-center space-x-1.5 animate-bounce";
+        liveBadgeCount.innerText = "5/5 sorted";
 
-        wfViewEmpty.style.opacity = "0";
-        wfViewTable.style.opacity = "1";
+        liveViewEmpty.style.opacity = "0";
+        liveViewTable.style.opacity = "1";
 
-        wfTarget1.innerText = "✓ Moved to Invoices"; wfType1.innerText = "Done";
-        wfTarget2.innerText = "✓ Moved to Photos"; wfType2.innerText = "Done";
-        wfTarget3.innerText = "✓ Moved to Resumes"; wfType3.innerText = "Done";
-        wfTarget4.innerText = "✓ Moved to Duplicates"; wfType4.innerText = "Isolated";
-        wfTarget5.innerText = "✓ Moved to Code"; wfType5.innerText = "Done";
+        liveTarget1.innerText = "✓ Moved to Invoices"; liveType1.innerText = "Done";
+        liveTarget2.innerText = "✓ Moved to Photos"; liveType2.innerText = "Done";
+        liveTarget3.innerText = "✓ Moved to Resumes"; liveType3.innerText = "Done";
+        liveTarget4.innerText = "✓ Moved to Duplicates"; liveType4.innerText = "Isolated";
+        liveTarget5.innerText = "✓ Moved to Code"; liveType5.innerText = "Done";
 
-        wfTarget1.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
-        wfTarget2.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
-        wfTarget3.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
-        wfTarget4.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
-        wfTarget5.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
+        liveTarget1.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
+        liveTarget2.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
+        liveTarget3.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
+        liveTarget4.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
+        liveTarget5.className = "col-span-3 pl-3 truncate font-sans text-accent-400 font-bold";
 
-        wfRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-accent-500/10 text-accent-300 border-l-2 border-accent-500 transition";
-        wfDupIcon.innerText = "✓";
+        liveRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-accent-500/10 text-accent-300 border-l-2 border-accent-500 transition";
+        liveDupIcon.innerText = "✓";
 
-        wfFooterMsg.innerText = "All files sorted safely. Press Ctrl+Z to undo anytime.";
+        liveFooterMsg.innerText = "All files sorted safely. Press Ctrl+Z to undo anytime.";
       }
     }
 
-    // Initialize everything on page load
+    function setupAppWorkflowPinAnimation() {
+      ScrollTrigger.create({
+        trigger: '#app-workflow-runway',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.8,
+        onUpdate: (self) => {
+          const p = self.progress;
+          if (p < 0.25) {
+            applyWorkflowPhase(1);
+          } else if (p >= 0.25 && p < 0.50) {
+            applyWorkflowPhase(2);
+          } else if (p >= 0.50 && p < 0.75) {
+            applyWorkflowPhase(3);
+          } else {
+            applyWorkflowPhase(4);
+          }
+        }
+      });
+    }
+
+    // Initialize all components on DOM ready
     document.addEventListener('DOMContentLoaded', () => {
       runHeadlineSolver();
-      applyScatterPositions(false);
-      setWorkflowStep(1);
+      setupScatterPinAnimation();
+      setupAppWorkflowPinAnimation();
+      applyWorkflowPhase(1);
     });
   </script>
 </body>
