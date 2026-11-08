@@ -83,6 +83,8 @@ def main():
         if app_bundle.exists() and shutil.which("hdiutil"):
             print("\n[*] Creating Apple Disk Image (.dmg)...")
             dmg_root = root_dir / "dmg_root"
+            if dmg_root.exists():
+                shutil.rmtree(dmg_root, ignore_errors=True)
             dmg_root.mkdir(exist_ok=True)
             shutil.copytree(app_bundle, dmg_root / "ByteSift.app", dirs_exist_ok=True)
             app_symlink = dmg_root / "Applications"
@@ -122,7 +124,7 @@ def main():
         print(" ".join(cmd))
         subprocess.check_call(cmd)
 
-    print("\n[✓] Packaging completed successfully. Artifacts available in ./dist/")
+    print("\n[+] Packaging completed successfully. Artifacts available in ./dist/")
 
 
 if __name__ == "__main__":
