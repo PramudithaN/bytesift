@@ -1,5 +1,11 @@
 # ByteSift
 
+![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=flat&logo=python&logoColor=white)
+![Version](https://img.shields.io/badge/Version-0.1.0-blue?style=flat)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat)
+![Dependencies](https://img.shields.io/badge/Dependencies-0%20(Standard%20Library)-brightgreen?style=flat)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat)
+
 ByteSift is a lightweight, offline file classification and organization utility designed to inspect file contents directly rather than relying solely on file extensions. Operating without artificial intelligence, external network connectivity, or third-party dependencies, it provides deterministic, low-latency categorization and deduplication.
 
 ---
