@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth bg-[#080c14] text-slate-100 selection:bg-sky-500/25 selection:text-sky-300">
+<html lang="en" class="bg-[#080c14] text-slate-100 selection:bg-sky-500/25 selection:text-sky-300 overflow-hidden h-screen w-screen">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ByteSift - Clean Up Your Messy Folders in Seconds</title>
+  <title>ByteSift - Clean Up Messy Folders in Seconds</title>
   <meta name="description" content="ByteSift checks what is actually inside each file to sort invoices, photos, and resumes into clean folders. 100% private, works offline with one-click undo.">
   
   <!-- Tailwind CSS -->
@@ -46,9 +46,12 @@
       background-color: #080c14;
       color: #f1f5f9;
       font-family: 'Inter', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
     }
 
-    /* Subtle Technical Grid Background */
+    /* Subtle Grid Background */
     .bg-grid-dark {
       background-size: 40px 40px;
       background-image: 
@@ -56,16 +59,35 @@
         linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     }
 
-    /* Top Global Scroll Progress */
-    #global-progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      width: 0%;
-      background: linear-gradient(90deg, #38bdf8, #0ea5e9, #6366f1);
-      z-index: 100;
-      transition: width 0.05s linear;
+    /* Full-screen reveal scene styling */
+    .scene-viewport {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 5rem 1.5rem 2rem 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(30px) scale(0.97);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+
+    .scene-viewport.active-scene {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0px) scale(1);
+      z-index: 20;
+    }
+
+    .scene-viewport.past-scene {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-30px) scale(0.97);
     }
 
     /* Scattered to Organized Letter Animation Initial State */
@@ -83,28 +105,24 @@
 
     /* Subtle Laser Glow */
     .subtle-laser-glow {
-      box-shadow: 0 0 40px -10px rgba(14, 165, 233, 0.2);
-    }
-    .step-active-glow {
-      box-shadow: 0 0 20px -2px rgba(14, 165, 233, 0.35);
+      box-shadow: 0 0 45px -10px rgba(14, 165, 233, 0.22);
     }
 
-    /* Custom Scrollbar for Code Snippets */
+    /* Hide scrollbars */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-surface-base antialiased text-slate-200">
+<body class="bg-surface-base antialiased text-slate-200 select-none bg-grid-dark">
 
-  <!-- Top Global Scroll Progress Bar -->
-  <div id="global-progress"></div>
-
-  <!-- Navigation Bar -->
+  <!-- ========================================================================= -->
+  <!-- PERSISTENT TOP NAVIGATION BAR                                             -->
+  <!-- ========================================================================= -->
   <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#080c14]/85 border-b border-surface-border">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       
       <!-- Brand Logo -->
-      <a href="#" class="flex items-center space-x-3 group">
+      <button onclick="goToScene(0)" class="flex items-center space-x-3 group">
         <div class="w-8 h-8 rounded-lg bg-sky-600 flex items-center justify-center text-white shadow-lg shadow-sky-600/20 group-hover:scale-105 transition-transform">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
             <path d="M4 4h4l2 2h8a2 2 0 0 1 2 2v2H6a2 2 0 0 0-2 2V4z" opacity="0.6"/>
@@ -113,69 +131,89 @@
           </svg>
         </div>
         <span class="font-bold text-lg text-white tracking-tight group-hover:text-sky-400 transition-colors">ByteSift</span>
-      </a>
+      </button>
 
-      <!-- Simple Nav Links -->
-      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
-        <a href="#how-it-works-track" class="hover:text-white transition-colors">How It Works</a>
-        <a href="#why-bytesift" class="hover:text-white transition-colors">Why ByteSift</a>
-        <a href="#download" class="hover:text-white transition-colors">Downloads</a>
-        <a href="#developers" class="hover:text-white transition-colors text-slate-500">Docs & CLI</a>
+      <!-- Nav Links: Reveal target scenes directly -->
+      <nav class="hidden md:flex items-center space-x-8 text-xs uppercase tracking-wider font-semibold text-slate-400">
+        <button id="nav-btn-0" onclick="goToScene(0)" class="text-white transition-colors">01 // Intro</button>
+        <button id="nav-btn-1" onclick="goToScene(1)" class="hover:text-white transition-colors">02 // Live Workflow</button>
+        <button id="nav-btn-2" onclick="goToScene(2)" class="hover:text-white transition-colors">03 // Why ByteSift</button>
+        <button id="nav-btn-3" onclick="goToScene(3)" class="hover:text-white transition-colors">04 // Downloads & Docs</button>
       </nav>
 
-      <!-- Action Buttons -->
+      <!-- Right CTAs -->
       <div class="flex items-center space-x-3">
         <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center space-x-1.5 text-xs font-semibold text-slate-300 hover:text-white px-3.5 py-1.5 rounded-lg border border-surface-border hover:border-slate-500 transition">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
           <span>GitHub</span>
         </a>
-        <a href="#download" class="text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 px-4 py-2 rounded-lg transition shadow-md shadow-sky-600/20">
-          Get ByteSift
-        </a>
+        <button onclick="goToScene(3)" class="text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 px-4 py-2 rounded-lg transition shadow-md shadow-sky-600/20">
+          Get App
+        </button>
       </div>
 
     </div>
   </header>
 
   <!-- ========================================================================= -->
-  <!-- HERO SECTION: FEATURING DISORGANIZED-TO-ORGANIZED LETTER ANIMATION        -->
+  <!-- FLOATING SIDE SCENE SCRUBBER (LANDO NORRIS CINEMATIC STYLE)               -->
   <!-- ========================================================================= -->
-  <section class="relative pt-32 pb-24 px-6 bg-grid-dark text-center overflow-hidden">
+  <aside class="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col space-y-4 text-xs font-mono">
+    <button onclick="goToScene(0)" id="dot-0" class="group flex items-center space-x-3 text-right justify-end">
+      <span class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 text-[10px]">Intro</span>
+      <span class="w-2.5 h-2.5 rounded-full bg-sky-400 ring-4 ring-sky-500/20 transition-all"></span>
+    </button>
+    <button onclick="goToScene(1)" id="dot-1" class="group flex items-center space-x-3 text-right justify-end">
+      <span class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 text-[10px]">Workflow</span>
+      <span class="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-slate-400 transition-all"></span>
+    </button>
+    <button onclick="goToScene(2)" id="dot-2" class="group flex items-center space-x-3 text-right justify-end">
+      <span class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 text-[10px]">Why ByteSift</span>
+      <span class="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-slate-400 transition-all"></span>
+    </button>
+    <button onclick="goToScene(3)" id="dot-3" class="group flex items-center space-x-3 text-right justify-end">
+      <span class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 text-[10px]">Downloads</span>
+      <span class="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-slate-400 transition-all"></span>
+    </button>
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- SCENE 0: HERO (FEATURING DISORGANIZED-TO-ORGANIZED LETTER ANIMATION)      -->
+  <!-- ========================================================================= -->
+  <section id="scene-0" class="scene-viewport active-scene text-center">
     <div class="max-w-4xl mx-auto space-y-6">
       
       <!-- Top Tag Badge -->
       <div class="inline-flex items-center space-x-2 bg-sky-500/10 border border-sky-500/30 px-4 py-1.5 rounded-full text-xs font-medium text-sky-400">
         <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-        <span>100% Private • Works Completely Offline • No AI Needed</span>
+        <span>100% Private • Works Offline • No AI Needed</span>
       </div>
 
-      <!-- ANIMATED HEADING: Letters begin scattered/disorganized and snap into order -->
+      <!-- ANIMATED HEADING: Letters begin scattered and snap into clean alignment -->
       <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] min-h-[140px] sm:min-h-[180px] flex flex-col items-center justify-center">
-        <!-- Line 1 of Title -->
         <span id="anim-headline-line1" class="inline-block">
           Clean up your messy folders
         </span>
-        <!-- Line 2 of Title (Gradient) -->
         <span id="anim-headline-line2" class="inline-block text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-400 mt-1">
           in just one click.
         </span>
       </h1>
 
-      <!-- Subtitle in Everyday Words -->
+      <!-- Plain English Subtitle -->
       <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed font-normal">
         Downloaded hundreds of files with confusing names? ByteSift checks what is actually inside each file (invoices, photos, resumes, and code) and neatly sorts them into organized folders.
       </p>
 
-      <!-- Action Buttons -->
+      <!-- Primary Action Buttons -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-        <a href="#download" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm shadow-lg shadow-sky-600/30 transition-all hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+        <button onclick="goToScene(3)" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm shadow-lg shadow-sky-600/30 transition-all hover:-translate-y-0.5 flex items-center justify-center space-x-2">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Download Free for Windows</span>
-        </a>
-        <a href="#how-it-works-track" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-surface-card hover:bg-surface-cardHover text-slate-300 hover:text-white border border-surface-border font-semibold text-sm transition flex items-center justify-center space-x-2">
-          <span>Scroll to Watch How It Works</span>
+        </button>
+        <button onclick="advanceToNextStep()" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-surface-card hover:bg-surface-cardHover text-slate-300 hover:text-white border border-surface-border font-semibold text-sm transition flex items-center justify-center space-x-2">
+          <span>Scroll Wheel To Reveal Workflow</span>
           <span class="text-sky-400 animate-bounce">↓</span>
-        </a>
+        </button>
       </div>
 
       <!-- Quick Metrics Strip -->
@@ -202,220 +240,207 @@
   </section>
 
   <!-- ========================================================================= -->
-  <!-- PINNED SCROLL WALKTHROUGH (LOCKED UNTIL ALL 4 STEPS FINISH)               -->
+  <!-- SCENE 1: LIVE INTERACTIVE WORKFLOW (REVEALED IN PLACE AS YOU SCROLL)      -->
   <!-- ========================================================================= -->
-  <section id="how-it-works-track" class="relative h-[360vh] bg-gradient-to-b from-surface-base via-[#090f1e] to-surface-base">
-    
-    <!-- Pinned Sticky Container: Locks in viewport while scrolling through the 4 steps -->
-    <div class="sticky top-16 h-[88vh] flex flex-col justify-between px-4 sm:px-6 py-4 z-20 overflow-hidden">
+  <section id="scene-1" class="scene-viewport">
+    <div class="max-w-4xl w-full mx-auto space-y-4">
       
-      <!-- Top Title & Explainer -->
-      <div class="max-w-4xl mx-auto w-full text-center space-y-2">
+      <!-- Top Step Switcher & Explainer -->
+      <div class="text-center space-y-2">
         <div class="flex items-center justify-center space-x-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
-            Interactive Walkthrough
+          <span class="text-[11px] font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 px-3 py-0.5 rounded-full border border-sky-500/20">
+            Interactive Workflow
           </span>
-          <span id="scroll-percentage-badge" class="text-xs font-mono text-slate-400 bg-surface-card px-2.5 py-1 rounded-full border border-surface-border">
+          <span id="workflow-phase-counter" class="text-[11px] font-mono text-slate-400 bg-surface-card px-2.5 py-0.5 rounded-full border border-surface-border">
             Phase 1 of 4
           </span>
         </div>
         
         <!-- Big Dynamic Explainer Banner -->
-        <div id="step-banner" class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-sky-500/30 text-left flex items-center space-x-4 transition-all duration-300 subtle-laser-glow">
-          <div id="step-badge-number" class="w-10 h-10 rounded-lg bg-sky-600 text-white font-bold text-base flex-shrink-0 flex items-center justify-center shadow-md shadow-sky-600/30">
+        <div id="workflow-banner" class="p-3 rounded-xl bg-surface-card border border-sky-500/30 text-left flex items-center space-x-3 subtle-laser-glow transition-all duration-300">
+          <div id="workflow-step-badge" class="w-9 h-9 rounded-lg bg-sky-600 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-sky-600/30">
             1
           </div>
           <div>
-            <div id="step-banner-title" class="font-bold text-white text-sm sm:text-base">
+            <div id="workflow-banner-title" class="font-bold text-white text-sm">
               Step 1: ByteSift opens clean and ready.
             </div>
-            <div id="step-banner-desc" class="text-xs sm:text-sm text-slate-400">
-              No files are opened yet. Zero computer memory bloat. Scroll to choose a folder.
+            <div id="workflow-banner-desc" class="text-xs text-slate-400">
+              No files are opened yet. Zero computer memory bloat. Scroll wheel to choose a folder.
             </div>
           </div>
         </div>
       </div>
 
-      <!-- The Simulated Windows App Window (Centered & Prominent) -->
-      <div class="max-w-4xl mx-auto w-full my-auto">
-        <div class="rounded-2xl bg-[#1c1c1c] border border-slate-700/80 shadow-2xl overflow-hidden subtle-laser-glow">
+      <!-- The Windows 11 App Stage (Centered & High-Impact) -->
+      <div class="rounded-2xl bg-[#1c1c1c] border border-slate-700/80 shadow-2xl overflow-hidden subtle-laser-glow">
+        
+        <!-- Titlebar -->
+        <div class="h-8 px-4 bg-[#252526] border-b border-[#333333] flex items-center justify-between select-none">
+          <div class="flex items-center space-x-2 text-xs font-medium text-slate-300">
+            <svg class="w-3.5 h-3.5 text-sky-400 fill-current" viewBox="0 0 24 24">
+              <path d="M4 4h4l2 2h8a2 2 0 0 1 2 2v2H6a2 2 0 0 0-2 2V4z" opacity="0.6"/>
+              <path d="M6 8h4l2 2h8a2 2 0 0 1 2 2v2H8a2 2 0 0 0-2 2V8z" opacity="0.8"/>
+              <path d="M4 12h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
+            </svg>
+            <span>ByteSift - Offline Content-Aware File Organizer</span>
+          </div>
+          <div class="flex items-center space-x-3 text-slate-400 text-xs">
+            <span class="hover:text-white px-2 py-0.5 cursor-pointer">
+              <svg class="w-2.5 h-2.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+            </span>
+            <span class="hover:text-white px-2 py-0.5 cursor-pointer">□</span>
+            <span class="hover:bg-red-500 hover:text-white px-2.5 py-0.5 rounded cursor-pointer transition-colors">✕</span>
+          </div>
+        </div>
+
+        <!-- Windows Menu Bar -->
+        <div class="h-6 px-4 bg-[#2b2b2b] text-slate-400 text-[11px] flex items-center space-x-4 border-b border-[#333333] select-none">
+          <span class="hover:text-white cursor-pointer">File</span>
+          <span class="hover:text-white cursor-pointer">Edit</span>
+          <span class="hover:text-white cursor-pointer">View</span>
+          <span class="hover:text-white cursor-pointer">Help</span>
+        </div>
+
+        <!-- App Interior -->
+        <div class="p-4 space-y-3 bg-[#181818]">
           
-          <!-- Window Title Bar -->
-          <div class="h-9 px-4 bg-[#252526] border-b border-[#333333] flex items-center justify-between select-none">
-            <div class="flex items-center space-x-2 text-xs font-medium text-slate-300">
-              <svg class="w-4 h-4 text-sky-400 fill-current" viewBox="0 0 24 24">
-                <path d="M4 4h4l2 2h8a2 2 0 0 1 2 2v2H6a2 2 0 0 0-2 2V4z" opacity="0.6"/>
-                <path d="M6 8h4l2 2h8a2 2 0 0 1 2 2v2H8a2 2 0 0 0-2 2V8z" opacity="0.8"/>
-                <path d="M4 12h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
-              </svg>
-              <span>ByteSift - Offline Content-Aware File Organizer</span>
+          <!-- Folder Path Row -->
+          <div id="wf-folder-box" class="p-2.5 rounded-xl bg-[#222222] border border-[#333333] space-y-1 transition-all">
+            <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <span>Folder To Organize:</span>
+              <span id="wf-folder-status" class="text-slate-500 font-normal">None selected yet</span>
             </div>
-            <!-- Window Buttons -->
-            <div class="flex items-center space-x-3 text-slate-400 text-xs">
-              <span class="hover:text-white px-2 py-0.5 cursor-pointer">
-                <svg class="w-2.5 h-2.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
-              </span>
-              <span class="hover:text-white px-2 py-0.5 cursor-pointer">□</span>
-              <span class="hover:bg-red-500 hover:text-white px-2.5 py-0.5 rounded cursor-pointer transition-colors">✕</span>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="wf-folder-input" type="text" readonly value="" placeholder="Click 'Browse Folder' to select your messy Downloads folder..." class="flex-1 bg-[#121212] border border-[#383838] rounded-lg px-3 py-1 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none transition-all">
+              <button id="wf-btn-browse" class="px-3 py-1 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-lg border border-[#444444] transition flex items-center justify-center space-x-1.5">
+                <svg class="w-3 h-3 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                <span>Browse Folder</span>
+              </button>
             </div>
           </div>
 
-          <!-- Windows App Menu Bar -->
-          <div class="h-7 px-4 bg-[#2b2b2b] text-slate-400 text-[11px] flex items-center space-x-4 border-b border-[#333333] select-none">
-            <span class="hover:text-white cursor-pointer">File</span>
-            <span class="hover:text-white cursor-pointer">Edit</span>
-            <span class="hover:text-white cursor-pointer">View</span>
-            <span class="hover:text-white cursor-pointer">Help</span>
+          <!-- Buttons Row -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5 border-t border-[#2b2b2b]">
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="wf-btn-organize" class="px-3.5 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 cursor-not-allowed">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>Organize Files (Ctrl+Enter)</span>
+              </button>
+              <button id="wf-btn-undo" class="px-3 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-lg border border-[#353535] transition-all flex items-center space-x-1.5">
+                <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                <span>Undo Last Session (Ctrl+Z)</span>
+              </button>
+            </div>
+            <div id="wf-badge-count" class="text-xs font-mono text-slate-500">
+              0 files
+            </div>
           </div>
 
-          <!-- Main App Interior -->
-          <div class="p-4 sm:p-5 space-y-3.5 bg-[#181818]">
+          <!-- Content Canvas Area -->
+          <div class="relative min-h-[190px] rounded-xl border border-[#333333] overflow-hidden bg-[#1c1c1c]">
             
-            <!-- Target Folder Bar -->
-            <div id="app-folder-box" class="p-3 rounded-xl bg-[#222222] border border-[#333333] space-y-1.5 transition-all">
-              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <span>Folder To Organize:</span>
-                <span id="app-folder-status" class="text-slate-500 font-normal">None selected yet</span>
+            <!-- Empty View -->
+            <div id="wf-view-empty" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-2 transition-opacity duration-300">
+              <div class="w-10 h-10 rounded-xl bg-white/[0.03] border border-dashed border-white/10 flex items-center justify-center text-slate-500">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
               </div>
-              <div class="flex flex-col sm:flex-row gap-2">
-                <input id="app-folder-input" type="text" readonly value="" placeholder="Click 'Browse Folder' to select your messy Downloads folder..." class="flex-1 bg-[#121212] border border-[#383838] rounded-lg px-3 py-1.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none transition-all">
-                <button id="app-btn-browse" class="px-3.5 py-1.5 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-lg border border-[#444444] transition flex items-center justify-center space-x-1.5">
-                  <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                  <span>Browse Folder</span>
-                </button>
-              </div>
+              <div class="text-xs font-semibold text-slate-300">No folder opened yet</div>
+              <div class="text-[11px] text-slate-500">Scroll down to reveal folder ingest and sorting!</div>
             </div>
 
-            <!-- Action Controls Row -->
-            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#2b2b2b]">
-              <div class="flex flex-wrap items-center gap-2">
-                <button id="app-btn-organize" class="px-4 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 cursor-not-allowed">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                  <span>Organize Files (Ctrl+Enter)</span>
-                </button>
-                <button id="app-btn-undo" class="px-3.5 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-lg border border-[#353535] transition-all flex items-center space-x-1.5">
-                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
-                  <span>Undo Last Session (Ctrl+Z)</span>
-                </button>
-              </div>
-              <div id="app-badge-count" class="text-xs font-mono text-slate-500">
-                0 files
-              </div>
-            </div>
-
-            <!-- Files Area Container -->
-            <div class="relative min-h-[210px] rounded-xl border border-[#333333] overflow-hidden bg-[#1c1c1c]">
-              
-              <!-- State 1 View: Empty State Prompt -->
-              <div id="app-view-empty" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-2 transition-opacity duration-300">
-                <div class="w-12 h-12 rounded-xl bg-white/[0.03] border border-dashed border-white/10 flex items-center justify-center text-slate-500">
-                  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-                </div>
-                <div class="text-xs font-semibold text-slate-300">No folder opened yet</div>
-                <div class="text-[11px] text-slate-500">Scroll down to watch ByteSift lock onto a folder and sort it!</div>
+            <!-- Table View -->
+            <div id="wf-view-table" class="opacity-0 transition-opacity duration-300">
+              <div class="grid grid-cols-12 px-3 py-1.5 font-semibold text-slate-400 bg-[#252525] border-b border-[#333333] text-[10px] select-none">
+                <div class="col-span-5">File Name</div>
+                <div class="col-span-2 text-right">Size</div>
+                <div class="col-span-3 pl-3">Sorts Into</div>
+                <div class="col-span-2 text-right">Detected As</div>
               </div>
 
-              <!-- State 2, 3, 4 View: Files Table -->
-              <div id="app-view-table" class="opacity-0 transition-opacity duration-300">
-                <div class="grid grid-cols-12 px-3.5 py-2 font-semibold text-slate-400 bg-[#252525] border-b border-[#333333] text-[11px] select-none">
-                  <div class="col-span-5">File Name</div>
-                  <div class="col-span-2 text-right">Size</div>
-                  <div class="col-span-3 pl-3">Sorts Into</div>
-                  <div class="col-span-2 text-right">Detected As</div>
+              <div class="divide-y divide-[#262626] text-[11px] font-mono">
+                
+                <!-- Row 1: Invoice PDF -->
+                <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
+                  <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
+                    <span class="text-rose-400">📄</span>
+                    <span class="truncate">invoice_march_2026.pdf</span>
+                  </div>
+                  <div class="col-span-2 text-right text-slate-400">420 KB</div>
+                  <div id="wf-target-1" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                  <div id="wf-type-1" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
                 </div>
 
-                <div class="divide-y divide-[#262626] text-[11px] font-mono">
-                  
-                  <!-- File 1: Invoice PDF -->
-                  <div class="grid grid-cols-12 px-3.5 py-2 items-center hover:bg-[#252525] transition">
-                    <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
-                      <span class="text-rose-400">📄</span>
-                      <span class="truncate">invoice_march_2026.pdf</span>
-                    </div>
-                    <div class="col-span-2 text-right text-slate-400">420 KB</div>
-                    <div id="row-target-1" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                    <div id="row-type-1" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                <!-- Row 2: Vacation Photo -->
+                <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
+                  <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
+                    <span class="text-emerald-400">🖼️</span>
+                    <span class="truncate">IMG_9041_hawaii.heic</span>
                   </div>
-
-                  <!-- File 2: Vacation Photo -->
-                  <div class="grid grid-cols-12 px-3.5 py-2 items-center hover:bg-[#252525] transition">
-                    <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
-                      <span class="text-emerald-400">🖼️</span>
-                      <span class="truncate">IMG_9041_hawaii.heic</span>
-                    </div>
-                    <div class="col-span-2 text-right text-slate-400">3.2 MB</div>
-                    <div id="row-target-2" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                    <div id="row-type-2" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                  </div>
-
-                  <!-- File 3: Resume -->
-                  <div class="grid grid-cols-12 px-3.5 py-2 items-center hover:bg-[#252525] transition">
-                    <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
-                      <span class="text-blue-400">📝</span>
-                      <span class="truncate">resume_pramuditha.docx</span>
-                    </div>
-                    <div class="col-span-2 text-right text-slate-400">128 KB</div>
-                    <div id="row-target-3" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                    <div id="row-type-3" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                  </div>
-
-                  <!-- File 4: Duplicate Copy -->
-                  <div id="row-dup-wrapper" class="grid grid-cols-12 px-3.5 py-2 items-center transition">
-                    <div class="col-span-5 flex items-center space-x-2 font-sans truncate font-medium">
-                      <span id="dup-icon-tag" class="text-slate-400">🖼️</span>
-                      <span class="truncate">IMG_9041_copy.heic</span>
-                    </div>
-                    <div class="col-span-2 text-right">3.2 MB</div>
-                    <div id="row-target-4" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                    <div id="row-type-4" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                  </div>
-
-                  <!-- File 5: Code Script -->
-                  <div class="grid grid-cols-12 px-3.5 py-2 items-center hover:bg-[#252525] transition">
-                    <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
-                      <span class="text-sky-400">🐍</span>
-                      <span class="truncate">backend_server.py</span>
-                    </div>
-                    <div class="col-span-2 text-right text-slate-400">15 KB</div>
-                    <div id="row-target-5" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
-                    <div id="row-type-5" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
-                  </div>
-
+                  <div class="col-span-2 text-right text-slate-400">3.2 MB</div>
+                  <div id="wf-target-2" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                  <div id="wf-type-2" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
                 </div>
+
+                <!-- Row 3: Resume -->
+                <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
+                  <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
+                    <span class="text-blue-400">📝</span>
+                    <span class="truncate">resume_pramuditha.docx</span>
+                  </div>
+                  <div class="col-span-2 text-right text-slate-400">128 KB</div>
+                  <div id="wf-target-3" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                  <div id="wf-type-3" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                </div>
+
+                <!-- Row 4: Duplicate Copy -->
+                <div id="wf-row-dup" class="grid grid-cols-12 px-3 py-1.5 items-center transition">
+                  <div class="col-span-5 flex items-center space-x-2 font-sans truncate font-medium">
+                    <span id="wf-dup-icon" class="text-slate-400">🖼️</span>
+                    <span class="truncate">IMG_9041_copy.heic</span>
+                  </div>
+                  <div class="col-span-2 text-right">3.2 MB</div>
+                  <div id="wf-target-4" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                  <div id="wf-type-4" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                </div>
+
+                <!-- Row 5: Code Script -->
+                <div class="grid grid-cols-12 px-3 py-1.5 items-center hover:bg-[#252525] transition">
+                  <div class="col-span-5 flex items-center space-x-2 text-slate-200 font-sans truncate">
+                    <span class="text-sky-400">🐍</span>
+                    <span class="truncate">backend_server.py</span>
+                  </div>
+                  <div class="col-span-2 text-right text-slate-400">15 KB</div>
+                  <div id="wf-target-5" class="col-span-3 pl-3 truncate font-sans text-slate-500">Pending Scan...</div>
+                  <div id="wf-type-5" class="col-span-2 text-right truncate font-sans text-[10px] text-slate-500">Reading bytes...</div>
+                </div>
+
               </div>
-
             </div>
 
-            <!-- Footer Status -->
-            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-[#2a2a2a] select-none">
-              <span id="app-footer-msg">Standby. Awaiting user directory.</span>
-              <span class="text-slate-600">Windows 11 Fluent Engine • 100% Offline</span>
-            </div>
+          </div>
 
+          <!-- Footer Bar -->
+          <div class="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-[#2a2a2a] select-none">
+            <span id="wf-footer-msg">Standby. Awaiting user directory.</span>
+            <span class="text-slate-600">Windows 11 Fluent Engine • 100% Offline</span>
           </div>
 
         </div>
+
       </div>
 
-      <!-- Bottom Step Scrub Navigator (Clickable anytime) -->
-      <div class="max-w-4xl mx-auto w-full pt-1">
-        <div class="grid grid-cols-4 gap-2 text-center text-xs font-mono">
-          <button onclick="jumpToWalkthroughStep(1)" class="p-2 rounded-lg bg-surface-card border border-surface-border hover:border-sky-500/40 text-left transition">
-            <div class="text-[10px] text-slate-500 font-bold">PHASE 01</div>
-            <div class="text-slate-300 font-semibold truncate text-[11px]">Empty UI</div>
-          </button>
-          <button onclick="jumpToWalkthroughStep(2)" class="p-2 rounded-lg bg-surface-card border border-surface-border hover:border-sky-500/40 text-left transition">
-            <div class="text-[10px] text-slate-500 font-bold">PHASE 02</div>
-            <div class="text-slate-300 font-semibold truncate text-[11px]">Select Folder</div>
-          </button>
-          <button onclick="jumpToWalkthroughStep(3)" class="p-2 rounded-lg bg-surface-card border border-surface-border hover:border-sky-500/40 text-left transition">
-            <div class="text-[10px] text-slate-500 font-bold">PHASE 03</div>
-            <div class="text-slate-300 font-semibold truncate text-[11px]">Inspect Content</div>
-          </button>
-          <button onclick="jumpToWalkthroughStep(4)" class="p-2 rounded-lg bg-surface-card border border-surface-border hover:border-sky-500/40 text-left transition">
-            <div class="text-[10px] text-slate-500 font-bold">PHASE 04</div>
-            <div class="text-slate-300 font-semibold truncate text-[11px]">Organize & Undo</div>
-          </button>
+      <!-- Step Navigation Buttons -->
+      <div class="flex items-center justify-between pt-1">
+        <div class="flex items-center space-x-2">
+          <button onclick="setWorkflowStep(1)" id="wf-step-btn-1" class="px-3 py-1 text-xs font-mono rounded bg-sky-600 text-white font-semibold shadow-sm transition">1. Empty</button>
+          <button onclick="setWorkflowStep(2)" id="wf-step-btn-2" class="px-3 py-1 text-xs font-mono rounded bg-surface-card hover:bg-slate-800 text-slate-400 border border-surface-border transition">2. Select</button>
+          <button onclick="setWorkflowStep(3)" id="wf-step-btn-3" class="px-3 py-1 text-xs font-mono rounded bg-surface-card hover:bg-slate-800 text-slate-400 border border-surface-border transition">3. Sift</button>
+          <button onclick="setWorkflowStep(4)" id="wf-step-btn-4" class="px-3 py-1 text-xs font-mono rounded bg-surface-card hover:bg-slate-800 text-slate-400 border border-surface-border transition">4. Organize</button>
+        </div>
+        <div class="text-[11px] text-slate-500 flex items-center space-x-2">
+          <span>Scroll wheel to step through</span>
+          <span class="text-sky-400">↓</span>
         </div>
       </div>
 
@@ -423,12 +448,12 @@
   </section>
 
   <!-- ========================================================================= -->
-  <!-- 4 FRIENDLY REASONS TO USE BYTESIFT (NO TECH JARGON)                       -->
+  <!-- SCENE 2: WHY BYTESIFT (4 CLEAR BENEFITS REVEALED IN PLACE)                -->
   <!-- ========================================================================= -->
-  <section id="why-bytesift" class="py-24 px-6 border-t border-surface-border bg-surface-base">
-    <div class="max-w-5xl mx-auto space-y-12">
+  <section id="scene-2" class="scene-viewport">
+    <div class="max-w-5xl w-full mx-auto space-y-8">
       
-      <div class="text-center space-y-3">
+      <div class="text-center space-y-2">
         <h2 class="text-xs font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 px-3 py-1 rounded-full inline-block border border-sky-500/20">
           Built For Everyone
         </h2>
@@ -440,66 +465,73 @@
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid md:grid-cols-2 gap-5">
         
         <!-- Card 1 -->
-        <div class="p-7 rounded-2xl bg-surface-card border border-surface-border space-y-3 hover:border-sky-500/30 transition">
-          <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold text-lg">
+        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-2.5 hover:border-sky-500/30 transition">
+          <div class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold text-base">
             🔍
           </div>
-          <h4 class="text-lg font-bold text-white">Looks inside files, not just their names</h4>
-          <p class="text-sm text-slate-400 leading-relaxed">
-            Ever had a file called <code class="text-xs bg-[#162033] text-sky-300 px-1.5 py-0.5 rounded border border-slate-700">download_921.tmp</code> or without any extension? ByteSift inspects the true content inside so invoices, pictures, and notes always end up where they belong.
+          <h4 class="text-base font-bold text-white">Looks inside files, not just their names</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Ever had a file called <code class="bg-[#162033] text-sky-300 px-1 py-0.5 rounded border border-slate-700">download_921.tmp</code> or without any extension? ByteSift inspects the true content inside so invoices, pictures, and notes always end up where they belong.
           </p>
         </div>
 
         <!-- Card 2 -->
-        <div class="p-7 rounded-2xl bg-surface-card border border-surface-border space-y-3 hover:border-sky-500/30 transition">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-lg">
+        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-2.5 hover:border-sky-500/30 transition">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-base">
             🗑️
           </div>
-          <h4 class="text-lg font-bold text-white">Finds annoying duplicate downloads</h4>
-          <p class="text-sm text-slate-400 leading-relaxed">
-            Accidentally downloaded the same ticket or photo 4 times? ByteSift checks whether files are truly identical and groups copies into a separate <code class="text-xs bg-[#162033] text-amber-300 px-1.5 py-0.5 rounded border border-slate-700">Duplicates/</code> folder so you can free up space.
+          <h4 class="text-base font-bold text-white">Finds annoying duplicate downloads</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Accidentally downloaded the same ticket or photo 4 times? ByteSift checks whether files are truly identical and groups copies into a separate <code class="bg-[#162033] text-amber-300 px-1 py-0.5 rounded border border-slate-700">Duplicates/</code> folder so you can free up space.
           </p>
         </div>
 
         <!-- Card 3 -->
-        <div class="p-7 rounded-2xl bg-surface-card border border-surface-border space-y-3 hover:border-sky-500/30 transition">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-lg">
+        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-2.5 hover:border-sky-500/30 transition">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-base">
             ↩️
           </div>
-          <h4 class="text-lg font-bold text-white">One-click Undo (Press Ctrl+Z)</h4>
-          <p class="text-sm text-slate-400 leading-relaxed">
-            Never worry about losing a file. ByteSift never deletes or overwrites anything. If you do not like how a folder was sorted, simply press <kbd class="text-xs bg-[#162033] text-white px-2 py-0.5 rounded border border-slate-700 font-mono">Ctrl+Z</kbd> (or ⌘Z on Mac) to put every file right back.
+          <h4 class="text-base font-bold text-white">One-click Undo (Press Ctrl+Z)</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Never worry about losing a file. ByteSift never deletes or overwrites anything. If you do not like how a folder was sorted, simply press <kbd class="bg-[#162033] text-white px-1.5 py-0.5 rounded border border-slate-700 font-mono">Ctrl+Z</kbd> (or ⌘Z on Mac) to put every file right back.
           </p>
         </div>
 
         <!-- Card 4 -->
-        <div class="p-7 rounded-2xl bg-surface-card border border-surface-border space-y-3 hover:border-sky-500/30 transition">
-          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold text-lg">
+        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-2.5 hover:border-sky-500/30 transition">
+          <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold text-base">
             🔒
           </div>
-          <h4 class="text-lg font-bold text-white">100% Private (No cloud, no accounts)</h4>
-          <p class="text-sm text-slate-400 leading-relaxed">
+          <h4 class="text-base font-bold text-white">100% Private (No cloud, no accounts)</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
             Your personal files stay strictly on your computer. ByteSift runs entirely in local memory without an internet connection, without AI hallucinations, and with zero tracking.
           </p>
         </div>
 
       </div>
 
+      <div class="text-center pt-2">
+        <button onclick="goToScene(3)" class="text-xs font-semibold text-sky-400 hover:text-sky-300 inline-flex items-center space-x-1">
+          <span>Ready to download? Scroll or click here</span>
+          <span>→</span>
+        </button>
+      </div>
+
     </div>
   </section>
 
   <!-- ========================================================================= -->
-  <!-- DOWNLOAD HUB: CLEAN & SEPARATED FROM DEVELOPER/CLI CODE                   -->
+  <!-- SCENE 3: DOWNLOAD HUB & DEVELOPER DOCS (REVEALED IN PLACE)                -->
   <!-- ========================================================================= -->
-  <section id="download" class="py-24 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base to-[#0b101c]">
-    <div class="max-w-4xl mx-auto space-y-10">
+  <section id="scene-3" class="scene-viewport overflow-y-auto no-scrollbar">
+    <div class="max-w-4xl w-full mx-auto space-y-8 my-auto py-6">
       
-      <div class="text-center space-y-3">
+      <div class="text-center space-y-2">
         <h2 class="text-xs font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 px-3 py-1 rounded-full inline-block border border-sky-500/20">
-          Get Started
+          Get Started Free
         </h2>
         <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
           Download ByteSift for your PC or Mac.
@@ -510,118 +542,92 @@
       </div>
 
       <!-- Main Download Cards (Clean, User-Friendly) -->
-      <div class="grid sm:grid-cols-2 gap-6">
+      <div class="grid sm:grid-cols-2 gap-5">
         
         <!-- Windows Download Card -->
-        <div class="p-8 rounded-2xl bg-surface-card border border-surface-border space-y-5 text-center flex flex-col justify-between hover:border-sky-500/40 transition">
-          <div class="space-y-3">
-            <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.799"/></svg>
+        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-4 text-center flex flex-col justify-between hover:border-sky-500/40 transition">
+          <div class="space-y-2">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.799"/></svg>
             </div>
-            <h4 class="text-xl font-bold text-white">Windows 10 / 11</h4>
+            <h4 class="text-lg font-bold text-white">Windows 10 / 11</h4>
             <p class="text-xs text-slate-400">Standalone application. Just download and double-click to run.</p>
           </div>
 
-          <div class="space-y-2 pt-4">
-            <a href="https://github.com/PramudithaN/bytesift/releases" class="w-full py-3.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm shadow-md shadow-sky-600/25 transition flex items-center justify-center space-x-2">
+          <div class="space-y-2 pt-2">
+            <a href="https://github.com/PramudithaN/bytesift/releases" class="w-full py-3 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-md shadow-sky-600/25 transition flex items-center justify-center space-x-2">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span>Download for Windows (.exe)</span>
             </a>
-            <div class="text-[11px] text-slate-500">Version 0.1.0 • No installation needed</div>
+            <div class="text-[10px] text-slate-500">Version 0.1.0 • No installation needed</div>
           </div>
         </div>
 
         <!-- macOS Download Card -->
-        <div class="p-8 rounded-2xl bg-surface-card border border-surface-border space-y-5 text-center flex flex-col justify-between hover:border-sky-500/40 transition">
-          <div class="space-y-3">
-            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.67-.82 1.13-1.96.99-3.1-.97.05-2.16.66-2.84 1.46-.61.7-.1.14 1.83 1.01 2.99 1.07-.05 2.18-.62 2.84-1.35"/></svg>
+        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-4 text-center flex flex-col justify-between hover:border-sky-500/40 transition">
+          <div class="space-y-2">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.67-.82 1.13-1.96.99-3.1-.97.05-2.16.66-2.84 1.46-.61.7-.1.14 1.83 1.01 2.99 1.07-.05 2.18-.62 2.84-1.35"/></svg>
             </div>
-            <h4 class="text-xl font-bold text-white">macOS</h4>
+            <h4 class="text-lg font-bold text-white">macOS</h4>
             <p class="text-xs text-slate-400">Universal package for Apple Silicon (M1-M4) & Intel Macs.</p>
           </div>
 
-          <div class="space-y-2 pt-4">
-            <a href="https://github.com/PramudithaN/bytesift/releases" class="w-full py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center space-x-2">
+          <div class="space-y-2 pt-2">
+            <a href="https://github.com/PramudithaN/bytesift/releases" class="w-full py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span>Download for Mac (.dmg)</span>
             </a>
-            <div class="text-[11px] text-slate-500">Apple Aqua HIG Compliant</div>
+            <div class="text-[10px] text-slate-500">Apple Aqua HIG Compliant</div>
           </div>
         </div>
 
       </div>
 
-    </div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SEPARATE DOCUMENTATION & CLI SECTION (FOR DEVELOPERS ONLY)                -->
-  <!-- ========================================================================= -->
-  <section id="developers" class="py-16 px-6 border-t border-surface-border bg-surface-base">
-    <div class="max-w-4xl mx-auto space-y-6">
-      
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-border pb-4">
-        <div>
-          <h4 class="font-bold text-white text-base">Developer Documentation & CLI</h4>
-          <p class="text-xs text-slate-400">Advanced terminal commands and Python standard library package details.</p>
+      <!-- Developer Documentation & CLI Card -->
+      <div class="p-5 rounded-2xl bg-surface-card border border-surface-border space-y-3">
+        <div class="flex items-center justify-between border-b border-surface-border pb-2.5">
+          <div>
+            <h4 class="font-bold text-white text-xs">Developer Documentation & CLI</h4>
+            <p class="text-[11px] text-slate-400">Run directly from terminal using pure Python standard library.</p>
+          </div>
+          <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-sky-400 hover:text-sky-300 flex items-center space-x-1">
+            <span>GitHub Repository</span>
+            <span>→</span>
+          </a>
         </div>
-        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-sky-400 hover:text-sky-300 flex items-center space-x-1">
-          <span>View GitHub README</span>
-          <span>→</span>
-        </a>
+
+        <div class="grid sm:grid-cols-2 gap-3 text-xs font-mono">
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 space-y-1">
+            <div class="text-slate-500 text-[10px] font-sans">Run Desktop App:</div>
+            <div class="text-sky-400">git clone https://github.com/PramudithaN/bytesift.git</div>
+            <div class="text-emerald-400">python -m bytesift.cli gui</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 space-y-1">
+            <div class="text-slate-500 text-[10px] font-sans">Terminal Dry-Run Scan:</div>
+            <div class="text-sky-400">python -m bytesift.cli scan ./Downloads</div>
+            <div class="text-emerald-400">python -m bytesift.cli organize ./Downloads</div>
+          </div>
+        </div>
       </div>
 
-      <div class="grid sm:grid-cols-2 gap-4 text-xs font-mono">
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 space-y-2">
-          <div class="text-slate-400 text-[11px] font-sans font-semibold">1. Clone & Run from Terminal:</div>
-          <div class="text-sky-400">git clone https://github.com/PramudithaN/bytesift.git</div>
-          <div class="text-slate-400">cd bytesift</div>
-          <div class="text-emerald-400">python -m bytesift.cli gui</div>
-        </div>
-
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 space-y-2">
-          <div class="text-slate-400 text-[11px] font-sans font-semibold">2. Command-Line Dry Run:</div>
-          <div class="text-slate-500"># Preview movements without touching files</div>
-          <div class="text-sky-400">python -m bytesift.cli scan ./Downloads</div>
-          <div class="text-emerald-400">python -m bytesift.cli organize ./Downloads</div>
-        </div>
+      <!-- Simple Footer inside scene -->
+      <div class="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-surface-border">
+        <span>ByteSift • MIT License</span>
+        <button onclick="goToScene(0)" class="text-sky-400 hover:text-sky-300">Back to Top ↑</button>
       </div>
 
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="border-t border-surface-border py-10 px-6 bg-surface-base text-slate-500 text-xs">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      
-      <div class="flex items-center space-x-2">
-        <div class="w-5 h-5 rounded bg-sky-600 flex items-center justify-center text-white font-bold text-[10px]">
-          B
-        </div>
-        <span class="font-bold text-slate-300">ByteSift</span>
-        <span>•</span>
-        <span>Free Open Source Software (MIT License)</span>
-      </div>
-
-      <div class="flex items-center space-x-6">
-        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">GitHub</a>
-        <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">Releases</a>
-        <a href="https://github.com/PramudithaN/bytesift/issues" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">Report an Issue</a>
-        <a href="https://github.com/PramudithaN/bytesift/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">License</a>
-      </div>
-
-    </div>
-  </footer>
-
   <!-- ========================================================================= -->
-  <!-- JAVASCRIPT: HERO LETTER ORGANIZER & PINNED SCROLL CONTROLLER              -->
+  <!-- JAVASCRIPT: LANDO NORRIS FULL-SCREEN REVEAL CONTROLLER                    -->
   <!-- ========================================================================= -->
   <script>
     // -----------------------------------------------------------------
     // 1. DISORGANIZED-TO-ORGANIZED HERO LETTERS ANIMATION
     // -----------------------------------------------------------------
-    function setupScatteredHeadline(containerId, text, isGradient) {
+    function setupScatteredHeadline(containerId, text) {
       const container = document.getElementById(containerId);
       if (!container) return;
 
@@ -662,10 +668,9 @@
     }
 
     function animateHeadlineIntoOrder() {
-      setupScatteredHeadline("anim-headline-line1", "Clean up your messy folders", false);
-      setupScatteredHeadline("anim-headline-line2", "in just one click.", true);
+      setupScatteredHeadline("anim-headline-line1", "Clean up your messy folders");
+      setupScatteredHeadline("anim-headline-line2", "in just one click.");
 
-      // Trigger organized snapping with staggered physics
       setTimeout(() => {
         const allLetters = document.querySelectorAll(".organizing-letter");
         allLetters.forEach((letter, index) => {
@@ -673,250 +678,350 @@
             letter.style.transform = "translate(0px, 0px) rotate(0deg)";
             letter.style.opacity = "1";
             letter.style.filter = "blur(0px)";
-          }, index * 24); // Stagger by 24ms per letter
+          }, index * 24);
         });
       }, 120);
     }
 
     // -----------------------------------------------------------------
-    // 2. TOP GLOBAL PROGRESS LINE
+    // 2. FULL-SCREEN SCENE REVEAL ENGINE (NEVER SCROLLS DOWN TRADITIONALLY)
     // -----------------------------------------------------------------
-    window.addEventListener('scroll', () => {
-      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      document.getElementById('global-progress').style.width = scrolled + '%';
+    let currentSceneIndex = 0;
+    let currentWorkflowStep = 1;
+    let isTransitioning = false;
+    const totalScenes = 4;
+
+    function goToScene(index) {
+      if (index < 0 || index >= totalScenes) return;
+      if (isTransitioning && currentSceneIndex === index) return;
+
+      isTransitioning = true;
+      const previousIndex = currentSceneIndex;
+      currentSceneIndex = index;
+
+      // Update Scene DOM classes
+      for (let i = 0; i < totalScenes; i++) {
+        const sceneEl = document.getElementById(`scene-${i}`);
+        const dotEl = document.getElementById(`dot-${i}`);
+        const navBtn = document.getElementById(`nav-btn-${i}`);
+
+        if (sceneEl) {
+          if (i === index) {
+            sceneEl.classList.remove('past-scene');
+            sceneEl.classList.add('active-scene');
+          } else if (i < index) {
+            sceneEl.classList.remove('active-scene');
+            sceneEl.classList.add('past-scene');
+          } else {
+            sceneEl.classList.remove('active-scene', 'past-scene');
+          }
+        }
+
+        if (dotEl) {
+          const dotCircle = dotEl.querySelector('span:last-child');
+          if (i === index) {
+            dotCircle.className = "w-2.5 h-2.5 rounded-full bg-sky-400 ring-4 ring-sky-500/20 transition-all";
+          } else {
+            dotCircle.className = "w-2 h-2 rounded-full bg-slate-600 group-hover:bg-slate-400 transition-all";
+          }
+        }
+
+        if (navBtn) {
+          if (i === index) {
+            navBtn.className = "text-white transition-colors";
+          } else {
+            navBtn.className = "hover:text-white transition-colors text-slate-400";
+          }
+        }
+      }
+
+      // Reset transition lock
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 650);
+    }
+
+    // -----------------------------------------------------------------
+    // 3. WORKFLOW STEP STATE MACHINE (PHASES 1 TO 4)
+    // -----------------------------------------------------------------
+    const wfBanner = document.getElementById('workflow-banner');
+    const wfStepBadge = document.getElementById('workflow-step-badge');
+    const wfBannerTitle = document.getElementById('workflow-banner-title');
+    const wfBannerDesc = document.getElementById('workflow-banner-desc');
+    const wfCounter = document.getElementById('workflow-phase-counter');
+
+    const wfFolderInput = document.getElementById('wf-folder-input');
+    const wfFolderStatus = document.getElementById('wf-folder-status');
+    const wfFolderBox = document.getElementById('wf-folder-box');
+    const wfBtnBrowse = document.getElementById('wf-btn-browse');
+    const wfBtnOrganize = document.getElementById('wf-btn-organize');
+    const wfBtnUndo = document.getElementById('wf-btn-undo');
+    const wfBadgeCount = document.getElementById('wf-badge-count');
+    const wfFooterMsg = document.getElementById('wf-footer-msg');
+
+    const wfViewEmpty = document.getElementById('wf-view-empty');
+    const wfViewTable = document.getElementById('wf-view-table');
+
+    const wfTarget1 = document.getElementById('wf-target-1');
+    const wfTarget2 = document.getElementById('wf-target-2');
+    const wfTarget3 = document.getElementById('wf-target-3');
+    const wfTarget4 = document.getElementById('wf-target-4');
+    const wfTarget5 = document.getElementById('wf-target-5');
+
+    const wfType1 = document.getElementById('wf-type-1');
+    const wfType2 = document.getElementById('wf-type-2');
+    const wfType3 = document.getElementById('wf-type-3');
+    const wfType4 = document.getElementById('wf-type-4');
+    const wfType5 = document.getElementById('wf-type-5');
+
+    const wfRowDup = document.getElementById('wf-row-dup');
+    const wfDupIcon = document.getElementById('wf-dup-icon');
+
+    function setWorkflowStep(step) {
+      currentWorkflowStep = step;
+      wfCounter.innerText = `Phase ${step} of 4`;
+
+      // Update button highlights
+      [1, 2, 3, 4].forEach(n => {
+        const btn = document.getElementById(`wf-step-btn-${n}`);
+        if (btn) {
+          if (n === step) {
+            btn.className = "px-3 py-1 text-xs font-mono rounded bg-sky-600 text-white font-semibold shadow-sm transition";
+          } else {
+            btn.className = "px-3 py-1 text-xs font-mono rounded bg-surface-card hover:bg-slate-800 text-slate-400 border border-surface-border transition";
+          }
+        }
+      });
+
+      if (step === 1) {
+        // STEP 1: EMPTY
+        wfStepBadge.innerText = "1";
+        wfStepBadge.className = "w-9 h-9 rounded-lg bg-sky-600 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-sky-600/30";
+        wfBannerTitle.innerText = "Step 1: ByteSift opens clean and ready.";
+        wfBannerDesc.innerText = "No files are opened yet. Zero computer memory bloat. Scroll wheel to choose a folder.";
+
+        wfFolderInput.value = "";
+        wfFolderStatus.innerText = "None selected yet";
+        wfFolderStatus.className = "text-slate-500 font-normal";
+        wfFolderBox.className = "p-2.5 rounded-xl bg-[#222222] border border-[#333333] space-y-1 transition-all";
+        wfBtnBrowse.className = "px-3 py-1 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-lg border border-[#444444] transition flex items-center justify-center space-x-1.5";
+
+        wfBtnOrganize.className = "px-3.5 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 cursor-not-allowed";
+        wfBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-lg border border-[#353535] transition-all flex items-center space-x-1.5";
+        wfBadgeCount.innerText = "0 files";
+
+        wfViewEmpty.style.opacity = "1";
+        wfViewEmpty.style.pointerEvents = "auto";
+        wfViewTable.style.opacity = "0";
+
+        wfFooterMsg.innerText = "Standby. Awaiting user directory.";
+
+      } else if (step === 2) {
+        // STEP 2: SELECT FOLDER
+        wfStepBadge.innerText = "2";
+        wfStepBadge.className = "w-9 h-9 rounded-lg bg-indigo-600 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-indigo-600/30";
+        wfBannerTitle.innerText = "Step 2: You pick a messy folder (e.g. Downloads).";
+        wfBannerDesc.innerText = "Click 'Browse Folder'. ByteSift immediately discovers the files without altering anything.";
+
+        wfFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
+        wfFolderStatus.innerText = "✓ Downloads Folder Selected";
+        wfFolderStatus.className = "text-sky-400 font-semibold";
+        wfFolderBox.className = "p-2.5 rounded-xl bg-sky-950/20 border border-sky-500/30 space-y-1 transition-all";
+        wfBtnBrowse.className = "px-3 py-1 bg-sky-600 text-white text-xs font-semibold rounded-lg border border-sky-500 shadow-sm transition flex items-center justify-center space-x-1.5";
+
+        wfBtnOrganize.className = "px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 shadow-sm";
+        wfBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-lg border border-[#353535] transition-all flex items-center space-x-1.5";
+        wfBadgeCount.innerText = "5 files found";
+
+        wfViewEmpty.style.opacity = "0";
+        wfViewEmpty.style.pointerEvents = "none";
+        wfViewTable.style.opacity = "1";
+
+        wfTarget1.innerText = "Scanning bytes..."; wfType1.innerText = "Reading...";
+        wfTarget2.innerText = "Scanning bytes..."; wfType2.innerText = "Reading...";
+        wfTarget3.innerText = "Scanning bytes..."; wfType3.innerText = "Reading...";
+        wfTarget4.innerText = "Scanning bytes..."; wfType4.innerText = "Reading...";
+        wfTarget5.innerText = "Scanning bytes..."; wfType5.innerText = "Reading...";
+
+        wfTarget1.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        wfTarget2.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        wfTarget3.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        wfTarget4.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+        wfTarget5.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
+
+        wfRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center transition";
+        wfDupIcon.innerText = "🖼️";
+
+        wfFooterMsg.innerText = "5 files loaded. Ready to inspect.";
+
+      } else if (step === 3) {
+        // STEP 3: SIFT
+        wfStepBadge.innerText = "3";
+        wfStepBadge.className = "w-9 h-9 rounded-lg bg-amber-500 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-amber-500/30";
+        wfBannerTitle.innerText = "Step 3: ByteSift checks what each file actually is.";
+        wfBannerDesc.innerText = "Invoices, photos, and resumes are recognized. Exact duplicates are highlighted in yellow!";
+
+        wfFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
+        wfFolderStatus.innerText = "✓ Analysis Complete (1 duplicate found)";
+        wfFolderStatus.className = "text-amber-400 font-semibold";
+        wfFolderBox.className = "p-2.5 rounded-xl bg-[#222222] border border-[#333333] space-y-1 transition-all";
+        wfBtnBrowse.className = "px-3 py-1 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-lg border border-[#444444] transition flex items-center justify-center space-x-1.5";
+
+        wfBtnOrganize.className = "px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 shadow-lg shadow-sky-600/30 animate-pulse";
+        wfBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-lg border border-[#353535] transition-all flex items-center space-x-1.5";
+        wfBadgeCount.innerText = "5 items ready";
+
+        wfViewEmpty.style.opacity = "0";
+        wfViewTable.style.opacity = "1";
+
+        wfTarget1.innerText = "Documents/Invoices"; wfType1.innerText = "Invoice / Receipt";
+        wfTarget2.innerText = "Images/Photos"; wfType2.innerText = "Photo File";
+        wfTarget3.innerText = "Documents/Resumes"; wfType3.innerText = "Resume / CV";
+        wfTarget4.innerText = "Duplicates Folder"; wfType4.innerText = "Exact Duplicate";
+        wfTarget5.innerText = "Code/Python"; wfType5.innerText = "Python Script";
+
+        wfTarget1.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
+        wfTarget2.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
+        wfTarget3.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
+        wfTarget4.className = "col-span-3 pl-3 truncate font-sans text-amber-300 font-bold";
+        wfTarget5.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
+
+        wfRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-[#352604] text-amber-300 border-l-2 border-amber-500 transition";
+        wfDupIcon.innerText = "⚠️";
+
+        wfFooterMsg.innerText = "Inspection done in 0.04s. Click 'Organize Files' to sort them.";
+
+      } else if (step === 4) {
+        // STEP 4: ORGANIZE & UNDO
+        wfStepBadge.innerText = "4";
+        wfStepBadge.className = "w-9 h-9 rounded-lg bg-emerald-600 text-white font-bold text-sm flex-shrink-0 flex items-center justify-center shadow-md shadow-emerald-600/30";
+        wfBannerTitle.innerText = "Step 4: All files neatly organized. Undo anytime!";
+        wfBannerDesc.innerText = "Everything is now sorted into neat folders. Hit Ctrl+Z if you ever want to revert back!";
+
+        wfFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
+        wfFolderStatus.innerText = "✓ 5 Files Successfully Organized";
+        wfFolderStatus.className = "text-emerald-400 font-bold";
+        wfFolderBox.className = "p-2.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-1 transition-all";
+
+        wfBtnOrganize.className = "px-3.5 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 shadow-sm";
+        wfBtnUndo.className = "px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-sky-600/30 transition-all flex items-center space-x-1.5 animate-bounce";
+        wfBadgeCount.innerText = "5/5 sorted";
+
+        wfViewEmpty.style.opacity = "0";
+        wfViewTable.style.opacity = "1";
+
+        wfTarget1.innerText = "✓ Moved to Invoices"; wfType1.innerText = "Done";
+        wfTarget2.innerText = "✓ Moved to Photos"; wfType2.innerText = "Done";
+        wfTarget3.innerText = "✓ Moved to Resumes"; wfType3.innerText = "Done";
+        wfTarget4.innerText = "✓ Moved to Duplicates"; wfType4.innerText = "Isolated";
+        wfTarget5.innerText = "✓ Moved to Code"; wfType5.innerText = "Done";
+
+        wfTarget1.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
+        wfTarget2.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
+        wfTarget3.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
+        wfTarget4.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
+        wfTarget5.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
+
+        wfRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-emerald-950/30 text-emerald-300 border-l-2 border-emerald-500 transition";
+        wfDupIcon.innerText = "✓";
+
+        wfFooterMsg.innerText = "All files sorted safely. Press Ctrl+Z to undo anytime.";
+      }
+    }
+
+    // -----------------------------------------------------------------
+    // 4. SCROLL WHEEL & GESTURE REVEAL DISPATCHER
+    // -----------------------------------------------------------------
+    let wheelAccumulator = 0;
+    const WHEEL_THRESHOLD = 50;
+
+    function advanceToNextStep() {
+      if (currentSceneIndex === 0) {
+        goToScene(1);
+        setWorkflowStep(1);
+      } else if (currentSceneIndex === 1) {
+        if (currentWorkflowStep < 4) {
+          setWorkflowStep(currentWorkflowStep + 1);
+        } else {
+          goToScene(2);
+        }
+      } else if (currentSceneIndex === 2) {
+        goToScene(3);
+      }
+    }
+
+    function retreatToPreviousStep() {
+      if (currentSceneIndex === 3) {
+        goToScene(2);
+      } else if (currentSceneIndex === 2) {
+        goToScene(1);
+        setWorkflowStep(4);
+      } else if (currentSceneIndex === 1) {
+        if (currentWorkflowStep > 1) {
+          setWorkflowStep(currentWorkflowStep - 1);
+        } else {
+          goToScene(0);
+        }
+      }
+    }
+
+    window.addEventListener('wheel', (e) => {
+      // If user is inside the scrollable downloads container on Scene 3, allow normal inner scroll
+      if (currentSceneIndex === 3 && e.target.closest('#scene-3')) {
+        const sc3 = document.getElementById('scene-3');
+        if (e.deltaY < 0 && sc3.scrollTop === 0) {
+          retreatToPreviousStep();
+        }
+        return;
+      }
+
+      e.preventDefault();
+      wheelAccumulator += e.deltaY;
+
+      if (Math.abs(wheelAccumulator) > WHEEL_THRESHOLD) {
+        if (wheelAccumulator > 0) {
+          advanceToNextStep();
+        } else {
+          retreatToPreviousStep();
+        }
+        wheelAccumulator = 0;
+      }
+    }, { passive: false });
+
+    // Keyboard navigation (Arrow keys / PageUp / PageDown)
+    window.addEventListener('keydown', (e) => {
+      if (['ArrowDown', 'PageDown', ' '].includes(e.key)) {
+        e.preventDefault();
+        advanceToNextStep();
+      } else if (['ArrowUp', 'PageUp'].includes(e.key)) {
+        e.preventDefault();
+        retreatToPreviousStep();
+      }
+    });
+
+    // Mobile / Touch swipe support
+    let touchStartY = 0;
+    window.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
     }, { passive: true });
 
-    // -----------------------------------------------------------------
-    // 3. PINNED STICKY WALKTHROUGH CONTROLLER
-    // -----------------------------------------------------------------
-    const track = document.getElementById('how-it-works-track');
-
-    const bannerNumber = document.getElementById('step-badge-number');
-    const bannerTitle = document.getElementById('step-banner-title');
-    const bannerDesc = document.getElementById('step-banner-desc');
-    const progressBadge = document.getElementById('scroll-percentage-badge');
-
-    const folderInput = document.getElementById('app-folder-input');
-    const folderStatus = document.getElementById('app-folder-status');
-    const folderBox = document.getElementById('app-folder-box');
-    const btnBrowse = document.getElementById('app-btn-browse');
-    const btnOrganize = document.getElementById('app-btn-organize');
-    const btnUndo = document.getElementById('app-btn-undo');
-    const badgeCount = document.getElementById('app-badge-count');
-    const footerMsg = document.getElementById('app-footer-msg');
-
-    const viewEmpty = document.getElementById('app-view-empty');
-    const viewTable = document.getElementById('app-view-table');
-
-    const rowTarget1 = document.getElementById('row-target-1');
-    const rowTarget2 = document.getElementById('row-target-2');
-    const rowTarget3 = document.getElementById('row-target-3');
-    const rowTarget4 = document.getElementById('row-target-4');
-    const rowTarget5 = document.getElementById('row-target-5');
-
-    const rowType1 = document.getElementById('row-type-1');
-    const rowType2 = document.getElementById('row-type-2');
-    const rowType3 = document.getElementById('row-type-3');
-    const rowType4 = document.getElementById('row-type-4');
-    const rowType5 = document.getElementById('row-type-5');
-
-    const rowDup = document.getElementById('row-dup-wrapper');
-    const dupIcon = document.getElementById('dup-icon-tag');
-
-    let currentWalkthroughPhase = 1;
-
-    function renderWalkthroughPhase(phase) {
-      if (currentWalkthroughPhase === phase) return;
-      currentWalkthroughPhase = phase;
-
-      progressBadge.innerText = `Phase ${phase} of 4`;
-
-      if (phase === 1) {
-        // PHASE 1: EMPTY WINDOW
-        bannerNumber.innerText = "1";
-        bannerNumber.className = "w-10 h-10 rounded-lg bg-sky-600 text-white font-bold text-base flex-shrink-0 flex items-center justify-center shadow-md shadow-sky-600/30";
-        bannerTitle.innerText = "Step 1: ByteSift opens clean and ready.";
-        bannerDesc.innerText = "No files are opened yet. Zero computer memory bloat. Scroll down to choose a folder.";
-
-        folderInput.value = "";
-        folderStatus.innerText = "None selected yet";
-        folderStatus.className = "text-slate-500 font-normal";
-        folderBox.className = "p-3 rounded-xl bg-[#222222] border border-[#333333] space-y-1.5 transition-all";
-        btnBrowse.className = "px-3.5 py-1.5 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-lg border border-[#444444] transition flex items-center justify-center space-x-1.5";
-
-        btnOrganize.className = "px-4 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 cursor-not-allowed";
-        btnUndo.className = "px-3.5 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-lg border border-[#353535] transition-all flex items-center space-x-1.5";
-        badgeCount.innerText = "0 files";
-
-        viewEmpty.style.opacity = "1";
-        viewEmpty.style.pointerEvents = "auto";
-        viewTable.style.opacity = "0";
-
-        footerMsg.innerText = "Standby. Awaiting user directory.";
-
-      } else if (phase === 2) {
-        // PHASE 2: FOLDER CHOSEN
-        bannerNumber.innerText = "2";
-        bannerNumber.className = "w-10 h-10 rounded-lg bg-indigo-600 text-white font-bold text-base flex-shrink-0 flex items-center justify-center shadow-md shadow-indigo-600/30";
-        bannerTitle.innerText = "Step 2: You pick a messy folder (e.g. Downloads).";
-        bannerDesc.innerText = "Click 'Browse Folder'. ByteSift immediately discovers the files without altering anything.";
-
-        folderInput.value = "C:\\Users\\Pramuditha\\Downloads";
-        folderStatus.innerText = "✓ Downloads Folder Selected";
-        folderStatus.className = "text-sky-400 font-semibold";
-        folderBox.className = "p-3 rounded-xl bg-sky-950/20 border border-sky-500/30 space-y-1.5 transition-all";
-        btnBrowse.className = "px-3.5 py-1.5 bg-sky-600 text-white text-xs font-semibold rounded-lg border border-sky-500 shadow-sm transition flex items-center justify-center space-x-1.5";
-
-        btnOrganize.className = "px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 shadow-sm";
-        btnUndo.className = "px-3.5 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-lg border border-[#353535] transition-all flex items-center space-x-1.5";
-        badgeCount.innerText = "5 files found";
-
-        viewEmpty.style.opacity = "0";
-        viewEmpty.style.pointerEvents = "none";
-        viewTable.style.opacity = "1";
-
-        rowTarget1.innerText = "Scanning bytes..."; rowType1.innerText = "Reading...";
-        rowTarget2.innerText = "Scanning bytes..."; rowType2.innerText = "Reading...";
-        rowTarget3.innerText = "Scanning bytes..."; rowType3.innerText = "Reading...";
-        rowTarget4.innerText = "Scanning bytes..."; rowType4.innerText = "Reading...";
-        rowTarget5.innerText = "Scanning bytes..."; rowType5.innerText = "Reading...";
-
-        rowTarget1.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-        rowTarget2.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-        rowTarget3.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-        rowTarget4.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-        rowTarget5.className = "col-span-3 pl-3 truncate font-sans text-slate-500";
-
-        rowDup.className = "grid grid-cols-12 px-3.5 py-2 items-center transition";
-        dupIcon.innerText = "🖼️";
-
-        footerMsg.innerText = "5 files loaded. Ready to inspect.";
-
-      } else if (phase === 3) {
-        // PHASE 3: INSPECTED & DUPLICATE IDENTIFIED
-        bannerNumber.innerText = "3";
-        bannerNumber.className = "w-10 h-10 rounded-lg bg-amber-500 text-white font-bold text-base flex-shrink-0 flex items-center justify-center shadow-md shadow-amber-500/30";
-        bannerTitle.innerText = "Step 3: ByteSift checks what each file actually is.";
-        bannerDesc.innerText = "Invoices, photos, and resumes are recognized. Exact duplicates are highlighted in yellow!";
-
-        folderInput.value = "C:\\Users\\Pramuditha\\Downloads";
-        folderStatus.innerText = "✓ Analysis Complete (1 duplicate found)";
-        folderStatus.className = "text-amber-400 font-semibold";
-        folderBox.className = "p-3 rounded-xl bg-[#222222] border border-[#333333] space-y-1.5 transition-all";
-        btnBrowse.className = "px-3.5 py-1.5 bg-[#2d2d2d] hover:bg-[#383838] text-white text-xs font-semibold rounded-lg border border-[#444444] transition flex items-center justify-center space-x-1.5";
-
-        btnOrganize.className = "px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 shadow-lg shadow-sky-600/30 animate-pulse";
-        btnUndo.className = "px-3.5 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-lg border border-[#353535] transition-all flex items-center space-x-1.5";
-        badgeCount.innerText = "5 items ready";
-
-        viewEmpty.style.opacity = "0";
-        viewTable.style.opacity = "1";
-
-        rowTarget1.innerText = "Documents/Invoices"; rowType1.innerText = "Invoice / Receipt";
-        rowTarget2.innerText = "Images/Photos"; rowType2.innerText = "Photo File";
-        rowTarget3.innerText = "Documents/Resumes"; rowType3.innerText = "Resume / CV";
-        rowTarget4.innerText = "Duplicates Folder"; rowType4.innerText = "Exact Duplicate";
-        rowTarget5.innerText = "Code/Python"; rowType5.innerText = "Python Script";
-
-        rowTarget1.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
-        rowTarget2.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
-        rowTarget3.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
-        rowTarget4.className = "col-span-3 pl-3 truncate font-sans text-amber-300 font-bold";
-        rowTarget5.className = "col-span-3 pl-3 truncate font-sans text-slate-200 font-medium";
-
-        rowDup.className = "grid grid-cols-12 px-3.5 py-2 items-center bg-[#352604] text-amber-300 border-l-2 border-amber-500 transition";
-        dupIcon.innerText = "⚠️";
-
-        footerMsg.innerText = "Inspection done in 0.04s. Click 'Organize Files' to sort them.";
-
-      } else if (phase === 4) {
-        // PHASE 4: ORGANIZED & 1-CLICK UNDO ACTIVE
-        bannerNumber.innerText = "4";
-        bannerNumber.className = "w-10 h-10 rounded-lg bg-emerald-600 text-white font-bold text-base flex-shrink-0 flex items-center justify-center shadow-md shadow-emerald-600/30";
-        bannerTitle.innerText = "Step 4: All files neatly organized. Undo anytime!";
-        bannerDesc.innerText = "Everything is now sorted into neat folders. Hit Ctrl+Z if you ever want to revert back!";
-
-        folderInput.value = "C:\\Users\\Pramuditha\\Downloads";
-        folderStatus.innerText = "✓ 5 Files Successfully Organized";
-        folderStatus.className = "text-emerald-400 font-bold";
-        folderBox.className = "p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-1.5 transition-all";
-
-        btnOrganize.className = "px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg transition-all flex items-center space-x-1.5 shadow-sm";
-        btnUndo.className = "px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-sky-600/30 transition-all flex items-center space-x-1.5 animate-bounce";
-        badgeCount.innerText = "5/5 sorted";
-
-        viewEmpty.style.opacity = "0";
-        viewTable.style.opacity = "1";
-
-        rowTarget1.innerText = "✓ Moved to Invoices"; rowType1.innerText = "Done";
-        rowTarget2.innerText = "✓ Moved to Photos"; rowType2.innerText = "Done";
-        rowTarget3.innerText = "✓ Moved to Resumes"; rowType3.innerText = "Done";
-        rowTarget4.innerText = "✓ Moved to Duplicates"; rowType4.innerText = "Isolated";
-        rowTarget5.innerText = "✓ Moved to Code"; rowType5.innerText = "Done";
-
-        rowTarget1.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
-        rowTarget2.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
-        rowTarget3.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
-        rowTarget4.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
-        rowTarget5.className = "col-span-3 pl-3 truncate font-sans text-emerald-400 font-bold";
-
-        rowDup.className = "grid grid-cols-12 px-3.5 py-2 items-center bg-emerald-950/30 text-emerald-300 border-l-2 border-emerald-500 transition";
-        dupIcon.innerText = "✓";
-
-        footerMsg.innerText = "All files sorted safely. Press Ctrl+Z to undo anytime.";
+    window.addEventListener('touchend', (e) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffY = touchStartY - touchEndY;
+      if (Math.abs(diffY) > 40) {
+        if (diffY > 0) {
+          advanceToNextStep();
+        } else {
+          retreatToPreviousStep();
+        }
       }
-    }
+    }, { passive: true });
 
-    // Scroll scrub engine that guarantees all 4 steps play while pinned
-    function updateWalkthroughOnScroll() {
-      if (!track) return;
-
-      const rect = track.getBoundingClientRect();
-      const totalScroll = track.offsetHeight - window.innerHeight;
-      const currentScroll = -rect.top;
-      const progress = Math.min(Math.max(currentScroll / totalScroll, 0), 1);
-
-      // Divide the 360vh runway equally across 4 phases:
-      // 0.00 - 0.25 -> Phase 1
-      // 0.25 - 0.50 -> Phase 2
-      // 0.50 - 0.75 -> Phase 3
-      // 0.75 - 1.00 -> Phase 4
-      if (progress < 0.25) {
-        renderWalkthroughPhase(1);
-      } else if (progress >= 0.25 && progress < 0.50) {
-        renderWalkthroughPhase(2);
-      } else if (progress >= 0.50 && progress < 0.75) {
-        renderWalkthroughPhase(3);
-      } else {
-        renderWalkthroughPhase(4);
-      }
-    }
-
-    function jumpToWalkthroughStep(phase) {
-      if (!track) return;
-      const trackTop = track.offsetTop;
-      const totalScroll = track.offsetHeight - window.innerHeight;
-      
-      let targetProgress = 0.05;
-      if (phase === 2) targetProgress = 0.35;
-      if (phase === 3) targetProgress = 0.62;
-      if (phase === 4) targetProgress = 0.88;
-
-      window.scrollTo({
-        top: trackTop + (totalScroll * targetProgress),
-        behavior: 'smooth'
-      });
-    }
-
-    window.addEventListener('scroll', updateWalkthroughOnScroll, { passive: true });
-    window.addEventListener('resize', updateWalkthroughOnScroll);
-
-    // Run headline animation and setup on page load
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
       animateHeadlineIntoOrder();
-      updateWalkthroughOnScroll();
+      goToScene(0);
+      setWorkflowStep(1);
     });
   </script>
 </body>
