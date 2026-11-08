@@ -81,13 +81,19 @@ class ByteSiftApp:
     def _update_widget_colors(self):
         """Applies dynamic theme colors to custom frames and treeview tags."""
         theme = self.current_theme
-        for card in [self.card_dir, self.card_opts, self.card_table]:
-            card.configure(style="CardContent.TFrame")
 
         # Treeview row styling
         self.tree.tag_configure("even", background=theme.table_bg, foreground=theme.text_primary)
         self.tree.tag_configure("odd", background=theme.table_alt_bg, foreground=theme.text_primary)
         self.tree.tag_configure("duplicate", background=theme.warning_bg, foreground=theme.warning_text)
+
+        # Re-apply tag colors to any existing items in the table
+        for idx, item in enumerate(self.tree.get_children()):
+            values = self.tree.item(item, "values")
+            if len(values) >= 4 and values[3] == "Duplicate":
+                self.tree.item(item, tags=("duplicate",))
+            else:
+                self.tree.item(item, tags=("odd" if idx % 2 == 1 else "even",))
 
         # Force title bar update
         set_windows_titlebar_appearance(self.root, theme.name == "dark")

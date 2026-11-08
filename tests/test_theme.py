@@ -22,5 +22,18 @@ class TestTheme(unittest.TestCase):
         # Should execute safely on any platform
         enable_windows_dpi_awareness()
 
+    def test_apply_fluent_theme(self):
+        import tkinter as tk
+        from bytesift.ui.theme import apply_fluent_theme
+        try:
+            r = tk.Tk()
+            r.withdraw()
+            apply_fluent_theme(r, DARK_THEME)
+            apply_fluent_theme(r, LIGHT_THEME)
+            r.destroy()
+        except tk.TclError:
+            # Headless CI environment without display
+            pass
+
 if __name__ == "__main__":
     unittest.main()
