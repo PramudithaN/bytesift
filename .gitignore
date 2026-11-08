@@ -24,3 +24,8 @@ dist/
 .vscode/
 .idea/
 *.swp
+
+# AI Agent rule & template files (per-repo local generated)
+AGENTS.md
+GEMINI.md
+templates/
