@@ -294,57 +294,259 @@
 
         </div>
 
-        <!-- 10 Scattered File Chips Taking Up The Full Section Canvas -->
+        <!-- 10 Scattered File Chips Taking Up The Full Section Canvas with Real File Previews & Icons -->
         <div id="chips-flight-layer" class="absolute inset-0 pointer-events-none">
           
-          <div id="chip-1" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">PDF</span>
-            <span>invoice_march_2026.pdf</span>
+          <!-- File 1: PDF Document -->
+          <div id="chip-1" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg bg-gradient-to-b from-rose-500/15 to-rose-950/40 border border-rose-500/30 p-1 flex flex-col justify-between shadow-inner">
+              <div class="flex items-center justify-between">
+                <div class="w-3.5 h-3.5 rounded bg-rose-600/90 text-white font-bold text-[8px] flex items-center justify-center">
+                  <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v1h2c.55 0 1-.45 1-1s-.45-1-1-1zm5 2h-1.5v-3h1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+                </div>
+                <div class="w-2 h-2 border-t border-r border-rose-400/60"></div>
+              </div>
+              <div class="space-y-0.5 px-0.5">
+                <div class="h-0.5 w-6 bg-rose-300/50 rounded"></div>
+                <div class="h-0.5 w-4 bg-rose-300/40 rounded"></div>
+                <div class="h-0.5 w-5 bg-rose-300/30 rounded"></div>
+              </div>
+              <div class="text-[7px] font-bold text-rose-400 uppercase tracking-tight text-center">PDF</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">invoice_march_2026.pdf</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold uppercase tracking-wider text-[8px]">PDF</span>
+                <span>1.4 MB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-2" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">IMG</span>
-            <span>photo_beach_9041.heic</span>
+          <!-- File 2: Image Photo -->
+          <div id="chip-2" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg overflow-hidden border border-brand-500/40 bg-slate-950 shadow-inner">
+              <svg class="w-full h-full object-cover" viewBox="0 0 40 44" fill="none">
+                <defs>
+                  <linearGradient id="photoGrad1" x1="0" y1="0" x2="0" y2="44" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#38bdf8"/>
+                    <stop offset="0.5" stop-color="#f59e0b"/>
+                    <stop offset="1" stop-color="#ef4444"/>
+                  </linearGradient>
+                </defs>
+                <rect width="40" height="44" fill="url(#photoGrad1)"/>
+                <circle cx="28" cy="12" r="5" fill="#fef08a" opacity="0.9"/>
+                <path d="M0 34L10 24L22 34L30 26L40 36V44H0V34Z" fill="#0f172a" opacity="0.85"/>
+                <path d="M6 44L18 30L34 44H6Z" fill="#020617"/>
+              </svg>
+              <div class="absolute bottom-0.5 right-0.5 w-3 h-3 rounded bg-black/70 backdrop-blur flex items-center justify-center text-brand-300">
+                <svg class="w-2 h-2 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">photo_beach_9041.heic</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold uppercase tracking-wider text-[8px]">HEIC</span>
+                <span>4.2 MB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-3" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">DOC</span>
-            <span>resume_pramuditha.docx</span>
+          <!-- File 3: Word Document -->
+          <div id="chip-3" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg bg-gradient-to-b from-blue-500/15 to-blue-950/40 border border-blue-500/30 p-1 flex flex-col justify-between shadow-inner">
+              <div class="flex items-center justify-between">
+                <div class="w-3.5 h-3.5 rounded bg-blue-600 text-white font-black text-[7px] flex items-center justify-center">W</div>
+                <div class="w-2 h-2 border-t border-r border-blue-400/60"></div>
+              </div>
+              <div class="space-y-0.5 px-0.5">
+                <div class="h-0.5 w-6 bg-blue-300/50 rounded"></div>
+                <div class="h-0.5 w-4 bg-blue-300/40 rounded"></div>
+                <div class="h-0.5 w-5 bg-blue-300/30 rounded"></div>
+              </div>
+              <div class="text-[7px] font-bold text-blue-400 uppercase tracking-tight text-center">DOCX</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">resume_pramuditha.docx</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold uppercase tracking-wider text-[8px]">DOCX</span>
+                <span>340 KB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-4" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">PY</span>
-            <span>backend_server.py</span>
+          <!-- File 4: Python Code -->
+          <div id="chip-4" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg bg-gradient-to-b from-amber-500/15 to-amber-950/40 border border-amber-500/30 p-1 flex flex-col justify-between shadow-inner">
+              <div class="flex items-center justify-between">
+                <div class="w-3.5 h-3.5 rounded bg-amber-500 text-slate-950 font-black text-[8px] flex items-center justify-center">&lt;/&gt;</div>
+                <div class="w-2 h-2 border-t border-r border-amber-400/60"></div>
+              </div>
+              <div class="space-y-0.5 px-0.5 font-mono text-[6px] text-amber-300/70 leading-none">
+                <div class="h-0.5 w-6 bg-amber-300/50 rounded"></div>
+                <div class="h-0.5 w-3 bg-cyan-300/50 rounded"></div>
+                <div class="h-0.5 w-5 bg-emerald-300/50 rounded"></div>
+              </div>
+              <div class="text-[7px] font-bold text-amber-400 uppercase tracking-tight text-center">PY</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">backend_server.py</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold uppercase tracking-wider text-[8px]">Python</span>
+                <span>24 KB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-5" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">PDF</span>
-            <span>tax_receipt_2026.pdf</span>
+          <!-- File 5: PDF Receipt -->
+          <div id="chip-5" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg bg-gradient-to-b from-rose-500/15 to-rose-950/40 border border-rose-500/30 p-1 flex flex-col justify-between shadow-inner">
+              <div class="flex items-center justify-between">
+                <div class="w-3.5 h-3.5 rounded bg-rose-600/90 text-white font-bold text-[8px] flex items-center justify-center">
+                  <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v1h2c.55 0 1-.45 1-1s-.45-1-1-1zm5 2h-1.5v-3h1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+                </div>
+                <div class="w-2 h-2 border-t border-r border-rose-400/60"></div>
+              </div>
+              <div class="space-y-0.5 px-0.5">
+                <div class="h-0.5 w-6 bg-rose-300/50 rounded"></div>
+                <div class="h-0.5 w-4 bg-rose-300/40 rounded"></div>
+                <div class="h-0.5 w-5 bg-rose-300/30 rounded"></div>
+              </div>
+              <div class="text-[7px] font-bold text-rose-400 uppercase tracking-tight text-center">PDF</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">tax_receipt_2026.pdf</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold uppercase tracking-wider text-[8px]">PDF</span>
+                <span>880 KB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-6" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-accent-500/40 text-xs font-mono text-accent-300 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-accent-500/20 text-accent-400 font-bold">DUP</span>
-            <span>photo_beach_copy.heic</span>
+          <!-- File 6: Exact Duplicate Photo -->
+          <div id="chip-6" class="absolute p-2 rounded-xl bg-slate-900/95 border border-emerald-500/50 shadow-2xl shadow-emerald-500/10 backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg overflow-hidden border border-emerald-500/50 bg-slate-950 shadow-inner">
+              <svg class="w-full h-full object-cover" viewBox="0 0 40 44" fill="none">
+                <rect width="40" height="44" fill="url(#photoGrad1)"/>
+                <circle cx="28" cy="12" r="5" fill="#fef08a" opacity="0.9"/>
+                <path d="M0 34L10 24L22 34L30 26L40 36V44H0V34Z" fill="#0f172a" opacity="0.85"/>
+                <path d="M6 44L18 30L34 44H6Z" fill="#020617"/>
+              </svg>
+              <div class="absolute inset-0 bg-emerald-950/40 backdrop-blur-[1px] flex items-center justify-center">
+                <span class="text-[7px] font-black tracking-widest text-emerald-300 uppercase px-1 py-0.5 rounded bg-emerald-500/30 border border-emerald-400/40">COPY</span>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-emerald-300 truncate">photo_beach_copy.heic</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold uppercase tracking-wider text-[8px]">Duplicate</span>
+                <span>4.2 MB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-7" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">CSV</span>
-            <span>export_data_q1.csv</span>
+          <!-- File 7: CSV Spreadsheet -->
+          <div id="chip-7" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg bg-gradient-to-b from-emerald-500/15 to-emerald-950/40 border border-emerald-500/30 p-1 flex flex-col justify-between shadow-inner">
+              <div class="flex items-center justify-between">
+                <div class="w-3.5 h-3.5 rounded bg-emerald-600 text-white font-bold text-[8px] flex items-center justify-center">
+                  <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm8 16H5v-4h6v4zm0-6H5V9h6v4zm0-6H5V5h6v2zm8 12h-6v-4h6v4zm0-6h-6V9h6v4zm0-6h-6V5h6v2z"/></svg>
+                </div>
+                <div class="w-2 h-2 border-t border-r border-emerald-400/60"></div>
+              </div>
+              <div class="grid grid-cols-2 gap-0.5 px-0.5">
+                <div class="h-0.5 bg-emerald-400/40 rounded-sm"></div>
+                <div class="h-0.5 bg-emerald-400/40 rounded-sm"></div>
+                <div class="h-0.5 bg-emerald-400/30 rounded-sm"></div>
+                <div class="h-0.5 bg-emerald-400/30 rounded-sm"></div>
+              </div>
+              <div class="text-[7px] font-bold text-emerald-400 uppercase tracking-tight text-center">CSV</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">export_data_q1.csv</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold uppercase tracking-wider text-[8px]">CSV</span>
+                <span>850 KB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-8" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">SQL</span>
-            <span>schema_setup.sql</span>
+          <!-- File 8: SQL Script -->
+          <div id="chip-8" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg bg-gradient-to-b from-cyan-500/15 to-cyan-950/40 border border-cyan-500/30 p-1 flex flex-col justify-between shadow-inner">
+              <div class="flex items-center justify-between">
+                <div class="w-3.5 h-3.5 rounded bg-cyan-600 text-white font-bold text-[8px] flex items-center justify-center">
+                  <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 4.02 2 6.5v11C2 19.98 6.48 22 12 22s10-2.02 10-4.5v-11C22 4.02 17.52 2 12 2zm0 2c4.42 0 8 1.34 8 2.5S16.42 9 12 9 4 7.66 4 6.5 7.58 4 12 4zm0 16c-4.42 0-8-1.34-8-2.5v-2.28C5.59 15.77 8.57 16.5 12 16.5s6.41-.73 8-1.78v2.28c0 1.16-3.58 2.5-8 2.5z"/></svg>
+                </div>
+                <div class="w-2 h-2 border-t border-r border-cyan-400/60"></div>
+              </div>
+              <div class="space-y-0.5 px-0.5">
+                <div class="h-0.5 w-6 bg-cyan-300/50 rounded"></div>
+                <div class="h-0.5 w-4 bg-cyan-300/40 rounded"></div>
+                <div class="h-0.5 w-5 bg-cyan-300/30 rounded"></div>
+              </div>
+              <div class="text-[7px] font-bold text-cyan-400 uppercase tracking-tight text-center">SQL</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">schema_setup.sql</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-bold uppercase tracking-wider text-[8px]">SQL</span>
+                <span>48 KB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-9" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">PDF</span>
-            <span>contract_signed.pdf</span>
+          <!-- File 9: PDF Contract -->
+          <div id="chip-9" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg bg-gradient-to-b from-rose-500/15 to-rose-950/40 border border-rose-500/30 p-1 flex flex-col justify-between shadow-inner">
+              <div class="flex items-center justify-between">
+                <div class="w-3.5 h-3.5 rounded bg-rose-600/90 text-white font-bold text-[8px] flex items-center justify-center">
+                  <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v1h2c.55 0 1-.45 1-1s-.45-1-1-1zm5 2h-1.5v-3h1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+                </div>
+                <div class="w-2 h-2 border-t border-r border-rose-400/60"></div>
+              </div>
+              <div class="space-y-0.5 px-0.5">
+                <div class="h-0.5 w-6 bg-rose-300/50 rounded"></div>
+                <div class="h-0.5 w-4 bg-rose-300/40 rounded"></div>
+                <div class="h-0.5 w-5 bg-rose-300/30 rounded"></div>
+              </div>
+              <div class="text-[7px] font-bold text-rose-400 uppercase tracking-tight text-center">PDF</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">contract_signed.pdf</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold uppercase tracking-wider text-[8px]">PDF</span>
+                <span>2.1 MB</span>
+              </div>
+            </div>
           </div>
 
-          <div id="chip-10" class="absolute px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-slate-200 shadow-xl flex items-center space-x-2">
-            <span class="text-[9px] px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold">IMG</span>
-            <span>sunset_hawaii.heic</span>
+          <!-- File 10: Image Hawaii Sunset -->
+          <div id="chip-10" class="absolute p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md flex items-center space-x-2.5 w-52 sm:w-56 transition-shadow">
+            <div class="relative w-10 h-11 shrink-0 rounded-lg overflow-hidden border border-brand-500/40 bg-slate-950 shadow-inner">
+              <svg class="w-full h-full object-cover" viewBox="0 0 40 44" fill="none">
+                <defs>
+                  <linearGradient id="photoGrad2" x1="0" y1="0" x2="0" y2="44" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#0284c7"/>
+                    <stop offset="0.6" stop-color="#06b6d4"/>
+                    <stop offset="1" stop-color="#10b981"/>
+                  </linearGradient>
+                </defs>
+                <rect width="40" height="44" fill="url(#photoGrad2)"/>
+                <circle cx="12" cy="14" r="5" fill="#e0f2fe" opacity="0.85"/>
+                <path d="M0 32L14 20L26 32L32 26L40 34V44H0V32Z" fill="#042f2e" opacity="0.85"/>
+                <path d="M12 44L22 32L38 44H12Z" fill="#021c1a"/>
+              </svg>
+              <div class="absolute bottom-0.5 right-0.5 w-3 h-3 rounded bg-black/70 backdrop-blur flex items-center justify-center text-brand-300">
+                <svg class="w-2 h-2 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[11px] sm:text-xs font-semibold text-slate-100 truncate">sunset_hawaii.heic</div>
+              <div class="flex items-center space-x-1.5 text-[9px] text-slate-400 mt-0.5">
+                <span class="px-1 py-0.5 rounded bg-brand-500/20 text-brand-400 font-bold uppercase tracking-wider text-[8px]">HEIC</span>
+                <span>3.8 MB</span>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -839,18 +1041,18 @@
       const fCode = document.getElementById('target-folder-code');
       const fDups = document.getElementById('target-folder-dups');
 
-      // Initial scattered coordinates (random messy spread across the 100vh canvas)
+      // Initial scattered coordinates (natural messy desktop spread across the arena)
       const initialScatter = [
-        { id: '#chip-1', x: 20, y: 30, rot: -14 },
-        { id: '#chip-2', x: 260, y: 15, rot: 12 },
-        { id: '#chip-3', x: 520, y: 40, rot: -8 },
-        { id: '#chip-4', x: 780, y: 20, rot: 15 },
-        { id: '#chip-5', x: 80, y: 95, rot: 9 },
-        { id: '#chip-6', x: 340, y: 110, rot: -16 },
-        { id: '#chip-7', x: 600, y: 90, rot: 10 },
-        { id: '#chip-8', x: 840, y: 120, rot: -12 },
-        { id: '#chip-9', x: 180, y: 170, rot: -6 },
-        { id: '#chip-10', x: 480, y: 165, rot: 14 }
+        { id: '#chip-1', x: 20, y: 15, rot: -8 },
+        { id: '#chip-2', x: 260, y: 5, rot: 7 },
+        { id: '#chip-3', x: 510, y: 25, rot: -6 },
+        { id: '#chip-4', x: 760, y: 10, rot: 8 },
+        { id: '#chip-5', x: 50, y: 85, rot: 6 },
+        { id: '#chip-6', x: 300, y: 95, rot: -9 },
+        { id: '#chip-7', x: 550, y: 80, rot: 7 },
+        { id: '#chip-8', x: 790, y: 105, rot: -8 },
+        { id: '#chip-9', x: 130, y: 155, rot: -5 },
+        { id: '#chip-10', x: 440, y: 165, rot: 9 }
       ];
 
       // Set initial scatter positions
@@ -863,7 +1065,7 @@
         const aRect = arena.getBoundingClientRect();
         const fRect = folderEl.getBoundingClientRect();
         return {
-          x: fRect.left - aRect.left + (fRect.width / 2) - 80,
+          x: fRect.left - aRect.left + (fRect.width / 2) - 110,
           y: fRect.top - aRect.top + 10
         };
       }
@@ -883,7 +1085,7 @@
             const cDups = document.getElementById('counter-dups');
 
             if (p > 0.6) {
-              if (cDocs) cDocs.innerText = '4 files';
+              if (cDocs) cDocs.innerText = '5 files';
               if (cImgs) cImgs.innerText = '2 files';
               if (cCode) cCode.innerText = '2 files';
               if (cDups) cDups.innerText = '1 file';
@@ -910,8 +1112,8 @@
         x: pDocs.x,
         y: pDocs.y,
         rotation: 0,
-        scale: 0.88,
-        opacity: 0.85,
+        scale: 0.72,
+        opacity: 0.75,
         stagger: 0.05,
         ease: 'power2.inOut'
       }, 0);
@@ -921,8 +1123,8 @@
         x: pImgs.x,
         y: pImgs.y,
         rotation: 0,
-        scale: 0.88,
-        opacity: 0.85,
+        scale: 0.72,
+        opacity: 0.75,
         stagger: 0.05,
         ease: 'power2.inOut'
       }, 0);
@@ -932,8 +1134,8 @@
         x: pCode.x,
         y: pCode.y,
         rotation: 0,
-        scale: 0.88,
-        opacity: 0.85,
+        scale: 0.72,
+        opacity: 0.75,
         stagger: 0.05,
         ease: 'power2.inOut'
       }, 0);
@@ -943,8 +1145,8 @@
         x: pDups.x,
         y: pDups.y,
         rotation: 0,
-        scale: 0.88,
-        opacity: 0.85,
+        scale: 0.72,
+        opacity: 0.75,
         borderColor: '#10b981',
         ease: 'power2.inOut'
       }, 0);
