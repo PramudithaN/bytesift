@@ -29,7 +29,7 @@ Traditional file organizers depend heavily on file extensions, failing when exte
 - **Collision Protection:** Automatically applies numerical suffixes (`filename (1).ext`) to prevent overwriting existing files.
 - **Reversible Operations:** Records each file relocation in a local transaction log (`.bytesift_history.json`), allowing full rollbacks.
 - **Zero External Dependencies:** Built using the standard library, ensuring low memory consumption (< 30 MB) and rapid startup times.
-- **Dual Interface:** Provides both a command-line interface (CLI) and a native graphical interface (Tkinter).
+- **Dual Interface:** Provides both a command-line interface (CLI) and a native modern Windows Fluent interface with automatic system Dark/Light mode detection.
 
 ---
 
