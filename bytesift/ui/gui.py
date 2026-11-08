@@ -11,6 +11,7 @@ import threading
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from typing import List, Optional
+import webbrowser
 
 from bytesift.core.organizer import Organizer, OrganizerConfig, PlanItem
 from bytesift.core.transaction import TransactionManager
@@ -214,6 +215,8 @@ class ByteSiftApp:
 
         # Help Menu
         help_menu = tk.Menu(menubar, tearoff=0)
+        help_menu.add_command(label="Visit Website...", command=lambda: webbrowser.open("https://pramudithan.github.io/bytesift/"))
+        help_menu.add_separator()
         help_menu.add_command(label="About ByteSift", command=self.on_about)
         menubar.add_cascade(label="Help", menu=help_menu)
 
@@ -231,7 +234,8 @@ class ByteSiftApp:
             "About ByteSift",
             "ByteSift v0.1.0\n\n"
             "Lightweight, 100% offline file content examiner and organizer.\n"
-            "Designed for macOS, Windows, and Linux without external dependencies."
+            "Designed for macOS, Windows, and Linux without external dependencies.\n\n"
+            "Official Website & Docs:\nhttps://pramudithan.github.io/bytesift/"
         )
 
     def _build_ui(self):

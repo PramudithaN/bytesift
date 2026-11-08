@@ -20,5 +20,11 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Homepage = "https://pramudithan.github.io/bytesift/"
+Documentation = "https://pramudithan.github.io/bytesift/"
+Repository = "https://github.com/PramudithaN/bytesift"
+Issues = "https://github.com/PramudithaN/bytesift/issues"
+
 [project.scripts]
 bytesift = "bytesift.cli:main"

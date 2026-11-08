@@ -124,7 +124,8 @@ def cmd_gui(args):
 def main():
     parser = argparse.ArgumentParser(
         prog="bytesift",
-        description="Lightweight, 100% offline file content examiner and organizer."
+        description="Lightweight, 100% offline file content examiner and organizer.",
+        epilog="Website & Documentation: https://pramudithan.github.io/bytesift/"
     )
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 

@@ -4,11 +4,11 @@
 ![Tkinter](https://img.shields.io/badge/Tkinter-20232A?style=for-the-badge&logo=python&logoColor=white)
 ![CLI](https://img.shields.io/badge/CLI-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Version](https://img.shields.io/badge/Version-0.1.0-007ACC?style=for-the-badge)
-![Website](https://img.shields.io/badge/Website-GitHub%20Pages-0ea5e9?style=for-the-badge)
+[![Website](https://img.shields.io/badge/Website-GitHub%20Pages-0ea5e9?style=for-the-badge)](https://pramudithan.github.io/bytesift/)
 
 ByteSift is a lightweight, offline file classification and organization utility designed to inspect file contents directly rather than relying solely on file extensions. Operating without artificial intelligence, external network connectivity, or third-party dependencies, it provides deterministic, low-latency categorization and deduplication.
 
-Official Website & Download Hub: [https://pramudithan.github.io/bytesift/](https://pramudithan.github.io/bytesift/)
+Official Website & Download Hub: [ByteSift - Clean Up Messy Folders in Seconds](https://pramudithan.github.io/bytesift/)
 
 ---
 
