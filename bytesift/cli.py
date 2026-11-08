@@ -115,7 +115,8 @@ def cmd_undo(args):
 def cmd_gui(args):
     try:
         from bytesift.ui.gui import launch_gui
-        launch_gui(args.folder if hasattr(args, "folder") and args.folder else None)
+        force_mac = getattr(args, "macos", False)
+        launch_gui(args.folder if hasattr(args, "folder") and args.folder else None, force_macos=force_mac)
     except Exception as e:
         print(f"Error launching GUI: {e}")
         sys.exit(1)
@@ -156,6 +157,7 @@ def main():
     # GUI command
     p_gui = subparsers.add_parser("gui", help="Launch the lightweight desktop GUI")
     p_gui.add_argument("folder", nargs="?", default=None, help="Optional initial directory to open")
+    p_gui.add_argument("--macos", "--mac", action="store_true", help="Launch GUI with macOS Aqua theme and styling")
     p_gui.set_defaults(func=cmd_gui)
 
     if len(sys.argv) == 1:

@@ -17,6 +17,8 @@ from bytesift.core.transaction import TransactionManager
 from bytesift.ui.theme import (
     DARK_THEME,
     LIGHT_THEME,
+    MACOS_DARK,
+    MACOS_LIGHT,
     ThemeColors,
     apply_fluent_theme,
     enable_windows_dpi_awareness,
@@ -49,9 +51,11 @@ def format_detection_source(method: str, is_duplicate: bool) -> str:
     return friendly.get(method, method)
 
 class ByteSiftApp:
-    def __init__(self, root: tk.Tk, initial_folder: Optional[str] = None):
+    def __init__(self, root: tk.Tk, initial_folder: Optional[str] = None, force_macos: bool = False):
         self.root = root
-        self.root.title("ByteSift - Offline Content-Aware File Organizer")
+        self.force_macos = force_macos
+        title_suffix = " (macOS Simulation)" if force_macos else ""
+        self.root.title(f"ByteSift - Offline Content-Aware File Organizer{title_suffix}")
         self.root.geometry("960x680")
         self.root.minsize(760, 520)
 
@@ -134,7 +138,10 @@ class ByteSiftApp:
         else:  # "System"
             is_dark = is_system_dark_theme()
 
-        self.current_theme = DARK_THEME if is_dark else LIGHT_THEME
+        if self.force_macos:
+            self.current_theme = MACOS_DARK if is_dark else MACOS_LIGHT
+        else:
+            self.current_theme = DARK_THEME if is_dark else LIGHT_THEME
         apply_fluent_theme(self.root, self.current_theme)
         self._apply_window_icon(is_dark)
         self._update_widget_colors()
@@ -520,9 +527,9 @@ class ByteSiftApp:
         else:
             messagebox.showinfo("Notice", "No previous session records found to undo.")
 
-def launch_gui(initial_folder: Optional[str] = None):
+def launch_gui(initial_folder: Optional[str] = None, force_macos: bool = False):
     root = tk.Tk()
-    ByteSiftApp(root, initial_folder)
+    ByteSiftApp(root, initial_folder, force_macos=force_macos)
     root.mainloop()
 
 if __name__ == "__main__":
