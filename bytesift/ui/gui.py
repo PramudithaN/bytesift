@@ -56,8 +56,12 @@ class ByteSiftApp:
         # High-DPI configuration for crisp Windows rendering
         enable_windows_dpi_awareness()
 
-        # Apply custom application icon (removes default Tkinter feather)
-        self._apply_window_icon()
+        # Register Windows AppUserModelID for independent taskbar grouping
+        if sys.platform == "win32":
+            try:
+                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Pramuditha.ByteSift.App.1.0")
+            except (AttributeError, OSError):
+                pass
 
         # State Variables
         self.current_plan: List[PlanItem] = []
@@ -68,6 +72,9 @@ class ByteSiftApp:
         self.recursive_var = tk.BooleanVar(value=False)
         self.theme_mode_var = tk.StringVar(value="System")
         self.current_theme: ThemeColors = DARK_THEME
+
+        # Pre-load initial theme icon (white icon in dark mode, black icon in light mode)
+        self._apply_window_icon(is_windows_dark_theme())
 
         # Build UI layout
         self._build_ui()
@@ -81,17 +88,16 @@ class ByteSiftApp:
         if initial_folder:
             self.on_scan()
 
-    def _apply_window_icon(self):
-        """Replaces the default Tkinter feather icon with the custom ByteSift application icon."""
-        if sys.platform == "win32":
-            try:
-                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Pramuditha.ByteSift.App.1.0")
-            except (AttributeError, OSError):
-                pass
-
+    def _apply_window_icon(self, is_dark: bool):
+        """
+        Applies theme-synchronized icons:
+        - White folder icon on dark background.
+        - Black folder icon on light background.
+        """
         assets_dir = Path(__file__).resolve().parent.parent / "assets"
-        ico_path = assets_dir / "icon.ico"
-        png_path = assets_dir / "icon.png"
+        suffix = "light" if is_dark else "dark"
+        ico_path = assets_dir / f"icon_{suffix}.ico"
+        png_path = assets_dir / f"icon_{suffix}.png"
 
         # Apply native Windows ICO to title bar and taskbar
         if ico_path.exists():
@@ -105,6 +111,10 @@ class ByteSiftApp:
             try:
                 self._icon_img = tk.PhotoImage(file=str(png_path))
                 self.root.iconphoto(True, self._icon_img)
+                # Subsample 512x512 down to crisp ~28x28 for UI header
+                self._header_icon = self._icon_img.subsample(18, 18)
+                if hasattr(self, "logo_lbl"):
+                    self.logo_lbl.configure(image=self._header_icon)
             except (tk.TclError, OSError):
                 pass
 
@@ -120,6 +130,7 @@ class ByteSiftApp:
 
         self.current_theme = DARK_THEME if is_dark else LIGHT_THEME
         apply_fluent_theme(self.root, self.current_theme)
+        self._apply_window_icon(is_dark)
         self._update_widget_colors()
 
     def _schedule_system_theme_check(self):
@@ -159,14 +170,10 @@ class ByteSiftApp:
         header_left = ttk.Frame(header_frame)
         header_left.pack(side=tk.LEFT, fill=tk.Y)
 
-        if hasattr(self, "_icon_img"):
-            try:
-                # Subsample 256x256 icon to crisp ~28x28 header badge
-                self._header_icon = self._icon_img.subsample(9, 9)
-                logo_lbl = ttk.Label(header_left, image=self._header_icon, style="TLabel")
-                logo_lbl.pack(side=tk.LEFT, padx=(0, 10))
-            except (tk.TclError, AttributeError):
-                pass
+        self.logo_lbl = ttk.Label(header_left, style="TLabel")
+        if hasattr(self, "_header_icon"):
+            self.logo_lbl.configure(image=self._header_icon)
+        self.logo_lbl.pack(side=tk.LEFT, padx=(0, 10))
 
         title_lbl = ttk.Label(
             header_left,
