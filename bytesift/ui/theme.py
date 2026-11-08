@@ -197,15 +197,15 @@ LIGHT_THEME = MACOS_LIGHT if IS_DARWIN else WINDOWS_LIGHT
 def get_system_font(size: int = 9, bold: bool = False) -> Tuple[str, int, str]:
     """Returns platform-optimized system font tuple."""
     weight = "bold" if bold else "normal"
-    if IS_DARWIN:
+    if sys.platform == "darwin":
         return (".AppleSystemUIFont", size, weight)
-    if IS_WINDOWS:
+    if sys.platform == "win32":
         return ("Segoe UI", size, weight)
     return ("sans-serif", size, weight)
 
 def enable_windows_dpi_awareness():
     """Configures high-DPI awareness on Windows to prevent blurry rendering."""
-    if not IS_WINDOWS:
+    if sys.platform != "win32":
         return
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
@@ -217,7 +217,7 @@ def enable_windows_dpi_awareness():
 
 def is_windows_dark_theme() -> bool:
     """Reads Windows Personalize registry key to detect Dark Mode."""
-    if not IS_WINDOWS or not winreg:
+    if sys.platform != "win32" or not winreg:
         return False
     try:
         key = winreg.OpenKey(
@@ -232,7 +232,7 @@ def is_windows_dark_theme() -> bool:
 
 def is_macos_dark_theme() -> bool:
     """Reads macOS user defaults to detect Dark Mode."""
-    if not IS_DARWIN:
+    if sys.platform != "darwin":
         return False
     try:
         res = subprocess.run(
@@ -247,15 +247,15 @@ def is_macos_dark_theme() -> bool:
 
 def is_system_dark_theme() -> bool:
     """Detects system Dark Mode across Windows, macOS, and Linux."""
-    if IS_WINDOWS:
+    if sys.platform == "win32":
         return is_windows_dark_theme()
-    if IS_DARWIN:
+    if sys.platform == "darwin":
         return is_macos_dark_theme()
     return False
 
 def set_windows_titlebar_appearance(root: tk.Tk, dark: bool):
     """Sets dark mode on Windows 10/11 title bar via DwmSetWindowAttribute."""
-    if not IS_WINDOWS:
+    if sys.platform != "win32":
         return
     try:
         root.update_idletasks()
