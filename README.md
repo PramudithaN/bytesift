@@ -1,162 +1,154 @@
-# ByteSift ⚡
+# ByteSift
 
-> **Lightweight, blazing-fast, 100% offline file content examiner and organizer without AI or internet.**
-
----
-
-## 📖 Overview
-
-**ByteSift** solves the messy folder problem by examining what is actually **inside** your files rather than relying solely on file extensions. It operates completely offline, without AI, external models, internet access, or third-party dependencies.
-
-Using binary signature analysis (magic bytes), fast text content heuristics, and EXIF/metadata inspection, ByteSift classifies, deduplicates, and sorts files in milliseconds while offering a **100% reversible undo** safety net.
-
-```
-Messy Folder/
-├── IMG_0041.dat        ──>  Images/JPEG/IMG_0041.dat     (Identified via Magic Bytes)
-├── scan_882.pdf        ──>  Documents/Invoices_Receipts/ (Identified via Text Heuristics)
-├── copy_of_photo.jpg   ──>  Duplicates/copy_of_photo.jpg (Identified via SHA-256)
-└── script              ──>  Code/Python/script           (Identified via Code Signature)
-```
+ByteSift is a lightweight, offline file classification and organization utility designed to inspect file contents directly rather than relying solely on file extensions. Operating without artificial intelligence, external network connectivity, or third-party dependencies, it provides deterministic, low-latency categorization and deduplication.
 
 ---
 
-## 🚀 Key Features
+## Overview
 
-* **100% Offline & Private:** Zero network requests, zero telemetry, zero LLMs/cloud dependencies. All inspection happens in local memory.
-* **True Content Inspection (Magic Bytes):** Detects PDFs, JPEGs, PNGs, ZIPs, Office OpenXML (`.docx`, `.xlsx`, `.pptx`), audio, video, and executables even if the file extension is wrong or missing.
-* **Smart Text & Document Heuristics:** Scans text files in chunks (< 8KB) to identify Invoices, Resumes, Legal Contracts, Python/JS/HTML/SQL code, Configs, and Logs.
-* **Instant Duplicate Detection:** 2-pass hashing (Size grouping + SHA-256) detects and isolates identical duplicate files into a `Duplicates/` folder.
-* **One-Click Reversible Undo:** Every move is recorded in a transaction journal (`.bytesift_history.json`). Revert any session instantly with `bytesift undo`.
-* **Zero Dependencies:** Pure standard library. Starts up in < 50ms and consumes < 25 MB RAM.
-* **Dual Interface:** Full-featured Command Line Interface (CLI) + Native Desktop GUI (Tkinter).
+Traditional file organizers depend heavily on file extensions, failing when extensions are incorrect, missing, or generic. ByteSift addresses this through a multi-tiered inspection pipeline:
+
+1. **Binary Magic Bytes:** Analyzes initial byte sequences to determine actual container and binary formats (e.g., PDF, JPEG, PNG, ZIP, Office OpenXML, executables).
+2. **Text Content Heuristics:** Evaluates bounded text samples (4–8 KB) against weighted keyword and structural patterns to identify invoices, resumes, contracts, source code, and system logs.
+3. **Metadata & Timestamp Parsing:** Extracts embedded timestamps (such as JPEG EXIF markers) to enable chronological archiving.
+4. **Content Deduplication:** Employs size-grouped SHA-256 hashing to identify identical files without unnecessary read cycles.
 
 ---
 
-## 🛠️ How Content Examination Works
+## Key Features
+
+- **Offline and Private:** Executes entirely within local memory. No network requests, telemetry, or external models are used.
+- **Content-Driven Classification:** Reliably detects file formats regardless of file extension accuracy.
+- **Deterministic Heuristic Engine:** Classifies unstructured text and documents through pattern matching rather than statistical language models.
+- **Duplicate Isolation:** Automatically routes identical files into a designated duplicates directory.
+- **Collision Protection:** Automatically applies numerical suffixes (`filename (1).ext`) to prevent overwriting existing files.
+- **Reversible Operations:** Records each file relocation in a local transaction log (`.bytesift_history.json`), allowing full rollbacks.
+- **Zero External Dependencies:** Built using the standard library, ensuring low memory consumption (< 30 MB) and rapid startup times.
+- **Dual Interface:** Provides both a command-line interface (CLI) and a native graphical interface (Tkinter).
+
+---
+
+## Architecture
 
 ```
-                     ┌──────────────────────────┐
-                     │       Input File         │
-                     └────────────┬─────────────┘
-                                  │
-                                  ▼
-               [Tier 1: Binary Magic Bytes Inspection]
-          Reads initial 16-64 bytes for immutable file signatures
-       (e.g., %PDF-, \xff\xd8\xff, PK\x03\x04, ID3, RIFF....WEBP)
-                                  │
-                 ┌────────────────┴────────────────┐
-                 │ Match?                          │ No Match / Plain Text
-                 ▼                                 ▼
-         [Binary Format Identified]   [Tier 2: Text Heuristic Engine]
-       (Images, Audio, Video, Archives)    Inspects 4-8KB sample using
-                                           weighted keywords & regex
-                                                   │
-                                  ┌────────────────┴────────────────┐
-                                  │ Match?                          │ No Match
-                                  ▼                                 ▼
-                     [Documents & Code Identified]     [Tier 3: Extension Fallback]
-                     (Invoices, Resumes, Python, SQL)
+                    +--------------------+
+                    |     Input File     |
+                    +---------+----------+
+                              |
+                              v
+                [Tier 1: Magic Byte Inspection]
+          Reads initial 16-64 bytes for file signatures
+                              |
+             +----------------+----------------+
+             | Binary Match                    | No Match / Text
+             v                                 v
+   [Format Identified]           [Tier 2: Text Heuristic Engine]
+ (Images, Audio, Archives)        Scans 4-8 KB for keywords/regex
+                                               |
+                              +----------------+----------------+
+                              | Text Match                      | Unmatched
+                              v                                 v
+                     [Document/Code Type]             [Tier 3: Extension Fallback]
 ```
 
 ---
 
-## 💻 Installation
+## Requirements and Installation
 
-ByteSift requires **Python 3.9+** and has **zero external package dependencies**.
+- **Python:** Version 3.9 or higher.
+- **Dependencies:** None (standard library only).
+
+### Installation
+
+Clone the repository and run directly:
 
 ```bash
-# Clone the repository
 git clone https://github.com/PramudithaN/bytesift.git
 cd bytesift
+```
 
-# Run directly
-python -m bytesift --help
+To install the executable script into your active Python environment:
 
-# Optional: Install as an editable CLI command in your environment
+```bash
 pip install -e .
 ```
 
 ---
 
-## 🎯 Usage
+## Usage
 
-### 1. Interactive Desktop GUI
+### 1. Graphical Interface
 
-Launch the native, lightweight GUI:
+To launch the desktop interface:
+
 ```bash
-python -m bytesift gui
-# or if installed:
-bytesift gui
+python -m bytesift.cli gui
 ```
-- Select your target folder.
-- Click **"🔍 Preview Scan"** to see what files were detected and where they will go.
-- Click **"⚡ Organize Files"** to apply changes.
-- Click **"↩️ Undo Last Run"** to restore files back to their exact original locations.
+
+The GUI allows directory selection, preview of categorization plans, execution, and rollback of previous actions.
 
 ---
 
-### 2. Command Line Interface (CLI)
+### 2. Command Line Interface
 
-#### **Scan & Preview (Dry Run)**
-Inspects the folder and prints a preview table without moving any files:
+#### Preview Organization Plan (Dry Run)
+
+Scans the target directory and outputs planned operations without moving files:
+
 ```bash
-python -m bytesift scan "C:\Users\username\Downloads"
+python -m bytesift.cli scan "/path/to/directory"
 ```
 
-#### **Organize Files**
-Organizes files with confirmation prompt:
+#### Execute Organization
+
+Analyzes contents and moves files into categorized subdirectories:
+
 ```bash
-python -m bytesift organize "C:\Users\username\Downloads"
+python -m bytesift.cli organize "/path/to/directory"
 ```
 
 **Options:**
+
+- `--yes`: Skips the interactive confirmation prompt.
+- `--strategy [smart|date|type]`: Selects classification mode (default: `smart`).
+- `--group-by-date`: Appends `YYYY-MM` subfolders for media assets.
+- `--no-duplicates`: Disables duplicate detection.
+- `-r, --recursive`: Processes subdirectories recursively.
+- `--dry-run`: Runs full analysis without altering the file system.
+
+#### Undo Previous Operation
+
+Restores all files from the latest session to their original paths and cleans up empty directories:
+
 ```bash
-# Organize without confirmation prompt
-python -m bytesift organize "D:\MessyFolder" --yes
-
-# Group images and videos into Year-Month subfolders (e.g., Images/JPEG/2024-05)
-python -m bytesift organize "D:\Photos" --group-by-date
-
-# Organize by timeline instead of categories
-python -m bytesift organize "D:\Archive" --strategy date
-
-# Include nested subfolders recursively
-python -m bytesift organize "D:\MessyFolder" -r
-
-# Disable duplicate detection
-python -m bytesift organize "D:\MessyFolder" --no-duplicates
-```
-
-#### **Undo / Rollback**
-Reverts the last organization session and cleans up empty folders:
-```bash
-python -m bytesift undo "C:\Users\username\Downloads"
+python -m bytesift.cli undo "/path/to/directory"
 ```
 
 ---
 
-## 🧪 Testing & Verification
+## Verification and Testing
 
-Run the built-in test suite:
+Execute the unit test suite:
 
 ```bash
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
-Benchmark:
-* **8 test suites executed in < 0.05 seconds.**
-* Memory footprint: **~22 MB**.
+The test suite covers:
+- Binary magic byte validation across common formats.
+- Text heuristic detection across structured documents and code.
+- End-to-end plan generation, collision resolution, and transaction rollbacks.
 
 ---
 
-## 🛡️ Safety & Integrity Principles
+## Safety and Rollback Mechanism
 
-1. **Collision Safe:** If a file with the same name already exists in the destination folder, ByteSift automatically suffixes the file (`filename (1).ext`) to ensure no data is ever overwritten.
-2. **Transaction Logging:** Every move operation is journaled to `.bytesift_history.json`.
-3. **Ignored Systems:** System directories (`.git`, `node_modules`, `.venv`, `Thumbs.db`, `.DS_Store`) are automatically skipped.
+1. **Transaction Journaling:** A session record is committed to `.bytesift_history.json` upon completion of file moves.
+2. **Safe Rollback:** The `undo` command reverses moves in inverse order, restoring original file locations.
+3. **Excluded Directories:** Hidden directories and standard version control/dependency folders (`.git`, `node_modules`, `.venv`) are ignored by default.
 
 ---
 
-## 📄 License
+## License
 
-MIT License. Free for personal and commercial use.
+This project is licensed under the MIT License.
