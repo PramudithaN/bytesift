@@ -294,6 +294,41 @@
 
         </div>
 
+        <!-- Success State: Smoothly reveals in the central space as files finish organizing -->
+        <div id="organized-success-view" class="absolute inset-x-0 top-4 sm:top-8 mx-auto max-w-xl px-4 flex flex-col items-center justify-center text-center z-10 pointer-events-none opacity-0">
+          <div class="p-5 sm:p-6 rounded-2xl bg-[#090f1d]/90 border border-brand-500/30 shadow-2xl backdrop-blur-md w-full subtle-laser-glow">
+            
+            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-2.5">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              <span class="tracking-wide uppercase text-[10px] font-bold">100% Sorted • Chaos Resolved</span>
+            </div>
+
+            <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight mb-1.5">
+              Your folder is clean, structured & duplicate-free.
+            </h3>
+            
+            <p class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto mb-4">
+              All 10 files placed into their categorized homes. Exact duplicates quarantined to reclaim storage without cloud latency.
+            </p>
+
+            <div class="grid grid-cols-3 gap-2.5 max-w-md mx-auto">
+              <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
+                <div class="text-base sm:text-lg font-mono font-bold text-brand-400">10 Files</div>
+                <div class="text-[10px] text-slate-400">Categorized</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-950/60 border border-accent-500/30 text-center">
+                <div class="text-base sm:text-lg font-mono font-bold text-accent-400">1 Duplicate</div>
+                <div class="text-[10px] text-slate-400">Quarantined</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
+                <div class="text-base sm:text-lg font-mono font-bold text-emerald-400">0.04s</div>
+                <div class="text-[10px] text-slate-400">100% Local</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <!-- 10 Scattered File Chips Taking Up The Full Section Canvas with Real File Previews & Icons -->
         <div id="chips-flight-layer" class="absolute inset-0 pointer-events-none">
           
@@ -1066,6 +1101,9 @@
         gsap.set(item.id, { x: item.x, y: item.y, rotation: item.rot, scale: 1 });
       });
 
+      // Initialize organized success view
+      gsap.set('#organized-success-view', { opacity: 0, y: 25, scale: 0.95 });
+
       // Calculate target folder landing positions relative to arena
       function getFolderPos(folderEl) {
         const aRect = arena.getBoundingClientRect();
@@ -1118,8 +1156,8 @@
         x: pDocs.x,
         y: pDocs.y,
         rotation: 0,
-        scale: 0.72,
-        opacity: 0.75,
+        scale: 0.65,
+        opacity: 0.4,
         stagger: 0.05,
         ease: 'power2.inOut'
       }, 0);
@@ -1129,8 +1167,8 @@
         x: pImgs.x,
         y: pImgs.y,
         rotation: 0,
-        scale: 0.72,
-        opacity: 0.75,
+        scale: 0.65,
+        opacity: 0.4,
         stagger: 0.05,
         ease: 'power2.inOut'
       }, 0);
@@ -1140,8 +1178,8 @@
         x: pCode.x,
         y: pCode.y,
         rotation: 0,
-        scale: 0.72,
-        opacity: 0.75,
+        scale: 0.65,
+        opacity: 0.4,
         stagger: 0.05,
         ease: 'power2.inOut'
       }, 0);
@@ -1151,11 +1189,20 @@
         x: pDups.x,
         y: pDups.y,
         rotation: 0,
-        scale: 0.72,
-        opacity: 0.75,
+        scale: 0.65,
+        opacity: 0.5,
         borderColor: '#10b981',
         ease: 'power2.inOut'
       }, 0);
+
+      // Reveal clean workspace confirmation card in the central space
+      scatterTL.to('#organized-success-view', {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.45,
+        ease: 'power2.out'
+      }, 0.35);
     }
 
     // -----------------------------------------------------------------
