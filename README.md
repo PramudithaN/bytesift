@@ -15,7 +15,7 @@ ByteSift is a lightweight, offline file classification and organization utility 
 Traditional file organizers depend heavily on file extensions, failing when extensions are incorrect, missing, or generic. ByteSift addresses this through a multi-tiered inspection pipeline:
 
 1. **Binary Magic Bytes:** Analyzes initial byte sequences to determine actual container and binary formats (e.g., PDF, JPEG, PNG, ZIP, Office OpenXML, executables).
-2. **Text Content Heuristics:** Evaluates bounded text samples (4–8 KB) against weighted keyword and structural patterns to identify invoices, resumes, contracts, source code, and system logs.
+2. **Text Content Heuristics:** Evaluates bounded text samples (4-8 KB) against weighted keyword and structural patterns to identify invoices, resumes, contracts, source code, and system logs.
 3. **Metadata & Timestamp Parsing:** Extracts embedded timestamps (such as JPEG EXIF markers) to enable chronological archiving.
 4. **Content Deduplication:** Employs size-grouped SHA-256 hashing to identify identical files without unnecessary read cycles.
 

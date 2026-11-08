@@ -56,7 +56,7 @@ class ByteSiftApp:
 
         subtitle_lbl = ttk.Label(
             header_frame,
-            text="— 100% Offline Content Inspector & File Organizer",
+            text="100% Offline Content Inspector & File Organizer",
             font=("Segoe UI", 10),
             foreground="#555555"
         )
