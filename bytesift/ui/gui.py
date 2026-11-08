@@ -104,8 +104,10 @@ class ByteSiftApp:
         - White folder icon on dark background.
         - Black folder icon on light background.
         """
-        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-            base_dir = Path(sys._MEIPASS)
+        # cspell:ignore MEIPASS
+        bundle_dir = getattr(sys, "_MEIPASS", None)
+        if getattr(sys, "frozen", False) and bundle_dir:
+            base_dir = Path(bundle_dir)
             assets_dir = base_dir / "bytesift" / "assets"
             if not assets_dir.exists():
                 assets_dir = base_dir / "assets"
