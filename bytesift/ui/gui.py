@@ -23,6 +23,29 @@ from bytesift.ui.theme import (
     set_windows_titlebar_appearance,
 )
 
+def format_file_size(size_bytes: int) -> str:
+    """Formats file size into a clean human-readable string."""
+    if size_bytes < 1024:
+        return f"{size_bytes} B"
+    num = float(size_bytes)
+    for unit in ["KB", "MB", "GB"]:
+        num /= 1024.0
+        if num < 1024.0:
+            return f"{num:.1f} {unit}"
+    return f"{num:.1f} TB"
+
+def format_detection_source(method: str, is_duplicate: bool) -> str:
+    """Converts internal technical labels into clear, user-friendly terms."""
+    if is_duplicate:
+        return "Duplicate (Exact Match)"
+    friendly = {
+        "magic_bytes": "File Content Header",
+        "text_heuristics": "Content Text Scan",
+        "extension_fallback": "File Extension",
+        "date_metadata": "Timeline Metadata",
+    }
+    return friendly.get(method, method)
+
 class ByteSiftApp:
     def __init__(self, root: tk.Tk, initial_folder: Optional[str] = None):
         self.root = root
@@ -90,7 +113,7 @@ class ByteSiftApp:
         # Re-apply tag colors to any existing items in the table
         for idx, item in enumerate(self.tree.get_children()):
             values = self.tree.item(item, "values")
-            if len(values) >= 4 and values[3] == "Duplicate":
+            if len(values) >= 4 and "Duplicate" in str(values[3]):
                 self.tree.item(item, tags=("duplicate",))
             else:
                 self.tree.item(item, tags=("odd" if idx % 2 == 1 else "even",))
@@ -150,11 +173,12 @@ class ByteSiftApp:
 
         self.dir_entry = ttk.Entry(dir_input_row, textvariable=self.selected_folder, font=("Segoe UI", 9))
         self.dir_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
+        self.dir_entry.bind("<Return>", lambda e: self.on_scan())
 
         browse_btn = ttk.Button(dir_input_row, text="Browse Folder", command=self.on_browse)
         browse_btn.pack(side=tk.LEFT, padx=(0, 6))
 
-        open_folder_btn = ttk.Button(dir_input_row, text="Open Explorer", command=self.on_open_in_explorer)
+        open_folder_btn = ttk.Button(dir_input_row, text="Open in File Explorer", command=self.on_open_in_explorer)
         open_folder_btn.pack(side=tk.LEFT)
 
         # 3. Card: Rules & Strategy Controls
@@ -175,16 +199,17 @@ class ByteSiftApp:
             width=10
         )
         strategy_combo.pack(side=tk.LEFT, padx=(0, 24))
+        strategy_combo.bind("<<ComboboxSelected>>", lambda e: self.on_scan())
 
-        ttk.Checkbutton(opts_row, text="Detect Duplicate Files", variable=self.duplicates_var).pack(side=tk.LEFT, padx=(0, 16))
-        ttk.Checkbutton(opts_row, text="Group Media by Date", variable=self.group_date_var).pack(side=tk.LEFT, padx=(0, 16))
-        ttk.Checkbutton(opts_row, text="Recursive Scan", variable=self.recursive_var).pack(side=tk.LEFT)
+        ttk.Checkbutton(opts_row, text="Detect Duplicate Files", variable=self.duplicates_var, command=self.on_scan).pack(side=tk.LEFT, padx=(0, 16))
+        ttk.Checkbutton(opts_row, text="Group Media by Date", variable=self.group_date_var, command=self.on_scan).pack(side=tk.LEFT, padx=(0, 16))
+        ttk.Checkbutton(opts_row, text="Recursive Scan", variable=self.recursive_var, command=self.on_scan).pack(side=tk.LEFT)
 
         # 4. Action Command Bar
         action_bar = ttk.Frame(container)
         action_bar.pack(fill=tk.X, pady=(0, 10))
 
-        self.scan_btn = ttk.Button(action_bar, text="Preview Scan", command=self.on_scan)
+        self.scan_btn = ttk.Button(action_bar, text="Refresh Preview", command=self.on_scan)
         self.scan_btn.pack(side=tk.LEFT, padx=(0, 10))
 
         self.organize_btn = ttk.Button(
@@ -203,17 +228,19 @@ class ByteSiftApp:
         self.card_table = ttk.Frame(container, style="CardContent.TFrame", padding="10")
         self.card_table.pack(fill=tk.BOTH, expand=True)
 
-        columns = ("file", "category", "method", "status")
+        columns = ("file", "size", "category", "method")
         self.tree = ttk.Treeview(self.card_table, columns=columns, show="headings", selectmode="browse")
-        self.tree.heading("file", text="Original File Name")
-        self.tree.heading("category", text="Destination Path")
-        self.tree.heading("method", text="Inspection Source")
-        self.tree.heading("status", text="Item State")
+        
+        # Consistent text anchors ensure headers and cell content align seamlessly
+        self.tree.heading("file", text="File Name", anchor=tk.W)
+        self.tree.heading("size", text="Size", anchor=tk.E)
+        self.tree.heading("category", text="Target Folder", anchor=tk.W)
+        self.tree.heading("method", text="Detected By", anchor=tk.W)
 
-        self.tree.column("file", width=290)
-        self.tree.column("category", width=260)
-        self.tree.column("method", width=160)
-        self.tree.column("status", width=110, anchor="center")
+        self.tree.column("file", width=340, anchor=tk.W)
+        self.tree.column("size", width=95, anchor=tk.E)
+        self.tree.column("category", width=230, anchor=tk.W)
+        self.tree.column("method", width=190, anchor=tk.W)
 
         scroll_y = ttk.Scrollbar(self.card_table, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll_y.set)
@@ -275,13 +302,20 @@ class ByteSiftApp:
             def update_ui():
                 self.current_plan = plan
                 for idx, item in enumerate(plan):
-                    status_text = "Duplicate" if item.is_duplicate else "Ready to Move"
+                    try:
+                        sz = item.source.stat().st_size
+                        size_str = format_file_size(sz)
+                    except OSError:
+                        size_str = "-"
+
+                    method_str = format_detection_source(item.method, item.is_duplicate)
                     tag = "duplicate" if item.is_duplicate else ("odd" if idx % 2 == 1 else "even")
+
                     self.tree.insert("", tk.END, values=(
                         item.source.name,
+                        size_str,
                         item.target_category,
-                        item.method,
-                        status_text
+                        method_str
                     ), tags=(tag,))
 
                 count = len(plan)
