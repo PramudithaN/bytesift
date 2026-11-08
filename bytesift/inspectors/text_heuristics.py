@@ -1,0 +1,175 @@
+"""
+ByteSift Text Heuristics Inspector
+Fast regex and keyword frequency scoring for text files and plain documents.
+"""
+
+from pathlib import Path
+import re
+from typing import Optional, Tuple
+
+# Sample size in bytes (reading first 8KB is lightning fast and sufficient for categorization)
+SAMPLE_SIZE = 8192
+
+# Rule definitions: (category, subcategory, list_of_keywords, minimum_matches, regex_bonus)
+TEXT_RULES: list[Tuple[str, str, list[str], int, Optional[re.Pattern]]] = [
+    # Invoices & Receipts
+    (
+        "Documents",
+        "Invoices_Receipts",
+        [
+            "invoice", "receipt", "total due", "bill to", "tax invoice",
+            "subtotal", "vat reg", "payment due", "amount payable", "remit to"
+        ],
+        2,
+        re.compile(r"(invoice\s*(#|no|number)|total\s*:\s*[\$\€\£\₹]?[0-9]+)", re.IGNORECASE)
+    ),
+    # Resumes & CVs
+    (
+        "Documents",
+        "Resumes_CVs",
+        [
+            "curriculum vitae", "work experience", "professional experience",
+            "education", "skills", "summary of qualifications", "employment history",
+            "certifications", "career objective"
+        ],
+        2,
+        re.compile(r"(curriculum\s+vitae|resume\b)", re.IGNORECASE)
+    ),
+    # Legal & Contracts
+    (
+        "Documents",
+        "Legal_Contracts",
+        [
+            "agreement", "non-disclosure", "confidentiality", "governing law",
+            "terms and conditions", "indemnification", "severability", "parties hereto"
+        ],
+        2,
+        re.compile(r"(non-disclosure\s+agreement|this\s+agreement\s+is\s+entered)", re.IGNORECASE)
+    ),
+    # Source Code: Python
+    (
+        "Code",
+        "Python",
+        ["def ", "import ", "from ", "class ", "self.", "return ", "elif ", "except "],
+        3,
+        re.compile(r"(if\s+__name__\s*==\s*['\"]__main__['\"]|def\s+[a-zA-Z0-9_]+\s*\(.*?\)\s*:)")
+    ),
+    # Source Code: JS / TS
+    (
+        "Code",
+        "JavaScript_TypeScript",
+        ["const ", "let ", "function ", "export ", "import ", "interface ", "return ", "console.log"],
+        3,
+        re.compile(r"(export\s+(default\s+)?(function|class|const)|import\s+.*\s+from\s+['\"])")
+    ),
+    # Source Code: HTML / Web
+    (
+        "Code",
+        "Web_HTML",
+        ["<!doctype html>", "<html", "<head>", "<body", "<div", "<script", "<meta "],
+        2,
+        re.compile(r"<!doctype\s+html>|<html(\s+[^>]*>|>)", re.IGNORECASE)
+    ),
+    # Source Code: CSS
+    (
+        "Code",
+        "Styles_CSS",
+        ["display:", "margin:", "padding:", "color:", "background:", "@media", ":root"],
+        3,
+        re.compile(r"(\.[a-zA-Z0-9_-]+\s*\{|[a-zA-Z0-9_-]+\s*:\s*[^;]+;)")
+    ),
+    # Source Code: SQL
+    (
+        "Code",
+        "SQL",
+        ["select ", "insert into", "update ", "delete from", "create table", "primary key", "where "],
+        2,
+        re.compile(r"\b(SELECT\s+.*\s+FROM|CREATE\s+TABLE)\b", re.IGNORECASE)
+    ),
+    # Source Code: Shell / Bash / PowerShell
+    (
+        "Code",
+        "Scripts_Shell",
+        ["#!/bin/bash", "#!/bin/sh", "echo ", "powershell", "set-location", "get-childitem", "chmod +x"],
+        2,
+        re.compile(r"^#!\s*/bin/(bash|sh|zsh)", re.MULTILINE)
+    ),
+    # Log files
+    (
+        "Logs",
+        "System_Logs",
+        ["[info]", "[error]", "[warn]", "[debug]", "[fatal]", "traceback", "exception:", "timestamp"],
+        3,
+        re.compile(r"(\[\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}|(INFO|ERROR|WARN|DEBUG)\s*[:\]])")
+    ),
+    # Documentation & Markdown Notes
+    (
+        "Documents",
+        "Markdown_Notes",
+        ["# ", "## ", "### ", "```", "---", "- [ ]", "- [x]"],
+        2,
+        re.compile(r"^#{1,3}\s+[a-zA-Z0-9]+", re.MULTILINE)
+    ),
+]
+
+def is_text_file(filepath: Path) -> bool:
+    """Checks if a file is plain text by reading a small chunk and checking byte values."""
+    try:
+        with open(filepath, "rb") as f:
+            chunk = f.read(1024)
+        if not chunk:
+            return True
+        # If there are null bytes, it's almost certainly binary
+        if b"\x00" in chunk:
+            return False
+        # Try UTF-8 decode
+        try:
+            chunk.decode("utf-8")
+            return True
+        except UnicodeDecodeError:
+            # Fallback check printable ASCII ratio
+            printable = sum(1 for b in chunk if 32 <= b <= 126 or b in (9, 10, 13))
+            return (printable / len(chunk)) > 0.85
+    except Exception:
+        return False
+
+def inspect_text_content(filepath: Path) -> Optional[Tuple[str, str]]:
+    """
+    Scans the beginning of a text file and scores it against known content patterns.
+    Returns (category, subcategory) or None.
+    """
+    if not is_text_file(filepath):
+        return None
+
+    try:
+        with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+            text = f.read(SAMPLE_SIZE)
+    except Exception:
+        return None
+
+    if not text.strip():
+        return ("Documents", "Empty_Text")
+
+    lower_text = text.lower()
+    best_candidate: Optional[Tuple[str, str]] = None
+    highest_score = 0
+
+    for category, subcategory, keywords, threshold, regex in TEXT_RULES:
+        # Count keyword hits
+        matches = sum(1 for kw in keywords if kw in lower_text)
+        
+        # Regex bonus
+        bonus = 0
+        if regex and regex.search(text):
+            bonus = 3
+
+        total_score = matches + bonus
+
+        if matches >= threshold and total_score > highest_score:
+            highest_score = total_score
+            best_candidate = (category, subcategory)
+
+    if best_candidate:
+        return best_candidate
+
+    return ("Documents", "General_Text")

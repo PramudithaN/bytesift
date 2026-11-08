@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bytesift"
+version = "0.1.0"
+description = "Lightweight, blazing-fast, 100% offline file content examiner and organizer without AI or internet."
+authors = [
+    { name = "Pramuditha" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Topic :: System :: Filesystems",
+    "Topic :: Utilities",
+]
+dependencies = []
+
+[project.scripts]
+bytesift = "bytesift.cli:main"

@@ -1,0 +1,75 @@
+"""
+ByteSift Metadata Inspector
+Extracts timestamp, date groups, and embedded metadata (e.g. EXIF) without external libraries.
+"""
+
+from datetime import datetime
+from pathlib import Path
+from typing import Optional, Tuple
+import os
+
+def get_file_dates(filepath: Path) -> Tuple[datetime, str, str]:
+    """
+    Returns (datetime_obj, year_str, year_month_str) for the file.
+    Prefers creation time (ctime on Windows) or modification time.
+    """
+    stat = filepath.stat()
+    # On Windows, st_ctime is the file creation timestamp; on Linux it's metadata change
+    timestamp = getattr(stat, "st_birthtime", None) or stat.st_ctime
+    # If ctime seems newer than mtime (e.g. downloaded recently), mtime might reflect actual file creation
+    dt_c = datetime.fromtimestamp(timestamp)
+    dt_m = datetime.fromtimestamp(stat.st_mtime)
+    
+    # Choose earlier date if realistic
+    chosen_dt = min(dt_c, dt_m)
+    return (chosen_dt, chosen_dt.strftime("%Y"), chosen_dt.strftime("%Y-%m"))
+
+def extract_jpeg_exif_date(filepath: Path) -> Optional[datetime]:
+    """
+    Lightweight zero-dependency JPEG EXIF parser for DateTimeOriginal (Tag 0x9003).
+    Scans the APP1 segment without requiring Pillow/PExif.
+    """
+    try:
+        with open(filepath, "rb") as f:
+            header = f.read(2)
+            if header != b"\xff\xd8":
+                return None
+
+            while True:
+                marker_header = f.read(4)
+                if len(marker_header) < 4 or marker_header[0] != 0xFF:
+                    break
+                marker = marker_header[1]
+                length = int.from_bytes(marker_header[2:4], "big")
+                
+                # APP1 marker (EXIF)
+                if marker == 0xE1:
+                    data = f.read(length - 2)
+                    if data.startswith(b"Exif\x00\x00"):
+                        # Search for ASCII date format: YYYY:MM:DD HH:MM:SS
+                        raw = data[6:]
+                        import re
+                        match = re.search(rb"\b(19\d\d|20\d\d):(\d\d):(\d\d)\s+(\d\d):(\d\d):(\d\d)\b", raw)
+                        if match:
+                            date_str = match.group(0).decode("ascii")
+                            return datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S")
+                    break
+                else:
+                    # Skip segment
+                    f.seek(length - 2, os.SEEK_CUR)
+    except Exception:
+        pass
+    return None
+
+def get_date_category(filepath: Path) -> Tuple[str, str]:
+    """
+    Determines year and year-month group for a file, using EXIF if JPEG, otherwise file stats.
+    Returns (year, year_month).
+    """
+    if filepath.suffix.lower() in (".jpg", ".jpeg"):
+        exif_dt = extract_jpeg_exif_date(filepath)
+        if exif_dt:
+            return (exif_dt.strftime("%Y"), exif_dt.strftime("%Y-%m"))
+
+    _, year, ym = get_file_dates(filepath)
+    return (year, ym)
