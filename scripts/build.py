@@ -38,6 +38,7 @@ def main():
 
     if sys.platform.startswith("win"):
         icon_path = assets_dir / "icon_light.ico"
+        version_file = root_dir / "scripts" / "version_info.txt"
         cmd = [
             sys.executable, "-m", "PyInstaller",
             "--noconfirm",
@@ -47,8 +48,11 @@ def main():
             "--name", "ByteSift-Windows-x64",
             "--icon", str(icon_path),
             "--add-data", add_data_arg,
-            str(entry_point),
         ]
+        if version_file.exists():
+            cmd.extend(["--version-file", str(version_file)])
+        cmd.append(str(entry_point))
+
         print("\n[*] Executing Windows Build:")
         print(" ".join(cmd))
         subprocess.check_call(cmd)
@@ -60,6 +64,17 @@ def main():
             shutil.copyfile(src_exe, dest_exe)
             print(f"\n[+] Created: {src_exe}")
             print(f"[+] Created mirror: {dest_exe}")
+
+            # Package into ZIP archive for browser download safety
+            zip_path = dist_dir / "ByteSift-Windows-x64.zip"
+            import zipfile
+            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+                zf.write(dest_exe, arcname="ByteSift.exe")
+                if (root_dir / "README.md").exists():
+                    zf.write(root_dir / "README.md", arcname="README.md")
+                if (root_dir / "LICENSE").exists():
+                    zf.write(root_dir / "LICENSE", arcname="LICENSE.txt")
+            print(f"[+] Created ZIP package: {zip_path}")
 
     elif sys.platform == "darwin":
         icns_path = assets_dir / "icon_light.icns"

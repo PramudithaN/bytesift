@@ -44,6 +44,7 @@ jobs:
           path: |
             dist/ByteSift-Windows-x64.exe
             dist/ByteSift.exe
+            dist/ByteSift-Windows-x64.zip
 
   build-macos:
     name: Build macOS Application & DMG (.dmg)
