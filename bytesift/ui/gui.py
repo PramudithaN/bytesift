@@ -20,7 +20,8 @@ from bytesift.ui.theme import (
     ThemeColors,
     apply_fluent_theme,
     enable_windows_dpi_awareness,
-    is_windows_dark_theme,
+    get_system_font,
+    is_system_dark_theme,
     set_windows_titlebar_appearance,
 )
 
@@ -75,7 +76,11 @@ class ByteSiftApp:
         self.current_theme: ThemeColors = DARK_THEME
 
         # Pre-load initial theme icon (white icon in dark mode, black icon in light mode)
-        self._apply_window_icon(is_windows_dark_theme())
+        self._apply_window_icon(is_system_dark_theme())
+
+        # Build native menu bar and shortcuts (integrated into macOS system menu)
+        self._build_menu_bar()
+        self._setup_keyboard_shortcuts()
 
         # Build UI layout
         self._build_ui()
@@ -83,7 +88,7 @@ class ByteSiftApp:
         # Determine and apply initial theme
         self._sync_theme()
 
-        # Start periodic background listener for Windows system theme changes
+        # Start periodic background listener for system theme changes (macOS/Windows)
         self._schedule_system_theme_check()
 
         if initial_folder:
@@ -127,7 +132,7 @@ class ByteSiftApp:
         elif mode == "Light":
             is_dark = False
         else:  # "System"
-            is_dark = is_windows_dark_theme()
+            is_dark = is_system_dark_theme()
 
         self.current_theme = DARK_THEME if is_dark else LIGHT_THEME
         apply_fluent_theme(self.root, self.current_theme)
@@ -135,9 +140,9 @@ class ByteSiftApp:
         self._update_widget_colors()
 
     def _schedule_system_theme_check(self):
-        """Polls Windows system theme every 2.5 seconds when in System mode."""
+        """Polls system theme every 2.5 seconds when in System mode."""
         if self.theme_mode_var.get() == "System":
-            sys_dark = is_windows_dark_theme()
+            sys_dark = is_system_dark_theme()
             current_is_dark = (self.current_theme.name == "dark")
             if sys_dark != current_is_dark:
                 self._sync_theme()
@@ -162,6 +167,57 @@ class ByteSiftApp:
 
         # Force title bar update
         set_windows_titlebar_appearance(self.root, theme.name == "dark")
+
+    def _build_menu_bar(self):
+        """Builds native top menu bar (integrated into macOS system menu on Mac)."""
+        menubar = tk.Menu(self.root)
+        self.root.config(menu=menubar)
+
+        mod = "⌘" if sys.platform == "darwin" else "Ctrl"
+
+        # File Menu
+        file_menu = tk.Menu(menubar, tearoff=0)
+        file_menu.add_command(label="Open Folder...", accelerator=f"{mod}+O", command=self.on_browse)
+        file_menu.add_command(label="Refresh Preview", accelerator=f"{mod}+R", command=self.on_scan)
+        open_lbl = "Reveal in Finder" if sys.platform == "darwin" else "Open in File Explorer"
+        file_menu.add_command(label=open_lbl, command=self.on_open_in_explorer)
+        file_menu.add_separator()
+        file_menu.add_command(label="Organize Files", accelerator=f"{mod}+Enter", command=self.on_organize)
+        menubar.add_cascade(label="File", menu=file_menu)
+
+        # Edit Menu
+        edit_menu = tk.Menu(menubar, tearoff=0)
+        edit_menu.add_command(label="Undo Organization", accelerator=f"{mod}+Z", command=self.on_undo)
+        menubar.add_cascade(label="Edit", menu=edit_menu)
+
+        # View Menu
+        view_menu = tk.Menu(menubar, tearoff=0)
+        view_menu.add_radiobutton(label="System Theme", variable=self.theme_mode_var, value="System", command=self._sync_theme)
+        view_menu.add_radiobutton(label="Dark Mode", variable=self.theme_mode_var, value="Dark", command=self._sync_theme)
+        view_menu.add_radiobutton(label="Light Mode", variable=self.theme_mode_var, value="Light", command=self._sync_theme)
+        menubar.add_cascade(label="View", menu=view_menu)
+
+        # Help Menu
+        help_menu = tk.Menu(menubar, tearoff=0)
+        help_menu.add_command(label="About ByteSift", command=self.on_about)
+        menubar.add_cascade(label="Help", menu=help_menu)
+
+    def _setup_keyboard_shortcuts(self):
+        """Binds standard macOS (Command) and Windows/Linux (Control) shortcuts."""
+        mod = "Command" if sys.platform == "darwin" else "Control"
+        self.root.bind(f"<{mod}-o>", lambda e: self.on_browse())
+        self.root.bind(f"<{mod}-r>", lambda e: self.on_scan())
+        self.root.bind(f"<{mod}-z>", lambda e: self.on_undo())
+        self.root.bind(f"<{mod}-Return>", lambda e: self.on_organize())
+
+    def on_about(self):
+        """Displays About ByteSift dialog."""
+        messagebox.showinfo(
+            "About ByteSift",
+            "ByteSift v0.1.0\n\n"
+            "Lightweight, 100% offline file content examiner and organizer.\n"
+            "Designed for macOS, Windows, and Linux without external dependencies."
+        )
 
     def _build_ui(self):
         # 1. Top Navigation & Header Bar
@@ -218,14 +274,15 @@ class ByteSiftApp:
         dir_input_row = ttk.Frame(self.card_dir, style="CardContent.TFrame")
         dir_input_row.pack(fill=tk.X)
 
-        self.dir_entry = ttk.Entry(dir_input_row, textvariable=self.selected_folder, font=("Segoe UI", 9))
+        self.dir_entry = ttk.Entry(dir_input_row, textvariable=self.selected_folder, font=get_system_font(9))
         self.dir_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
         self.dir_entry.bind("<Return>", lambda e: self.on_scan())
 
         browse_btn = ttk.Button(dir_input_row, text="Browse Folder", command=self.on_browse)
         browse_btn.pack(side=tk.LEFT, padx=(0, 6))
 
-        open_folder_btn = ttk.Button(dir_input_row, text="Open in File Explorer", command=self.on_open_in_explorer)
+        open_btn_text = "Reveal in Finder" if sys.platform == "darwin" else "Open in File Explorer"
+        open_folder_btn = ttk.Button(dir_input_row, text=open_btn_text, command=self.on_open_in_explorer)
         open_folder_btn.pack(side=tk.LEFT)
 
         # 3. Card: Rules & Strategy Controls
@@ -344,7 +401,26 @@ class ByteSiftApp:
                 recursive=self.recursive_var.get()
             )
             organizer = Organizer(config)
-            plan = organizer.generate_plan(folder)
+            try:
+                plan = organizer.generate_plan(folder)
+            except PermissionError:
+                def alert_permission():
+                    self.scan_btn.config(state=tk.NORMAL)
+                    self.status_var.set("Access denied by system security.")
+                    if sys.platform == "darwin":
+                        messagebox.showwarning(
+                            "macOS Permission Required",
+                            f"ByteSift was denied access to '{folder.name}'.\n\n"
+                            "macOS requires explicit permission for user folders (Documents, Downloads, Desktop).\n\n"
+                            "To grant access:\n"
+                            "1. Open Apple Menu > System Settings.\n"
+                            "2. Navigate to 'Privacy & Security' > 'Files and Folders'.\n"
+                            "3. Enable access for Terminal / Python."
+                        )
+                    else:
+                        messagebox.showwarning("Permission Denied", f"Access denied to '{folder}'.")
+                self.root.after(0, alert_permission)
+                return
 
             def update_ui():
                 self.current_plan = plan

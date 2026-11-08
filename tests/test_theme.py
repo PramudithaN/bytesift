@@ -3,6 +3,9 @@ from bytesift.ui.theme import (
     DARK_THEME,
     LIGHT_THEME,
     is_windows_dark_theme,
+    is_macos_dark_theme,
+    is_system_dark_theme,
+    get_system_font,
     enable_windows_dpi_awareness,
 )
 
@@ -13,10 +16,17 @@ class TestTheme(unittest.TestCase):
         self.assertTrue(DARK_THEME.bg.startswith("#"))
         self.assertTrue(LIGHT_THEME.bg.startswith("#"))
 
-    def test_windows_theme_detection(self):
-        # Should return a boolean without throwing an exception
-        res = is_windows_dark_theme()
-        self.assertIsInstance(res, bool)
+    def test_theme_detection(self):
+        self.assertIsInstance(is_windows_dark_theme(), bool)
+        self.assertIsInstance(is_macos_dark_theme(), bool)
+        self.assertIsInstance(is_system_dark_theme(), bool)
+
+    def test_system_font_resolver(self):
+        font = get_system_font(10, bold=True)
+        self.assertIsInstance(font, tuple)
+        self.assertEqual(len(font), 3)
+        self.assertEqual(font[1], 10)
+        self.assertEqual(font[2], "bold")
 
     def test_dpi_awareness_call(self):
         # Should execute safely on any platform

@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_IGNORED_NAMES: Set[str] = {
     ".git", ".svn", ".hg", "node_modules", "__pycache__", ".venv", "venv",
-    ".bytesift_history.json", "desktop.ini", ".DS_Store", "Thumbs.db"
+    ".bytesift_history.json", "desktop.ini", ".DS_Store", "Thumbs.db",
+    ".localized", ".Trashes", ".fseventsd", ".Spotlight-V100"
 }
 
 @dataclass
@@ -73,10 +74,10 @@ class Organizer:
 
     def _is_ignored(self, item: Path, root: Path) -> bool:
         """Determines if a file or any of its parents is in the ignored list."""
-        if item.name in self.ignored or item.name.startswith("."):
+        if item.name in self.ignored or item.name.startswith(".") or item.name.startswith("._"):
             return True
         for part in item.relative_to(root).parts[:-1]:
-            if part in self.ignored or part.startswith("."):
+            if part in self.ignored or part.startswith(".") or part.startswith("._"):
                 return True
         return False
 

@@ -1,17 +1,19 @@
 """
-ByteSift Modern Windows Theme & Styling Engine
-Provides authentic Windows 11 / Fluent styling with complete dark and light mode coverage
-for Scrollbars, Comboboxes, Checkbuttons, Inputs, Tables, and Popups.
+ByteSift Modern Cross-Platform Theme & Styling Engine
+Supports Windows 11 Fluent and macOS Aqua/Human Interface Guidelines with automatic
+system dark/light mode detection on Windows, macOS, and Linux.
 """
 
 import ctypes
 from dataclasses import dataclass
+import subprocess
 import sys
 import tkinter as tk
 from tkinter import ttk
-from typing import Optional
+from typing import Optional, Tuple
 
 IS_WINDOWS = sys.platform == "win32"
+IS_DARWIN = sys.platform == "darwin"
 
 if IS_WINDOWS:
     try:
@@ -54,7 +56,8 @@ class ThemeColors:
     warning_bg: str
     warning_text: str
 
-DARK_THEME = ThemeColors(
+# Windows 11 Fluent Dark & Light Palettes
+WINDOWS_DARK = ThemeColors(
     name="dark",
     bg="#1a1a1a",
     card_bg="#242424",
@@ -87,7 +90,7 @@ DARK_THEME = ThemeColors(
     warning_text="#ffd358"
 )
 
-LIGHT_THEME = ThemeColors(
+WINDOWS_LIGHT = ThemeColors(
     name="light",
     bg="#f3f3f3",
     card_bg="#ffffff",
@@ -120,8 +123,88 @@ LIGHT_THEME = ThemeColors(
     warning_text="#7a5200"
 )
 
+# macOS Aqua & Human Interface Guidelines Palettes
+MACOS_DARK = ThemeColors(
+    name="dark",
+    bg="#1e1e1e",
+    card_bg="#282828",
+    card_border="#3a3a3c",
+    text_primary="#ffffff",
+    text_secondary="#98989d",
+    accent="#0a84ff",
+    accent_hover="#409cff",
+    accent_text="#ffffff",
+    button_secondary_bg="#323232",
+    button_secondary_hover="#3d3d3d",
+    button_secondary_pressed="#262626",
+    entry_bg="#1e1e1e",
+    entry_border="#3a3a3c",
+    scroll_track="#202020",
+    scroll_thumb="#444446",
+    scroll_thumb_hover="#5c5c5e",
+    check_bg="#1e1e1e",
+    check_border="#545458",
+    check_indicator="#0a84ff",
+    table_bg="#222222",
+    table_alt_bg="#282828",
+    table_selected="#0a84ff",
+    table_selected_text="#ffffff",
+    table_header_bg="#2c2c2e",
+    table_header_text="#d1d1d6",
+    table_border="#3a3a3c",
+    status_bg="#181818",
+    warning_bg="#3a2e0a",
+    warning_text="#ffd60a"
+)
+
+MACOS_LIGHT = ThemeColors(
+    name="light",
+    bg="#f2f2f7",
+    card_bg="#ffffff",
+    card_border="#e5e5ea",
+    text_primary="#000000",
+    text_secondary="#6c6c70",
+    accent="#007aff",
+    accent_hover="#0062cc",
+    accent_text="#ffffff",
+    button_secondary_bg="#e5e5ea",
+    button_secondary_hover="#d1d1d6",
+    button_secondary_pressed="#c7c7cc",
+    entry_bg="#ffffff",
+    entry_border="#d1d1d6",
+    scroll_track="#f2f2f7",
+    scroll_thumb="#c7c7cc",
+    scroll_thumb_hover="#aeaeb2",
+    check_bg="#ffffff",
+    check_border="#8e8e93",
+    check_indicator="#007aff",
+    table_bg="#ffffff",
+    table_alt_bg="#f7f7fa",
+    table_selected="#007aff",
+    table_selected_text="#ffffff",
+    table_header_bg="#f2f2f7",
+    table_header_text="#1c1c1e",
+    table_border="#e5e5ea",
+    status_bg="#e5e5ea",
+    warning_bg="#fff9e6",
+    warning_text="#8f6b00"
+)
+
+# Active platform theme defaults
+DARK_THEME = MACOS_DARK if IS_DARWIN else WINDOWS_DARK
+LIGHT_THEME = MACOS_LIGHT if IS_DARWIN else WINDOWS_LIGHT
+
+def get_system_font(size: int = 9, bold: bool = False) -> Tuple[str, int, str]:
+    """Returns platform-optimized system font tuple."""
+    weight = "bold" if bold else "normal"
+    if IS_DARWIN:
+        return (".AppleSystemUIFont", size, weight)
+    if IS_WINDOWS:
+        return ("Segoe UI", size, weight)
+    return ("sans-serif", size, weight)
+
 def enable_windows_dpi_awareness():
-    """Configures high-DPI awareness on Windows to prevent blurry text."""
+    """Configures high-DPI awareness on Windows to prevent blurry rendering."""
     if not IS_WINDOWS:
         return
     try:
@@ -133,7 +216,7 @@ def enable_windows_dpi_awareness():
             pass
 
 def is_windows_dark_theme() -> bool:
-    """Reads the Windows Personalize registry key to detect system dark mode."""
+    """Reads Windows Personalize registry key to detect Dark Mode."""
     if not IS_WINDOWS or not winreg:
         return False
     try:
@@ -147,8 +230,31 @@ def is_windows_dark_theme() -> bool:
     except (OSError, FileNotFoundError):
         return False
 
+def is_macos_dark_theme() -> bool:
+    """Reads macOS user defaults to detect Dark Mode."""
+    if not IS_DARWIN:
+        return False
+    try:
+        res = subprocess.run(
+            ["defaults", "read", "-g", "AppleInterfaceStyle"],
+            capture_output=True,
+            text=True,
+            timeout=1
+        )
+        return res.returncode == 0 and "Dark" in res.stdout
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+def is_system_dark_theme() -> bool:
+    """Detects system Dark Mode across Windows, macOS, and Linux."""
+    if IS_WINDOWS:
+        return is_windows_dark_theme()
+    if IS_DARWIN:
+        return is_macos_dark_theme()
+    return False
+
 def set_windows_titlebar_appearance(root: tk.Tk, dark: bool):
-    """Sets immersive dark mode on Windows 10/11 title bar via DwmSetWindowAttribute."""
+    """Sets dark mode on Windows 10/11 title bar via DwmSetWindowAttribute."""
     if not IS_WINDOWS:
         return
     try:
@@ -158,7 +264,6 @@ def set_windows_titlebar_appearance(root: tk.Tk, dark: bool):
             hwnd = root.winfo_id()
 
         val = ctypes.c_int(1 if dark else 0)
-        # Try DWMWA_USE_IMMERSIVE_DARK_MODE = 20 (Win11/Win10 20H1+), then 19 (older Win10)
         res = ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, 20, ctypes.byref(val), ctypes.sizeof(val))
         if res != 0:
             ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, 19, ctypes.byref(val), ctypes.sizeof(val))
@@ -166,17 +271,22 @@ def set_windows_titlebar_appearance(root: tk.Tk, dark: bool):
         pass
 
 def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
-    """Applies modern Windows Fluent theme styles across all TTK and Tk widgets."""
+    """Applies modern Fluent (Windows) / Aqua (macOS) styles across widgets."""
     root.configure(bg=theme.bg)
     style = ttk.Style(root)
     style.theme_use("clam")
+
+    font_body = get_system_font(9)
+    font_bold = get_system_font(9, bold=True)
+    font_title = get_system_font(16, bold=True)
+    font_section = get_system_font(10, bold=True)
 
     # Global Tk option database for popups, combobox dropdown lists, and menus
     root.option_add("*TCombobox*Listbox.background", theme.card_bg)
     root.option_add("*TCombobox*Listbox.foreground", theme.text_primary)
     root.option_add("*TCombobox*Listbox.selectBackground", theme.accent)
     root.option_add("*TCombobox*Listbox.selectForeground", theme.accent_text)
-    root.option_add("*TCombobox*Listbox.font", ("Segoe UI", 9))
+    root.option_add("*TCombobox*Listbox.font", font_body)
     root.option_add("*TCombobox*Listbox.relief", "flat")
     root.option_add("*TCombobox*Listbox.borderWidth", "1")
     root.option_add("*TCombobox*Listbox.highlightThickness", "1")
@@ -190,48 +300,13 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
     style.configure("Status.TFrame", background=theme.status_bg)
 
     # Label styles
-    style.configure(
-        "TLabel",
-        background=theme.bg,
-        foreground=theme.text_primary,
-        font=("Segoe UI", 9)
-    )
-    style.configure(
-        "Card.TLabel",
-        background=theme.card_bg,
-        foreground=theme.text_primary,
-        font=("Segoe UI", 9)
-    )
-    style.configure(
-        "CardSecondary.TLabel",
-        background=theme.card_bg,
-        foreground=theme.text_secondary,
-        font=("Segoe UI", 9)
-    )
-    style.configure(
-        "Title.TLabel",
-        background=theme.bg,
-        foreground=theme.text_primary,
-        font=("Segoe UI", 16, "bold")
-    )
-    style.configure(
-        "Subtitle.TLabel",
-        background=theme.bg,
-        foreground=theme.text_secondary,
-        font=("Segoe UI", 9)
-    )
-    style.configure(
-        "Section.TLabel",
-        background=theme.card_bg,
-        foreground=theme.text_primary,
-        font=("Segoe UI", 10, "bold")
-    )
-    style.configure(
-        "Status.TLabel",
-        background=theme.status_bg,
-        foreground=theme.text_primary,
-        font=("Segoe UI", 9)
-    )
+    style.configure("TLabel", background=theme.bg, foreground=theme.text_primary, font=font_body)
+    style.configure("Card.TLabel", background=theme.card_bg, foreground=theme.text_primary, font=font_body)
+    style.configure("CardSecondary.TLabel", background=theme.card_bg, foreground=theme.text_secondary, font=font_body)
+    style.configure("Title.TLabel", background=theme.bg, foreground=theme.text_primary, font=font_title)
+    style.configure("Subtitle.TLabel", background=theme.bg, foreground=theme.text_secondary, font=font_body)
+    style.configure("Section.TLabel", background=theme.card_bg, foreground=theme.text_primary, font=font_section)
+    style.configure("Status.TLabel", background=theme.status_bg, foreground=theme.text_primary, font=font_body)
 
     # Modern Entry styling
     style.configure(
@@ -242,7 +317,8 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
         bordercolor=theme.entry_border,
         lightcolor=theme.card_bg,
         darkcolor=theme.card_bg,
-        padding=6
+        padding=6,
+        font=font_body
     )
     style.map(
         "TEntry",
@@ -260,7 +336,7 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
         lowerbordercolor=theme.check_border,
         indicatorsize=15,
         indicatormargin=(0, 2, 8, 2),
-        font=("Segoe UI", 9)
+        font=font_body
     )
     style.map(
         "TCheckbutton",
@@ -289,7 +365,8 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
         bordercolor=theme.entry_border,
         lightcolor=theme.card_bg,
         darkcolor=theme.card_bg,
-        padding=5
+        padding=5,
+        font=font_body
     )
     style.map(
         "TCombobox",
@@ -305,7 +382,7 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
     # Primary Accent Button
     style.configure(
         "Accent.TButton",
-        font=("Segoe UI", 9, "bold"),
+        font=font_bold,
         background=theme.accent,
         foreground=theme.accent_text,
         bordercolor=theme.accent,
@@ -321,10 +398,10 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
         bordercolor=[("active", theme.accent_hover), ("disabled", theme.card_border)]
     )
 
-    # Standard Secondary Fluent Button
+    # Secondary Button
     style.configure(
         "TButton",
-        font=("Segoe UI", 9),
+        font=font_body,
         background=theme.button_secondary_bg,
         foreground=theme.text_primary,
         bordercolor=theme.card_border,
@@ -344,7 +421,7 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
         bordercolor=[("active", theme.text_secondary), ("disabled", theme.card_border)]
     )
 
-    # Modern Fluent Scrollbar styling
+    # Modern Scrollbar styling
     for orient in ["Vertical", "Horizontal"]:
         style.configure(
             f"{orient}.TScrollbar",
@@ -374,7 +451,7 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
         lightcolor=theme.table_bg,
         darkcolor=theme.table_bg,
         rowheight=28,
-        font=("Segoe UI", 9)
+        font=font_body
     )
     style.map(
         "Treeview",
@@ -388,7 +465,7 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
         bordercolor=theme.table_border,
         lightcolor=theme.table_header_bg,
         darkcolor=theme.table_header_bg,
-        font=("Segoe UI", 9, "bold"),
+        font=font_bold,
         relief="flat",
         padding=(8, 7)
     )
@@ -398,5 +475,6 @@ def apply_fluent_theme(root: tk.Tk, theme: ThemeColors):
         foreground=[("active", theme.text_primary)]
     )
 
-    # Update Windows Title Bar
-    set_windows_titlebar_appearance(root, theme.name == "dark")
+    # Update Windows Title Bar if on Windows
+    if IS_WINDOWS:
+        set_windows_titlebar_appearance(root, theme.name == "dark")
