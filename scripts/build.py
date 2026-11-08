@@ -62,18 +62,19 @@ def main():
             print(f"[+] Created mirror: {dest_exe}")
 
     elif sys.platform == "darwin":
-        icon_path = assets_dir / "icon_light.png"
+        icns_path = assets_dir / "icon_light.icns"
         cmd = [
             sys.executable, "-m", "PyInstaller",
             "--noconfirm",
             "--clean",
             "--windowed",
             "--name", "ByteSift",
-            "--icon", str(icon_path),
             "--osx-bundle-identifier", "com.bytesift.app",
             "--add-data", add_data_arg,
-            str(entry_point),
         ]
+        if icns_path.exists():
+            cmd.extend(["--icon", str(icns_path)])
+        cmd.append(str(entry_point))
         print("\n[*] Executing macOS Build:")
         print(" ".join(cmd))
         subprocess.check_call(cmd)
