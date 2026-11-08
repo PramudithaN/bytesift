@@ -104,7 +104,13 @@ class ByteSiftApp:
         - White folder icon on dark background.
         - Black folder icon on light background.
         """
-        assets_dir = Path(__file__).resolve().parent.parent / "assets"
+        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+            base_dir = Path(sys._MEIPASS)
+            assets_dir = base_dir / "bytesift" / "assets"
+            if not assets_dir.exists():
+                assets_dir = base_dir / "assets"
+        else:
+            assets_dir = Path(__file__).resolve().parent.parent / "assets"
         suffix = "light" if is_dark else "dark"
         ico_path = assets_dir / f"icon_{suffix}.ico"
         png_path = assets_dir / f"icon_{suffix}.png"

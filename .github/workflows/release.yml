@@ -1,0 +1,174 @@
+name: Release Standalone Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release Tag to build & publish (e.g. v0.1.0)'
+        required: true
+        default: 'v0.1.0'
+      draft:
+        description: 'Create as Draft Release'
+        type: boolean
+        default: false
+      prerelease:
+        description: 'Mark as Pre-release'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows Executable (.exe)
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller
+
+      - name: Compile Windows Executable
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed `
+            --name "ByteSift-Windows-x64" `
+            --icon "bytesift/assets/icon_light.ico" `
+            --add-data "bytesift/assets;bytesift/assets" `
+            bytesift/__main__.py
+          Copy-Item "dist/ByteSift-Windows-x64.exe" -Destination "dist/ByteSift.exe"
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-binaries
+          path: |
+            dist/ByteSift-Windows-x64.exe
+            dist/ByteSift.exe
+
+  build-macos:
+    name: Build macOS Application & DMG (.dmg)
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller
+
+      - name: Compile macOS Application Bundle
+        run: |
+          pyinstaller --noconfirm --clean --windowed \
+            --name "ByteSift" \
+            --icon "bytesift/assets/icon_light.png" \
+            --add-data "bytesift/assets:bytesift/assets" \
+            --osx-bundle-identifier "com.bytesift.app" \
+            bytesift/__main__.py
+
+      - name: Package DMG and ZIP
+        run: |
+          mkdir -p dmg_root
+          cp -R dist/ByteSift.app dmg_root/
+          ln -s /Applications dmg_root/Applications
+          hdiutil create -volname "ByteSift" -srcfolder dmg_root -ov -format UDZO "dist/ByteSift-macOS-Universal.dmg"
+          cp "dist/ByteSift-macOS-Universal.dmg" "dist/ByteSift.dmg"
+          ditto -c -k --keepParent dist/ByteSift.app dist/ByteSift-macOS.zip
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-binaries
+          path: |
+            dist/ByteSift-macOS-Universal.dmg
+            dist/ByteSift.dmg
+            dist/ByteSift-macOS.zip
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download all release binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Generate SHA-256 Checksums
+        run: |
+          cd release-assets
+          sha256sum ByteSift-Windows-x64.exe ByteSift.exe ByteSift-macOS-Universal.dmg ByteSift.dmg ByteSift-macOS.zip > checksums.txt
+          cat checksums.txt
+
+      - name: Resolve Release Tag Name
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Assets and Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: "ByteSift ${{ steps.vars.outputs.tag }}"
+          draft: ${{ github.event.inputs.draft || false }}
+          prerelease: ${{ github.event.inputs.prerelease || false }}
+          generate_release_notes: true
+          files: |
+            release-assets/ByteSift-Windows-x64.exe
+            release-assets/ByteSift.exe
+            release-assets/ByteSift-macOS-Universal.dmg
+            release-assets/ByteSift.dmg
+            release-assets/ByteSift-macOS.zip
+            release-assets/checksums.txt
+          body: |
+            ## ByteSift Standalone Release
+
+            Deterministic, offline file classifier and smart organizer. Inspects file contents directly rather than relying on file extensions.
+
+            ### Downloads
+
+            | Platform | File | Description |
+            | :--- | :--- | :--- |
+            | **Windows 10 / 11 (64-bit)** | [`ByteSift-Windows-x64.exe`](https://github.com/PramudithaN/bytesift/releases/download/${{ steps.vars.outputs.tag }}/ByteSift-Windows-x64.exe) | Portable single-file executable. Just download and double-click to run. |
+            | **Windows (Convenience mirror)** | [`ByteSift.exe`](https://github.com/PramudithaN/bytesift/releases/download/${{ steps.vars.outputs.tag }}/ByteSift.exe) | Same portable binary with shortened file name. |
+            | **macOS (Universal / Apple Silicon & Intel)** | [`ByteSift-macOS-Universal.dmg`](https://github.com/PramudithaN/bytesift/releases/download/${{ steps.vars.outputs.tag }}/ByteSift-macOS-Universal.dmg) | Drag-and-drop disk image installer. |
+            | **macOS (Convenience mirror)** | [`ByteSift.dmg`](https://github.com/PramudithaN/bytesift/releases/download/${{ steps.vars.outputs.tag }}/ByteSift.dmg) | Same disk image with shortened file name. |
+            | **macOS Portable Zip** | [`ByteSift-macOS.zip`](https://github.com/PramudithaN/bytesift/releases/download/${{ steps.vars.outputs.tag }}/ByteSift-macOS.zip) | Standalone zipped `.app` bundle. |
+
+            ### Integrity & Verification
+
+            Check file integrity against `checksums.txt` using SHA-256:
+            ```bash
+            # Windows PowerShell
+            Get-FileHash -Algorithm SHA256 .\ByteSift-Windows-x64.exe
+
+            # macOS / Linux
+            shasum -a 256 ByteSift-macOS-Universal.dmg
+            ```

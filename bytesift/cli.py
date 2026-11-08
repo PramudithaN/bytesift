@@ -161,9 +161,15 @@ def main():
     p_gui.set_defaults(func=cmd_gui)
 
     if len(sys.argv) == 1:
-        print_banner()
-        parser.print_help()
-        sys.exit(0)
+        # Default to desktop GUI when launched without subcommands (e.g. double-clicked executable)
+        try:
+            from bytesift.ui.gui import launch_gui
+            launch_gui()
+            sys.exit(0)
+        except Exception:
+            print_banner()
+            parser.print_help()
+            sys.exit(0)
 
     args = parser.parse_args()
     if hasattr(args, "func"):
