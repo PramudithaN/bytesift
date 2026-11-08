@@ -3,6 +3,7 @@ ByteSift Modern Windows Desktop GUI
 Engineered for Windows 10/11 with Fluent cards, High-DPI support, and automatic system theme detection.
 """
 
+import ctypes
 from pathlib import Path
 import subprocess
 import sys
