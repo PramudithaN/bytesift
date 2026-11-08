@@ -100,6 +100,11 @@ def main():
             print(f"[+] Created DMG: {dmg_path}")
             shutil.rmtree(dmg_root, ignore_errors=True)
 
+        if app_bundle.exists() and shutil.which("ditto"):
+            zip_path = dist_dir / "ByteSift-macOS.zip"
+            subprocess.check_call(["ditto", "-c", "-k", "--keepParent", str(app_bundle), str(zip_path)])
+            print(f"[+] Created ZIP: {zip_path}")
+
     else:
         # Linux
         icon_path = assets_dir / "icon_light.png"

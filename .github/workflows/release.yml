@@ -7,17 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release Tag to build & publish (e.g. v0.1.0)'
+        description: 'Release Tag to build & publish (e.g. v0.1.1)'
         required: true
-        default: 'v0.1.0'
-      draft:
-        description: 'Create as Draft Release'
-        type: boolean
-        default: false
-      prerelease:
-        description: 'Mark as Pre-release'
-        type: boolean
-        default: false
+        default: 'v0.1.1'
 
 permissions:
   contents: write
@@ -43,12 +35,7 @@ jobs:
 
       - name: Compile Windows Executable
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed `
-            --name "ByteSift-Windows-x64" `
-            --icon "bytesift/assets/icon_light.ico" `
-            --add-data "bytesift/assets;bytesift/assets" `
-            bytesift/__main__.py
-          Copy-Item "dist/ByteSift-Windows-x64.exe" -Destination "dist/ByteSift.exe"
+          python scripts/build.py
 
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
@@ -76,23 +63,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pyinstaller
 
-      - name: Compile macOS Application Bundle
+      - name: Compile macOS Application Bundle & DMG
         run: |
-          pyinstaller --noconfirm --clean --windowed \
-            --name "ByteSift" \
-            --icon "bytesift/assets/icon_light.png" \
-            --add-data "bytesift/assets:bytesift/assets" \
-            --osx-bundle-identifier "com.bytesift.app" \
-            bytesift/__main__.py
-
-      - name: Package DMG and ZIP
-        run: |
-          mkdir -p dmg_root
-          cp -R dist/ByteSift.app dmg_root/
-          ln -s /Applications dmg_root/Applications
-          hdiutil create -volname "ByteSift" -srcfolder dmg_root -ov -format UDZO "dist/ByteSift-macOS-Universal.dmg"
-          cp "dist/ByteSift-macOS-Universal.dmg" "dist/ByteSift.dmg"
-          ditto -c -k --keepParent dist/ByteSift.app dist/ByteSift-macOS.zip
+          python scripts/build.py
 
       - name: Upload macOS Artifacts
         uses: actions/upload-artifact@v4
@@ -134,11 +107,14 @@ jobs:
 
       - name: Upload Assets and Create GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
           name: "ByteSift ${{ steps.vars.outputs.tag }}"
-          draft: ${{ github.event.inputs.draft || false }}
-          prerelease: ${{ github.event.inputs.prerelease || false }}
+          draft: false
+          prerelease: false
+          make_latest: true
           generate_release_notes: true
           files: |
             release-assets/ByteSift-Windows-x64.exe
