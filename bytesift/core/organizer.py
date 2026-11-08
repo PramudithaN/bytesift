@@ -5,12 +5,15 @@ Generates execution plans, previews organization actions, and safely executes mo
 
 from dataclasses import dataclass
 from pathlib import Path
+import logging
 import shutil
 from typing import Callable, List, Optional, Set
 from bytesift.core.classifier import Classifier, Classification
 from bytesift.core.transaction import TransactionManager, FileMoveRecord
 from bytesift.inspectors.hasher import find_duplicate_groups
 from bytesift.inspectors.metadata import get_date_category
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_IGNORED_NAMES: Set[str] = {
     ".git", ".svn", ".hg", "node_modules", "__pycache__", ".venv", "venv",
@@ -118,7 +121,7 @@ class Organizer:
 
             # Strategy: Date-first
             if self.config.strategy == "date":
-                year, ym = get_date_category(file)
+                _, ym = get_date_category(file)
                 category = f"Timeline/{ym}"
                 method = "date_metadata"
             else:
@@ -167,8 +170,8 @@ class Organizer:
                     target_path=str(item.target_path.resolve())
                 ))
                 moved_count += 1
-            except Exception as e:
-                print(f"[Error] Failed to move {item.source.name} -> {item.target_path}: {e}")
+            except (OSError, shutil.Error) as e:
+                logger.error("Failed to move %s -> %s: %s", item.source.name, item.target_path, e)
 
         transaction_mgr.save_session(records)
         return moved_count

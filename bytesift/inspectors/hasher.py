@@ -17,7 +17,7 @@ def calculate_file_hash(filepath: Path, algorithm: str = "sha256") -> str:
             while chunk := f.read(CHUNK_SIZE):
                 hasher.update(chunk)
         return hasher.hexdigest()
-    except Exception:
+    except (OSError, PermissionError):
         return ""
 
 def quick_signature_hash(filepath: Path) -> str:
@@ -38,7 +38,7 @@ def quick_signature_hash(filepath: Path) -> str:
             f.seek(-8192, 2)
             hasher.update(f.read(8192))
         return hasher.hexdigest()
-    except Exception:
+    except (OSError, PermissionError):
         return ""
 
 def find_duplicate_groups(filepaths: List[Path]) -> Dict[str, List[Path]]:
@@ -52,7 +52,7 @@ def find_duplicate_groups(filepaths: List[Path]) -> Dict[str, List[Path]]:
         try:
             sz = path.stat().st_size
             by_size.setdefault(sz, []).append(path)
-        except Exception:
+        except (OSError, PermissionError):
             continue
 
     duplicates: Dict[str, List[Path]] = {}

@@ -4,9 +4,12 @@ Extracts timestamp, date groups, and embedded metadata (e.g. EXIF) without exter
 """
 
 from datetime import datetime
-from pathlib import Path
-from typing import Optional, Tuple
 import os
+from pathlib import Path
+import re
+from typing import Optional, Tuple
+
+EXIF_DATE_PATTERN = re.compile(rb"\b(19\d\d|20\d\d):(\d\d):(\d\d)\s+(\d\d):(\d\d):(\d\d)\b")
 
 def get_file_dates(filepath: Path) -> Tuple[datetime, str, str]:
     """
@@ -48,8 +51,7 @@ def extract_jpeg_exif_date(filepath: Path) -> Optional[datetime]:
                     if data.startswith(b"Exif\x00\x00"):
                         # Search for ASCII date format: YYYY:MM:DD HH:MM:SS
                         raw = data[6:]
-                        import re
-                        match = re.search(rb"\b(19\d\d|20\d\d):(\d\d):(\d\d)\s+(\d\d):(\d\d):(\d\d)\b", raw)
+                        match = EXIF_DATE_PATTERN.search(raw)
                         if match:
                             date_str = match.group(0).decode("ascii")
                             return datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S")
@@ -57,7 +59,7 @@ def extract_jpeg_exif_date(filepath: Path) -> Optional[datetime]:
                 else:
                     # Skip segment
                     f.seek(length - 2, os.SEEK_CUR)
-    except Exception:
+    except (OSError, ValueError, IndexError):
         pass
     return None
 

@@ -130,7 +130,7 @@ def is_text_file(filepath: Path) -> bool:
             # Fallback check printable ASCII ratio
             printable = sum(1 for b in chunk if 32 <= b <= 126 or b in (9, 10, 13))
             return (printable / len(chunk)) > 0.85
-    except Exception:
+    except (OSError, PermissionError):
         return False
 
 def inspect_text_content(filepath: Path) -> Optional[Tuple[str, str]]:
@@ -144,7 +144,7 @@ def inspect_text_content(filepath: Path) -> Optional[Tuple[str, str]]:
     try:
         with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
             text = f.read(SAMPLE_SIZE)
-    except Exception:
+    except (OSError, PermissionError):
         return None
 
     if not text.strip():

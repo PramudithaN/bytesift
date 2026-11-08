@@ -94,7 +94,7 @@ def inspect_zip_based_format(filepath: Path) -> Tuple[str, str]:
                     mime = z.read("mimetype").decode("utf-8", errors="ignore").strip()
                     if "epub" in mime:
                         return ("Documents", "EPUB")
-                except Exception:
+                except (OSError, UnicodeDecodeError):
                     pass
             if "word/document.xml" in namelist:
                 return ("Documents", "Word_DOCX")
@@ -104,7 +104,7 @@ def inspect_zip_based_format(filepath: Path) -> Tuple[str, str]:
                 return ("Documents", "PowerPoint_PPTX")
             if "META-INF/container.xml" in namelist:
                 return ("Documents", "EPUB")
-    except Exception:
+    except (zipfile.BadZipFile, OSError, KeyError):
         pass
     return ("Archives", "ZIP")
 

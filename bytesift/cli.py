@@ -21,17 +21,9 @@ def print_banner():
     """
     print(banner)
 
-def format_size(bytes_val: int) -> str:
-    """Formats file size into human-readable string."""
-    for unit in ["B", "KB", "MB", "GB"]:
-        if bytes_val < 1024.0:
-            return f"{bytes_val:3.1f} {unit}"
-        bytes_val /= 1024.0
-    return f"{bytes_val:.1f} TB"
-
 def display_plan(plan: List[PlanItem], base_folder: Path):
     if not plan:
-        print("\n✅ All files are already organized or folder is empty.")
+        print("\nAll files are already organized or folder is empty.")
         return
 
     print(f"\nFound {len(plan)} file(s) to organize in '{base_folder}':\n")
@@ -68,7 +60,7 @@ def cmd_scan(args):
     organizer = Organizer(config)
     plan = organizer.generate_plan(folder)
     display_plan(plan, folder)
-    print("\n💡 Run 'bytesift organize' to apply these changes.")
+    print("\nRun 'bytesift organize' to apply these changes.")
 
 def cmd_organize(args):
     folder = Path(args.folder).resolve()
@@ -101,8 +93,8 @@ def cmd_organize(args):
 
     print("\nMoving files...")
     moved = organizer.execute_plan(folder, plan)
-    print(f"🎉 Successfully organized {moved} file(s)!")
-    print("💡 To revert anytime, run: bytesift undo \"{folder}\"")
+    print(f"Successfully organized {moved} file(s).")
+    print("To revert anytime, run: bytesift undo \"{folder}\"")
 
 def cmd_undo(args):
     folder = Path(args.folder).resolve()
@@ -116,7 +108,7 @@ def cmd_undo(args):
         for err in errors:
             print(f"[!] {err}")
     if reverted > 0:
-        print(f"✅ Successfully rolled back {reverted} file(s) to original locations!")
+        print(f"Successfully rolled back {reverted} file(s) to original locations.")
     else:
         print("No files were restored.")
 

@@ -4,12 +4,15 @@ Maintains a local journal of moved files for one-click rollback (Undo).
 """
 
 import json
+import logging
 import os
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
+import shutil
 from typing import List, Optional, Tuple
 
+logger = logging.getLogger(__name__)
 JOURNAL_FILENAME = ".bytesift_history.json"
 
 @dataclass
@@ -44,8 +47,8 @@ class TransactionManager:
         try:
             with open(self.journal_path, "w", encoding="utf-8") as f:
                 json.dump(sessions, f, indent=2)
-        except Exception as e:
-            print(f"[Warning] Failed to write undo journal: {e}")
+        except OSError as e:
+            logger.warning("Failed to write undo journal: %s", e)
 
     def load_sessions(self) -> List[dict]:
         """Loads previous sessions from the journal file."""
@@ -54,7 +57,7 @@ class TransactionManager:
         try:
             with open(self.journal_path, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception:
+        except (OSError, json.JSONDecodeError):
             return []
 
     def undo_last_session(self) -> Tuple[int, List[str]]:
@@ -62,7 +65,6 @@ class TransactionManager:
         Reverts the most recent session's file moves.
         Returns (num_reverted, list_of_errors).
         """
-        import shutil
         sessions = self.load_sessions()
         if not sessions:
             return 0, ["No previous organization sessions found to undo."]
@@ -85,7 +87,7 @@ class TransactionManager:
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(src), str(dest))
                 reverted_count += 1
-            except Exception as e:
+            except OSError as e:
                 errors.append(f"Failed to move '{src}' back to '{dest}': {e}")
 
         # Clean up empty created directories
@@ -99,19 +101,19 @@ class TransactionManager:
             else:
                 if self.journal_path.exists():
                     self.journal_path.unlink()
-        except Exception:
+        except OSError:
             pass
 
         return reverted_count, errors
 
     def _cleanup_empty_dirs(self, root: Path) -> None:
         """Recursively removes empty directories in the base folder."""
-        for dirpath, dirnames, filenames in os.walk(root, topdown=False):
+        for dirpath, _, _ in os.walk(root, topdown=False):
             p = Path(dirpath)
             if p == root or p.name.startswith("."):
                 continue
             try:
                 if not any(p.iterdir()):
                     p.rmdir()
-            except Exception:
+            except OSError:
                 pass

@@ -4,7 +4,6 @@
 ![Tkinter](https://img.shields.io/badge/Tkinter-20232A?style=for-the-badge&logo=python&logoColor=white)
 ![CLI](https://img.shields.io/badge/CLI-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Version](https://img.shields.io/badge/Version-0.1.0-007ACC?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-3ECF8E?style=for-the-badge)
 
 ByteSift is a lightweight, offline file classification and organization utility designed to inspect file contents directly rather than relying solely on file extensions. Operating without artificial intelligence, external network connectivity, or third-party dependencies, it provides deterministic, low-latency categorization and deduplication.
 
@@ -141,6 +140,7 @@ python -m unittest discover -s tests -p "test_*.py"
 ```
 
 The test suite covers:
+
 - Binary magic byte validation across common formats.
 - Text heuristic detection across structured documents and code.
 - End-to-end plan generation, collision resolution, and transaction rollbacks.
