@@ -56,6 +56,9 @@ class ByteSiftApp:
         # High-DPI configuration for crisp Windows rendering
         enable_windows_dpi_awareness()
 
+        # Apply custom application icon (removes default Tkinter feather)
+        self._apply_window_icon()
+
         # State Variables
         self.current_plan: List[PlanItem] = []
         self.selected_folder = tk.StringVar(value=initial_folder or "")
@@ -77,6 +80,33 @@ class ByteSiftApp:
 
         if initial_folder:
             self.on_scan()
+
+    def _apply_window_icon(self):
+        """Replaces the default Tkinter feather icon with the custom ByteSift application icon."""
+        if sys.platform == "win32":
+            try:
+                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Pramuditha.ByteSift.App.1.0")
+            except (AttributeError, OSError):
+                pass
+
+        assets_dir = Path(__file__).resolve().parent.parent / "assets"
+        ico_path = assets_dir / "icon.ico"
+        png_path = assets_dir / "icon.png"
+
+        # Apply native Windows ICO to title bar and taskbar
+        if ico_path.exists():
+            try:
+                self.root.iconbitmap(default=str(ico_path))
+            except (tk.TclError, OSError):
+                pass
+
+        # Apply PhotoImage icon for window and dialogs
+        if png_path.exists():
+            try:
+                self._icon_img = tk.PhotoImage(file=str(png_path))
+                self.root.iconphoto(True, self._icon_img)
+            except (tk.TclError, OSError):
+                pass
 
     def _sync_theme(self):
         """Resolves theme mode setting and applies color scheme."""
@@ -128,6 +158,15 @@ class ByteSiftApp:
 
         header_left = ttk.Frame(header_frame)
         header_left.pack(side=tk.LEFT, fill=tk.Y)
+
+        if hasattr(self, "_icon_img"):
+            try:
+                # Subsample 256x256 icon to crisp ~28x28 header badge
+                self._header_icon = self._icon_img.subsample(9, 9)
+                logo_lbl = ttk.Label(header_left, image=self._header_icon, style="TLabel")
+                logo_lbl.pack(side=tk.LEFT, padx=(0, 10))
+            except (tk.TclError, AttributeError):
+                pass
 
         title_lbl = ttk.Label(
             header_left,
