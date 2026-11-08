@@ -15,10 +15,10 @@
         extend: {
           colors: {
             brand: {
-              300: '#7dd3fc',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
             },
             accent: {
               400: '#34d399',
@@ -26,11 +26,11 @@
               600: '#059669',
             },
             surface: {
-              base: '#06090e',
-              card: '#0c121e',
-              cardHover: '#111a2b',
+              base: '#09090b',
+              card: '#121215',
+              cardHover: '#18181c',
               border: 'rgba(255, 255, 255, 0.08)',
-              borderHover: 'rgba(56, 189, 248, 0.3)',
+              borderHover: 'rgba(255, 255, 255, 0.16)',
             }
           },
           fontFamily: {
@@ -69,17 +69,17 @@
     }
 
     body {
-      background-color: #06090e;
-      color: #f1f5f9;
+      background-color: #09090b;
+      color: #e4e4e7;
       font-family: 'Inter', -apple-system, sans-serif;
     }
 
     /* Subtle Grid Background */
     .bg-grid-dark {
-      background-size: 40px 40px;
+      background-size: 48px 48px;
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     }
 
     /* Top Global Scroll Progress */
@@ -87,9 +87,9 @@
       position: fixed;
       top: 0;
       left: 0;
-      height: 3px;
+      height: 2px;
       width: 0%;
-      background: linear-gradient(90deg, #38bdf8, #0ea5e9, #10b981);
+      background: linear-gradient(90deg, #3b82f6, #10b981);
       z-index: 100;
       transition: width 0.05s linear;
     }
@@ -100,19 +100,19 @@
       transition: color 0.25s ease-out;
     }
     .char-sorting {
-      color: #38bdf8;
+      color: #60a5fa;
       opacity: 0.85;
     }
 
     /* Layer Card Stack Effect */
     .layer-card {
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 -20px 40px -10px rgba(0, 0, 0, 0.8);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 -20px 40px -10px rgba(0, 0, 0, 0.85);
     }
 
-    /* Subtle Laser Glow */
+    /* Soft Natural Window Shadow */
     .subtle-laser-glow {
-      box-shadow: 0 0 50px -10px rgba(14, 165, 233, 0.22);
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7);
     }
 
     /* Hide real mouse cursor over the live app workflow demonstration to avoid cursor confusion */
@@ -134,7 +134,7 @@
   <!-- ========================================================================= -->
   <!-- PERSISTENT TOP NAVIGATION BAR                                             -->
   <!-- ========================================================================= -->
-  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#06090e]/85 border-b border-surface-border">
+  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#09090b]/85 border-b border-surface-border">
     <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
       
       <!-- Brand Logo -->
@@ -151,10 +151,10 @@
 
       <!-- Nav Links -->
       <nav class="hidden md:flex items-center space-x-8 text-xs uppercase tracking-wider font-semibold text-slate-400">
-        <a href="#scatter-runway" class="hover:text-white transition-colors">01 // Chaos To Order</a>
-        <a href="#app-workflow-runway" class="hover:text-white transition-colors">02 // Live App</a>
-        <a href="#why-bytesift" class="hover:text-white transition-colors">03 // Why ByteSift</a>
-        <a href="#download" class="hover:text-white transition-colors">04 // Downloads</a>
+        <a href="#scatter-runway" class="hover:text-white transition-colors">How it works</a>
+        <a href="#app-workflow-runway" class="hover:text-white transition-colors">Live Demo</a>
+        <a href="#why-bytesift" class="hover:text-white transition-colors">Why ByteSift</a>
+        <a href="#download" class="hover:text-white transition-colors">Download</a>
       </nav>
 
       <!-- Right CTAs -->
@@ -178,16 +178,16 @@
     <div class="max-w-4xl mx-auto space-y-6 my-auto">
       
       <!-- Top Tag Badge -->
-      <div class="inline-flex items-center space-x-2 bg-brand-500/10 border border-brand-500/30 px-3.5 py-1 rounded-full text-xs font-medium text-brand-400">
-        <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
-        <span>100% Private • Works Offline • Zero AI Dependency</span>
+      <div class="inline-flex items-center space-x-2 bg-white/[0.04] border border-white/[0.08] px-3.5 py-1 rounded-full text-xs font-medium text-slate-300">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Free & Open Source Desktop App</span>
       </div>
 
       <!-- ANIMATED HEADING: Characters begin in the wrong jumbled order and sort into place -->
       <div class="py-2">
         <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
           <div id="anim-headline-line1" class="font-mono tracking-tight text-white">
-            Clean up your messy folders
+            Tidy your messy files
           </div>
           <div id="anim-headline-line2" class="font-mono tracking-tight text-brand-400 mt-1">
             in just one click.
@@ -197,18 +197,18 @@
 
       <!-- Plain English Subtitle -->
       <p class="max-w-2xl mx-auto text-sm sm:text-base text-slate-400 leading-relaxed font-normal">
-        Downloaded hundreds of files with confusing names? ByteSift checks what is actually inside each file (invoices, photos, resumes, and code) and neatly sorts them into organized folders.
+        ByteSift sorts your photos, documents, and code into neat folders, and clears duplicate downloads. 100% private on your computer.
       </p>
 
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-        <a href="#download" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-semibold text-xs uppercase tracking-wider shadow-lg shadow-brand-500/25 transition-all hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+        <a href="#download" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-semibold text-xs uppercase tracking-wider shadow-lg shadow-brand-500/20 transition-all hover:-translate-y-0.5 flex items-center justify-center space-x-2">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Download Free for Windows</span>
         </a>
         <a href="#scatter-runway" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-surface-card hover:bg-surface-cardHover text-slate-300 hover:text-white border border-surface-border font-semibold text-xs uppercase tracking-wider transition flex items-center justify-center space-x-2">
-          <span>Scroll to Watch Transformation</span>
-          <span class="text-brand-400">↓</span>
+          <span>Scroll to Watch</span>
+          <span class="text-brand-400 font-mono">↓</span>
         </a>
       </div>
 
@@ -216,19 +216,19 @@
       <div class="pt-8 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto text-left border-t border-surface-border/60">
         <div class="p-3.5 rounded-xl bg-surface-card border border-surface-border">
           <div class="text-2xl font-bold text-white font-mono">0.04s</div>
-          <div class="text-xs text-slate-400 mt-0.5">Scans 100+ files instantly</div>
+          <div class="text-xs text-slate-400 mt-0.5">Lightning fast sort</div>
         </div>
         <div class="p-3.5 rounded-xl bg-surface-card border border-surface-border">
-          <div class="text-2xl font-bold text-accent-400 font-mono">100% Safe</div>
-          <div class="text-xs text-slate-400 mt-0.5">Undo anytime with Ctrl+Z</div>
+          <div class="text-2xl font-bold text-accent-400 font-mono">Ctrl+Z</div>
+          <div class="text-xs text-slate-400 mt-0.5">Undo changes anytime</div>
         </div>
         <div class="p-3.5 rounded-xl bg-surface-card border border-surface-border">
-          <div class="text-2xl font-bold text-white font-mono">Offline</div>
-          <div class="text-xs text-slate-400 mt-0.5">Files never leave your PC</div>
+          <div class="text-2xl font-bold text-white font-mono">100% Offline</div>
+          <div class="text-xs text-slate-400 mt-0.5">Files stay on your PC</div>
         </div>
         <div class="p-3.5 rounded-xl bg-surface-card border border-surface-border">
           <div class="text-2xl font-bold text-brand-400 font-mono">Free</div>
-          <div class="text-xs text-slate-400 mt-0.5">Open source MIT license</div>
+          <div class="text-xs text-slate-400 mt-0.5">MIT Open source license</div>
         </div>
       </div>
 
@@ -241,18 +241,18 @@
   <div id="scatter-runway" class="relative h-[240vh] z-20">
     
     <!-- Pinned 100vh Full Screen Stage -->
-    <div id="scatter-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-6 py-20 overflow-hidden bg-gradient-to-b from-[#06090e] via-[#090f1d] to-[#06090e]">
+    <div id="scatter-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-6 py-20 overflow-hidden bg-gradient-to-b from-[#09090b] via-[#0d0d12] to-[#09090b]">
       
       <!-- Stage Header -->
       <div class="max-w-4xl mx-auto w-full text-center space-y-2 z-20">
-        <div class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full inline-block border border-brand-500/20">
-          01 // Chaos To Order
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-300 bg-white/[0.05] px-3.5 py-1 rounded-full inline-block border border-white/[0.08]">
+          How It Works
         </div>
         <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Watch messy files fly into place.
+          Watch your files sort themselves.
         </h2>
         <p class="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto">
-          As you scroll, random downloads across your computer untangle and glide smoothly into organized category folders.
+          Scroll down to see scattered files glide directly into neat folders.
         </p>
       </div>
 
@@ -263,8 +263,8 @@
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 z-20">
           
           <!-- Folder 1: Documents -->
-          <div id="target-folder-docs" class="p-4 rounded-xl bg-surface-card border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
-            <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
+          <div id="target-folder-docs" class="p-4 rounded-xl bg-zinc-900/60 border border-white/[0.08] flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300 hover:border-brand-500/40">
+            <div class="w-8 h-8 rounded-lg bg-brand-500/10 text-brand-400 flex items-center justify-center">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
             </div>
             <div class="text-xs font-bold text-white uppercase tracking-wider">Documents</div>
@@ -272,8 +272,8 @@
           </div>
 
           <!-- Folder 2: Images -->
-          <div id="target-folder-imgs" class="p-4 rounded-xl bg-surface-card border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
-            <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
+          <div id="target-folder-imgs" class="p-4 rounded-xl bg-zinc-900/60 border border-white/[0.08] flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300 hover:border-brand-500/40">
+            <div class="w-8 h-8 rounded-lg bg-brand-500/10 text-brand-400 flex items-center justify-center">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
             </div>
             <div class="text-xs font-bold text-white uppercase tracking-wider">Images</div>
@@ -281,8 +281,8 @@
           </div>
 
           <!-- Folder 3: Code -->
-          <div id="target-folder-code" class="p-4 rounded-xl bg-surface-card border border-brand-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
-            <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
+          <div id="target-folder-code" class="p-4 rounded-xl bg-zinc-900/60 border border-white/[0.08] flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300 hover:border-brand-500/40">
+            <div class="w-8 h-8 rounded-lg bg-brand-500/10 text-brand-400 flex items-center justify-center">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
             </div>
             <div class="text-xs font-bold text-white uppercase tracking-wider">Code</div>
@@ -290,8 +290,8 @@
           </div>
 
           <!-- Folder 4: Duplicates -->
-          <div id="target-folder-dups" class="p-4 rounded-xl bg-surface-card border border-accent-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
-            <div class="w-8 h-8 rounded-lg bg-accent-500/20 text-accent-400 flex items-center justify-center">
+          <div id="target-folder-dups" class="p-4 rounded-xl bg-zinc-900/60 border border-accent-500/30 flex flex-col items-center justify-center text-center space-y-1.5 transition-all duration-300">
+            <div class="w-8 h-8 rounded-lg bg-accent-500/10 text-accent-400 flex items-center justify-center">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
             </div>
             <div class="text-xs font-bold text-white uppercase tracking-wider">Duplicates</div>
@@ -302,28 +302,28 @@
 
         <!-- Success State: Smoothly reveals in the central space as files finish organizing -->
         <div id="organized-success-view" class="absolute inset-x-0 top-6 sm:top-10 mx-auto max-w-xl px-4 flex flex-col items-center justify-center text-center z-10 pointer-events-none opacity-0">
-          <div class="p-5 sm:p-6 rounded-2xl bg-[#090f1d]/90 border border-brand-500/30 shadow-2xl backdrop-blur-md w-full subtle-laser-glow">
+          <div class="p-5 sm:p-6 rounded-2xl bg-zinc-900/90 border border-white/[0.08] shadow-2xl backdrop-blur-md w-full">
             
             <h3 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight mb-1.5">
-              Your folder is clean, structured & duplicate-free.
+              All files neatly organized.
             </h3>
             
             <p class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto mb-4">
-              All 10 files placed into their categorized homes. Exact duplicates quarantined to reclaim storage without cloud latency.
+              Documents, photos, and code are separated. Duplicate copies are quarantined.
             </p>
 
             <div class="grid grid-cols-3 gap-2.5 max-w-md mx-auto">
-              <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
+              <div class="p-2.5 rounded-xl bg-zinc-950/80 border border-zinc-800 text-center">
                 <div class="text-base sm:text-lg font-mono font-bold text-brand-400">10 Files</div>
-                <div class="text-[10px] text-slate-400">Categorized</div>
+                <div class="text-[10px] text-slate-400">Sorted</div>
               </div>
-              <div class="p-2.5 rounded-xl bg-slate-950/60 border border-accent-500/30 text-center">
+              <div class="p-2.5 rounded-xl bg-zinc-950/80 border border-accent-500/30 text-center">
                 <div class="text-base sm:text-lg font-mono font-bold text-accent-400">1 Duplicate</div>
-                <div class="text-[10px] text-slate-400">Quarantined</div>
+                <div class="text-[10px] text-slate-400">Isolated</div>
               </div>
-              <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
+              <div class="p-2.5 rounded-xl bg-zinc-950/80 border border-zinc-800 text-center">
                 <div class="text-base sm:text-lg font-mono font-bold text-emerald-400">0.04s</div>
-                <div class="text-[10px] text-slate-400">100% Local</div>
+                <div class="text-[10px] text-slate-400">Instant</div>
               </div>
             </div>
 
@@ -605,29 +605,29 @@
   <div id="app-workflow-runway" class="relative h-[280vh] z-30 layer-card">
     
     <!-- Pinned 100vh Full Screen Stage -->
-    <div id="app-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-6 py-16 overflow-hidden bg-gradient-to-b from-[#080c14] via-[#090f1d] to-[#080c14] cursor-none">
+    <div id="app-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-6 py-16 overflow-hidden bg-gradient-to-b from-[#09090b] via-[#0d0d12] to-[#09090b] cursor-none">
       
       <!-- Workflow Header & Live Explainer -->
       <div class="max-w-3xl mx-auto w-full text-center space-y-2 z-20">
         <div class="flex items-center justify-center space-x-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full border border-brand-500/20">
-            02 // Live Windows Workflow
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-300 bg-white/[0.05] px-3 py-1 rounded-full border border-white/[0.08]">
+            Live Demo
           </span>
-          <span id="wf-phase-badge" class="text-xs font-mono text-slate-400 bg-surface-card px-2.5 py-1 rounded-full border border-surface-border">
-            Phase 1 of 4
+          <span id="wf-phase-badge" class="text-xs font-mono text-slate-400 bg-white/[0.03] px-2.5 py-1 rounded-full border border-white/[0.08]">
+            Step 1 of 4
           </span>
         </div>
 
-        <div id="wf-status-banner" class="p-3 rounded-xl bg-surface-card border border-brand-500/30 text-left flex items-center space-x-3 subtle-laser-glow transition-all duration-300">
-          <div id="wf-banner-num" class="w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30">
+        <div id="wf-status-banner" class="p-3.5 rounded-xl bg-zinc-900/90 border border-white/[0.08] text-left flex items-center space-x-3 shadow-xl transition-all duration-300">
+          <div id="wf-banner-num" class="w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/20">
             1
           </div>
           <div>
             <div id="wf-banner-title" class="font-bold text-white text-xs sm:text-sm">
-              Step 1: ByteSift opens clean and ready.
+              1. Open ByteSift
             </div>
             <div id="wf-banner-desc" class="text-[11px] text-slate-400">
-              No files are opened yet. Zero computer memory bloat. Scroll down to choose a folder.
+              Clean, lightweight, and ready to use. Scroll down to choose a folder.
             </div>
           </div>
         </div>
@@ -635,7 +635,7 @@
 
       <!-- The Windows 11 App Stage (Centered, High-Impact, Zero Emojis) -->
       <div class="max-w-3xl w-full mx-auto my-auto z-10">
-        <div id="mock-app-window" class="rounded-xl bg-[#1c1c1c] border border-slate-700/80 shadow-2xl overflow-hidden subtle-laser-glow relative">
+        <div id="mock-app-window" class="rounded-xl bg-[#18181b] border border-zinc-800 shadow-2xl overflow-hidden relative">
           
           <!-- Realistic Animated OS Mouse Cursor -->
           <div id="workflow-mouse-cursor" class="absolute top-0 left-0 pointer-events-none z-50 select-none opacity-0 transition-opacity duration-200">
@@ -821,56 +821,56 @@
   <!-- ========================================================================= -->
   <!-- SECTION 03: WHY BYTESIFT (4 CLEAR BENEFITS, STRICT 3 COLORS)              -->
   <!-- ========================================================================= -->
-  <section id="why-bytesift" class="relative py-28 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base via-[#090e1c] to-surface-base z-30 layer-card">
+  <section id="why-bytesift" class="relative py-28 px-6 border-t border-surface-border bg-[#09090b] z-30 layer-card">
     <div class="max-w-5xl mx-auto space-y-12">
       
       <div class="text-center space-y-2">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full inline-block border border-brand-500/20">
-          03 // Built For Everyone
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-300 bg-white/[0.05] px-3.5 py-1 rounded-full inline-block border border-white/[0.08]">
+          Why ByteSift
         </h2>
         <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Why you will love ByteSift.
+          Simple, safe, and private.
         </h3>
         <p class="text-slate-400 text-sm max-w-xl mx-auto">
-          No complicated settings, no learning curve. Just a clean tool that keeps your computer tidy.
+          Everything you need to keep your computer tidy, with zero learning curve.
         </p>
       </div>
 
       <div class="grid md:grid-cols-2 gap-5">
         
         <!-- Card 1 -->
-        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-2.5 hover:border-brand-500/30 transition">
-          <div class="text-xs font-mono font-bold text-brand-400">01 // CONTENT INSPECTION</div>
-          <h4 class="text-base font-bold text-white">Looks inside files, not just their names</h4>
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.08] space-y-2.5 hover:border-brand-500/40 transition">
+          <div class="text-xs font-mono font-bold text-brand-400">SMART DETECTION</div>
+          <h4 class="text-base font-bold text-white">Inspects what is inside files</h4>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Ever had a file called <code class="bg-[#162033] text-brand-400 px-1 py-0.5 rounded border border-slate-700">download_921.tmp</code> or without any extension? ByteSift inspects the true content inside so invoices, pictures, and notes always end up where they belong.
+            Even with cryptic names or missing extensions, ByteSift checks the internal file format so photos, receipts, and documents always go to the right folder.
           </p>
         </div>
 
         <!-- Card 2 -->
-        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-2.5 hover:border-brand-500/30 transition">
-          <div class="text-xs font-mono font-bold text-brand-400">02 // DEDUPLICATION</div>
-          <h4 class="text-base font-bold text-white">Finds annoying duplicate downloads</h4>
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.08] space-y-2.5 hover:border-brand-500/40 transition">
+          <div class="text-xs font-mono font-bold text-brand-400">DEDUPLICATION</div>
+          <h4 class="text-base font-bold text-white">Catches duplicate downloads</h4>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Accidentally downloaded the same ticket or photo 4 times? ByteSift checks whether files are truly identical and groups copies into a separate <code class="bg-[#162033] text-brand-400 px-1 py-0.5 rounded border border-slate-700">Duplicates/</code> folder so you can free up space.
+            Downloaded the same file several times? ByteSift spots exact matching copies and groups them in a <code class="bg-zinc-800 text-brand-400 px-1 py-0.5 rounded text-[11px]">Duplicates</code> folder so you can free up space.
           </p>
         </div>
 
         <!-- Card 3 -->
-        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-2.5 hover:border-accent-400/30 transition">
-          <div class="text-xs font-mono font-bold text-accent-400">03 // SAFE & REVERSIBLE</div>
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.08] space-y-2.5 hover:border-accent-400/40 transition">
+          <div class="text-xs font-mono font-bold text-accent-400">SAFE & REVERSIBLE</div>
           <h4 class="text-base font-bold text-white">One-click Undo (Press Ctrl+Z)</h4>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Never worry about losing a file. ByteSift never deletes or overwrites anything. If you do not like how a folder was sorted, simply press <kbd class="bg-[#162033] text-white px-1.5 py-0.5 rounded border border-slate-700 font-mono">Ctrl+Z</kbd> (or ⌘Z on Mac) to put every file right back.
+            Never worry about misplaced files. Press <kbd class="bg-zinc-800 text-white px-1.5 py-0.5 rounded font-mono text-[11px] border border-zinc-700">Ctrl+Z</kbd> (or ⌘Z on Mac) anytime to put every file right back where it was.
           </p>
         </div>
 
         <!-- Card 4 -->
-        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-2.5 hover:border-brand-500/30 transition">
-          <div class="text-xs font-mono font-bold text-brand-400">04 // ZERO CLOUD</div>
-          <h4 class="text-base font-bold text-white">100% Private (No cloud, no accounts)</h4>
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.08] space-y-2.5 hover:border-brand-500/40 transition">
+          <div class="text-xs font-mono font-bold text-brand-400">100% OFFLINE</div>
+          <h4 class="text-base font-bold text-white">Zero cloud, zero tracking</h4>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Your personal files stay strictly on your computer. ByteSift runs entirely in local memory without an internet connection, without AI hallucinations, and with zero tracking.
+            Your files never leave your computer. ByteSift runs completely on your machine without an internet connection, accounts, or telemetry.
           </p>
         </div>
 
@@ -882,15 +882,15 @@
   <!-- ========================================================================= -->
   <!-- SECTION 04: DOWNLOAD HUB (SEPARATED FROM DEVELOPER CLI CODE)              -->
   <!-- ========================================================================= -->
-  <section id="download" class="py-24 px-6 border-t border-surface-border bg-gradient-to-b from-surface-base to-[#0b101c] z-30 layer-card">
+  <section id="download" class="py-24 px-6 border-t border-surface-border bg-[#09090b] z-30 layer-card">
     <div class="max-w-4xl mx-auto space-y-8">
       
       <div class="text-center space-y-2">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full inline-block border border-brand-500/20">
-          04 // Get Started Free
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-300 bg-white/[0.05] px-3.5 py-1 rounded-full inline-block border border-white/[0.08]">
+          Get Started
         </h2>
         <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Download ByteSift for your PC or Mac.
+          Download ByteSift for Windows & Mac.
         </h3>
         <p class="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto">
           Free, open-source under the MIT license, and ready to run immediately.
@@ -901,7 +901,7 @@
       <div class="grid sm:grid-cols-2 gap-5">
         
         <!-- Windows Download Card -->
-        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-4 text-center flex flex-col justify-between hover:border-brand-500/40 transition">
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.08] space-y-4 text-center flex flex-col justify-between hover:border-brand-500/40 transition">
           <div class="space-y-2">
             <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center mx-auto">
               <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.799"/></svg>
@@ -911,7 +911,7 @@
           </div>
 
           <div class="space-y-2 pt-2">
-            <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.exe" class="w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-bold text-xs shadow-md shadow-brand-500/25 transition flex items-center justify-center space-x-2">
+            <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.exe" class="w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition flex items-center justify-center space-x-2">
               <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span>Download for Windows (.exe)</span>
             </a>
@@ -923,7 +923,7 @@
         </div>
 
         <!-- macOS Download Card -->
-        <div class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-4 text-center flex flex-col justify-between hover:border-brand-500/40 transition">
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.08] space-y-4 text-center flex flex-col justify-between hover:border-brand-500/40 transition">
           <div class="space-y-2">
             <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center mx-auto">
               <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.67-.82 1.13-1.96.99-3.1-.97.05-2.16.66-2.84 1.46-.61.7-.1.14 1.83 1.01 2.99 1.07-.05 2.18-.62 2.84-1.35"/></svg>
@@ -933,7 +933,7 @@
           </div>
 
           <div class="space-y-2 pt-2">
-            <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-macOS-Universal.dmg" class="w-full py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2">
+            <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-macOS-Universal.dmg" class="w-full py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2">
               <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2v14m0 0l-4-4m4 4l4-4M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span>Download for Mac (.dmg)</span>
             </a>
@@ -947,7 +947,7 @@
       </div>
 
       <!-- Developer Documentation & CLI Card -->
-      <div id="developers" class="p-5 rounded-2xl bg-surface-card border border-surface-border space-y-3">
+      <div id="developers" class="p-5 rounded-2xl bg-zinc-900/60 border border-white/[0.08] space-y-3">
         <div class="flex items-center justify-between border-b border-surface-border pb-2.5">
           <div>
             <h4 class="font-bold text-white text-xs">Developer Documentation & CLI</h4>
@@ -1083,7 +1083,7 @@
     }
 
     function runHeadlineSolver() {
-      animateJumbledToOrganized("anim-headline-line1", "Clean up your messy folders", 200);
+      animateJumbledToOrganized("anim-headline-line1", "Tidy your messy files", 200);
       animateJumbledToOrganized("anim-headline-line2", "in just one click.", 650);
     }
 
@@ -1261,21 +1261,21 @@
       if (currentWorkflowPhase === phase) return;
       currentWorkflowPhase = phase;
 
-      wfPhaseBadge.innerText = `Phase ${phase} of 4`;
+      wfPhaseBadge.innerText = `Step ${phase} of 4`;
 
       if (phase === 1) {
         // STEP 1: EMPTY
         wfBannerNum.innerText = "1";
-        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
-        wfBannerTitle.innerText = "Step 1: ByteSift opens clean and ready.";
-        wfBannerDesc.innerText = "No files are opened yet. Zero computer memory bloat. Scroll down to choose a folder.";
+        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/20";
+        wfBannerTitle.innerText = "1. Open ByteSift";
+        wfBannerDesc.innerText = "Clean, lightweight, and ready. Scroll down to choose a folder.";
 
         liveFolderInput.value = "";
         liveFolderStatus.innerText = "None selected yet";
         liveFolderStatus.className = "text-slate-500 font-normal";
 
-        liveBtnOrganize.className = "px-3 py-1.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 cursor-not-allowed";
-        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
+        liveBtnOrganize.className = "px-3 py-1.5 bg-zinc-800 text-slate-500 text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 cursor-not-allowed";
+        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-500 text-xs font-semibold rounded-md border border-zinc-800 transition-all flex items-center space-x-1.5";
         liveBadgeCount.innerText = "0 files";
 
         liveViewEmpty.style.opacity = "1";
@@ -1287,16 +1287,16 @@
       } else if (phase === 2) {
         // STEP 2: SELECT FOLDER
         wfBannerNum.innerText = "2";
-        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
-        wfBannerTitle.innerText = "Step 2: You pick a messy folder (e.g. Downloads).";
-        wfBannerDesc.innerText = "ByteSift instantly discovers the files without altering or moving anything.";
+        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/20";
+        wfBannerTitle.innerText = "2. Select a folder";
+        wfBannerDesc.innerText = "ByteSift discovers your files in milliseconds without altering anything yet.";
 
         liveFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
         liveFolderStatus.innerText = "✓ Downloads Folder Selected";
         liveFolderStatus.className = "text-brand-400 font-semibold";
 
         liveBtnOrganize.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-sm";
-        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
+        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-md border border-zinc-800 transition-all flex items-center space-x-1.5";
         liveBadgeCount.innerText = "5 files found";
 
         liveViewEmpty.style.opacity = "0";
@@ -1323,16 +1323,16 @@
       } else if (phase === 3) {
         // STEP 3: SIFT
         wfBannerNum.innerText = "3";
-        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/30";
-        wfBannerTitle.innerText = "Step 3: ByteSift checks what each file actually is.";
-        wfBannerDesc.innerText = "Invoices, photos, and resumes are recognized. Exact duplicates are cleanly highlighted!";
+        wfBannerNum.className = "w-8 h-8 rounded-lg bg-brand-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-brand-500/20";
+        wfBannerTitle.innerText = "3. Instant categorization & duplicate check";
+        wfBannerDesc.innerText = "Photos, documents, and code are separated, and duplicate copies are highlighted.";
 
         liveFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
         liveFolderStatus.innerText = "✓ Analysis Complete (1 duplicate found)";
         liveFolderStatus.className = "text-brand-400 font-semibold";
 
-        liveBtnOrganize.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-lg shadow-brand-500/30 animate-pulse";
-        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-md border border-[#353535] transition-all flex items-center space-x-1.5";
+        liveBtnOrganize.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-md shadow-brand-500/20";
+        liveBtnUndo.className = "px-3 py-1.5 bg-[#252525] text-slate-400 text-xs font-semibold rounded-md border border-zinc-800 transition-all flex items-center space-x-1.5";
         liveBadgeCount.innerText = "5 items ready";
 
         liveViewEmpty.style.opacity = "0";
@@ -1358,16 +1358,16 @@
       } else if (phase === 4) {
         // STEP 4: ORGANIZE & UNDO
         wfBannerNum.innerText = "4";
-        wfBannerNum.className = "w-8 h-8 rounded-lg bg-accent-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-accent-500/30";
-        wfBannerTitle.innerText = "Step 4: All files neatly organized. Undo anytime!";
-        wfBannerDesc.innerText = "Everything is now sorted into neat folders. Hit Ctrl+Z if you ever want to revert back!";
+        wfBannerNum.className = "w-8 h-8 rounded-lg bg-accent-500 text-white font-bold text-xs flex-shrink-0 flex items-center justify-center shadow-md shadow-accent-500/20";
+        wfBannerTitle.innerText = "4. Organized in one click";
+        wfBannerDesc.innerText = "Everything is now in neat folders. Click Undo anytime if you change your mind.";
 
         liveFolderInput.value = "C:\\Users\\Pramuditha\\Downloads";
         liveFolderStatus.innerText = "✓ 5 Files Successfully Organized";
         liveFolderStatus.className = "text-accent-400 font-bold";
 
         liveBtnOrganize.className = "px-3 py-1.5 bg-accent-500 text-white text-xs font-bold rounded-md transition-all flex items-center space-x-1.5 shadow-sm";
-        liveBtnUndo.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md shadow-lg shadow-brand-500/30 transition-all flex items-center space-x-1.5 animate-bounce";
+        liveBtnUndo.className = "px-3 py-1.5 bg-brand-500 hover:bg-brand-400 text-white text-xs font-bold rounded-md shadow-md shadow-brand-500/20 transition-all flex items-center space-x-1.5";
         liveBadgeCount.innerText = "5/5 sorted";
 
         liveViewEmpty.style.opacity = "0";
