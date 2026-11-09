@@ -642,7 +642,7 @@
     <!-- Pinned Scattered Files Runway -->
     <div id="scatter-runway" class="relative h-[220vh] z-20">
       
-      <div id="scatter-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-4 sm:px-6 py-14 sm:py-20 overflow-hidden bg-white dark:bg-[#000000] border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
+      <div id="scatter-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-center items-center gap-4 sm:gap-6 px-4 sm:px-6 py-6 sm:py-8 overflow-hidden bg-white dark:bg-[#000000] border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
         
         <!-- Header -->
         <div class="max-w-3xl mx-auto w-full text-center space-y-2 z-20">
@@ -655,7 +655,7 @@
         </div>
 
         <!-- Scattered Arena -->
-        <div id="scatter-arena" class="relative flex-1 w-full max-w-5xl mx-auto my-2 z-10 flex flex-col justify-end pb-8">
+        <div id="scatter-arena" class="relative w-full max-w-5xl mx-auto z-10 flex flex-col justify-end pb-2 sm:pb-3 h-[460px] sm:h-[400px]">
           
           <!-- 4 Folders -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 z-20">
@@ -682,7 +682,7 @@
           </div>
 
           <!-- Success State -->
-          <div id="organized-success-view" class="absolute inset-x-0 top-6 sm:top-10 mx-auto max-w-md px-4 flex flex-col items-center justify-center text-center z-10 pointer-events-none opacity-0">
+          <div id="organized-success-view" class="absolute inset-x-0 top-10 sm:top-14 mx-auto max-w-md px-4 flex flex-col items-center justify-center text-center z-10 pointer-events-none opacity-0">
             <div class="p-6 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full space-y-3">
               <div class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold text-lg mx-auto flex items-center justify-center">
                 ✓
@@ -791,7 +791,7 @@
     <!-- Pinned Desktop App Walkthrough -->
     <div id="app-workflow-runway" class="relative h-[250vh] z-20">
       
-      <div id="app-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-4 sm:px-6 py-14 sm:py-20 overflow-hidden bg-[#fbfbfd] dark:bg-[#0d0d0f] border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
+      <div id="app-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-center items-center gap-4 sm:gap-6 px-4 sm:px-6 py-6 sm:py-8 overflow-hidden bg-[#fbfbfd] dark:bg-[#0d0d0f] border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
         
         <div class="max-w-2xl mx-auto w-full text-center space-y-2 z-20">
           <h2 class="text-2xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">
@@ -813,7 +813,7 @@
         </div>
 
         <!-- The App Window -->
-        <div class="max-w-3xl w-full mx-auto my-auto z-10">
+        <div class="max-w-3xl w-full mx-auto z-10">
           <div id="mock-app-window" class="rounded-2xl bg-white dark:bg-[#161618] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden relative transition-colors duration-300">
             
             <!-- Mouse Cursor -->
@@ -1389,6 +1389,7 @@
           start: 'top top',
           end: 'bottom bottom',
           scrub: 1.0,
+          invalidateOnRefresh: true,
           onUpdate: (self) => {
             const p = self.progress;
             const cDocs = document.getElementById('counter-docs');

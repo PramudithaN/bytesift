@@ -30,3 +30,7 @@ dist/
 AGENTS.md
 GEMINI.md
 templates/
+
+# Hyperframes cache
+.hyperframes/
+brag-output/

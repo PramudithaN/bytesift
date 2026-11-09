@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 500" width="100%" height="100%">
+  <defs>
+    <!-- Window Drop Shadow -->
+    <filter id="win-shadow" x="-5%" y="-5%" width="115%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.45" />
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+
+    <linearGradient id="titlebar-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#232326" />
+      <stop offset="100%" stop-color="#1c1c1e" />
+    </linearGradient>
+
+    <linearGradient id="organize-btn-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0077ed" />
+      <stop offset="100%" stop-color="#0062c4" />
+    </linearGradient>
+
+    <linearGradient id="dup-row-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#064e3b" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#065f46" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    .font-base { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .font-mono { font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace; }
+  </style>
+
+  <!-- Window Container with Filter Shadow -->
+  <g filter="url(#win-shadow)">
+    <!-- Window Background -->
+    <rect x="20" y="20" width="800" height="460" rx="14" fill="#161618" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1" />
+
+    <!-- Titlebar -->
+    <path d="M 20 34 Q 20 20 34 20 L 806 20 Q 820 20 820 34 L 820 64 L 20 64 Z" fill="url(#titlebar-grad)" />
+    <line x1="20" y1="64" x2="820" y2="64" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+
+    <!-- Traffic Lights (macOS buttons) -->
+    <circle cx="44" cy="42" r="6" fill="#ff5f56" stroke="#e0443e" stroke-width="0.5" />
+    <circle cx="64" cy="42" r="6" fill="#ffbd2e" stroke="#dea123" stroke-width="0.5" />
+    <circle cx="84" cy="42" r="6" fill="#27c93f" stroke="#1aab29" stroke-width="0.5" />
+
+    <!-- App Icon & Title in Titlebar -->
+    <!-- Folder Icon Sift SVG -->
+    <g transform="translate(108, 33)">
+      <path d="M2 3a1 1 0 0 1 1-1h4l2 2h7a1 1 0 0 1 1 1v2H2V3z" fill="#0071e3" />
+      <path d="M1 7h16v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7z" fill="#2997ff" />
+      <path d="M6 10l3 3 5-5" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    </g>
+    <text x="134" y="46" class="font-base" font-size="12.5" font-weight="600" fill="#f5f5f7">ByteSift</text>
+    <text x="190" y="46" class="font-base" font-size="12" fill="#86868b">•  Offline File Organizer</text>
+
+    <!-- Version badge -->
+    <rect x="752" y="32" width="48" height="20" rx="5" fill="#2c2c2e" />
+    <text x="776" y="46" class="font-mono" font-size="10.5" fill="#a1a1a6" text-anchor="middle">v0.1.7</text>
+  </g>
+
+  <!-- ==================== BODY CONTENT ==================== -->
+
+  <!-- Top Folder Selection Box -->
+  <rect x="40" y="80" width="760" height="72" rx="10" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.07)" stroke-width="1" />
+  
+  <text x="54" y="99" class="font-base" font-size="10" font-weight="700" fill="#86868b" letter-spacing="0.6">FOLDER TO ORGANIZE:</text>
+  <text x="786" y="99" class="font-base" font-size="11" font-weight="600" fill="#2997ff" text-anchor="end">Preview Ready (4 files found)</text>
+
+  <!-- Folder Path Input Field -->
+  <rect x="54" y="109" width="606" height="31" rx="6" fill="#2c2c2e" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" />
+  <!-- Folder icon inside input -->
+  <path d="M66 119h3.5l1.5 1.5h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-0.5z" fill="#0071e3" />
+  <text x="84" y="129" class="font-mono" font-size="11.5" fill="#f5f5f7">C:\Users\Downloads</text>
+
+  <!-- Browse Button -->
+  <rect x="668" y="109" width="118" height="31" rx="6" fill="#2c2c2e" stroke="rgba(255, 255, 255, 0.14)" stroke-width="1" />
+  <text x="727" y="129" class="font-base" font-size="11" font-weight="600" fill="#f5f5f7" text-anchor="middle">Browse Folder</text>
+
+  <!-- Action Bar -->
+  <!-- Organize Button (Primary) -->
+  <rect x="40" y="164" width="134" height="33" rx="8" fill="url(#organize-btn-grad)" />
+  <path d="M53 180.5l3.5 3.5 6.5-6.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <text x="108" y="185" class="font-base" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">Organize Files</text>
+
+  <!-- Undo Button (Secondary) -->
+  <rect x="184" y="164" width="118" height="33" rx="8" fill="#242426" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" />
+  <text x="243" y="185" class="font-base" font-size="11.5" font-weight="500" fill="#a1a1a6" text-anchor="middle">Undo (Ctrl+Z)</text>
+
+  <!-- Status pill / count right -->
+  <rect x="670" y="168" width="130" height="24" rx="12" fill="#242426" stroke="rgba(255, 255, 255, 0.08)" />
+  <circle cx="682" cy="180" r="3.5" fill="#2997ff" />
+  <text x="742" y="184" class="font-mono" font-size="10.5" fill="#f5f5f7" text-anchor="middle">4 planned (1 dup)</text>
+
+  <!-- ==================== TABLE CONTAINER ==================== -->
+  <rect x="40" y="208" width="760" height="216" rx="9" fill="#121214" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+
+  <!-- Table Header -->
+  <path d="M 40 217 Q 40 208 49 208 L 791 208 Q 800 208 800 217 L 800 238 L 40 238 Z" fill="#1c1c1e" />
+  <line x1="40" y1="238" x2="800" y2="238" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+
+  <text x="60" y="225" class="font-base" font-size="10" font-weight="700" fill="#86868b" letter-spacing="0.5">FILE</text>
+  <text x="320" y="225" class="font-base" font-size="10" font-weight="700" fill="#86868b" letter-spacing="0.5">SIZE</text>
+  <text x="410" y="225" class="font-base" font-size="10" font-weight="700" fill="#86868b" letter-spacing="0.5">DESTINATION</text>
+  <text x="780" y="225" class="font-base" font-size="10" font-weight="700" fill="#86868b" letter-spacing="0.5" text-anchor="end">DETECTION METHOD</text>
+
+  <!-- Row 1: README.md -->
+  <g transform="translate(0, 240)">
+    <!-- Doc icon -->
+    <path d="M60 12h8l4 4v10a1 1 0 0 1-1 1H60a1 1 0 0 1-1-1V13a1 1 0 0 1 1-1z" fill="none" stroke="#2997ff" stroke-width="1.3" />
+    <path d="M68 12v4h4" fill="none" stroke="#2997ff" stroke-width="1.3" />
+    <text x="79" y="22" class="font-base" font-size="12" font-weight="500" fill="#f5f5f7">README.md</text>
+    <text x="320" y="22" class="font-mono" font-size="11" fill="#86868b">7.3 KB</text>
+    <text x="410" y="22" class="font-base" font-size="12" font-weight="500" fill="#2997ff">📁 Documents/</text>
+    
+    <!-- Status badge -->
+    <rect x="664" y="10" width="116" height="19" rx="4" fill="rgba(41, 151, 255, 0.12)" stroke="rgba(41, 151, 255, 0.3)" />
+    <text x="722" y="23" class="font-base" font-size="10" font-weight="600" fill="#2997ff" text-anchor="middle">Markdown Heuristic</text>
+    <line x1="40" y1="36" x2="800" y2="36" stroke="rgba(255, 255, 255, 0.04)" stroke-width="1" />
+  </g>
+
+  <!-- Row 2: icon_light.png -->
+  <g transform="translate(0, 278)">
+    <!-- Image icon -->
+    <rect x="59" y="11" width="13" height="13" rx="1.5" fill="none" stroke="#a78bfa" stroke-width="1.3" />
+    <circle cx="63" cy="15" r="1.5" fill="#a78bfa" />
+    <path d="M60 22l4-4 3 2 4-4" stroke="#a78bfa" stroke-width="1.3" fill="none" stroke-linecap="round" />
+    <text x="79" y="22" class="font-base" font-size="12" font-weight="500" fill="#f5f5f7">icon_light.png</text>
+    <text x="320" y="22" class="font-mono" font-size="11" fill="#86868b">7.3 KB</text>
+    <text x="410" y="22" class="font-base" font-size="12" font-weight="500" fill="#a78bfa">📁 Images/PNG/</text>
+    
+    <!-- Status badge -->
+    <rect x="654" y="10" width="126" height="19" rx="4" fill="rgba(167, 139, 250, 0.12)" stroke="rgba(167, 139, 250, 0.3)" />
+    <text x="717" y="23" class="font-base" font-size="10" font-weight="600" fill="#a78bfa" text-anchor="middle">PNG Bytes (\x89PNG)</text>
+    <line x1="40" y1="36" x2="800" y2="36" stroke="rgba(255, 255, 255, 0.04)" stroke-width="1" />
+  </g>
+
+  <!-- Row 3: classifier.py -->
+  <g transform="translate(0, 316)">
+    <!-- Code icon -->
+    <path d="M63 13l-4 4 4 4M69 13l4 4-4 4" fill="none" stroke="#38bdf8" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="79" y="22" class="font-base" font-size="12" font-weight="500" fill="#f5f5f7">classifier.py</text>
+    <text x="320" y="22" class="font-mono" font-size="11" fill="#86868b">4.2 KB</text>
+    <text x="410" y="22" class="font-base" font-size="12" font-weight="500" fill="#38bdf8">📁 Code/Python/</text>
+    
+    <!-- Status badge -->
+    <rect x="674" y="10" width="106" height="19" rx="4" fill="rgba(56, 189, 248, 0.12)" stroke="rgba(56, 189, 248, 0.3)" />
+    <text x="727" y="23" class="font-base" font-size="10" font-weight="600" fill="#38bdf8" text-anchor="middle">Python Source</text>
+    <line x1="40" y1="36" x2="800" y2="36" stroke="rgba(255, 255, 255, 0.04)" stroke-width="1" />
+  </g>
+
+  <!-- Row 4: favicon.png (DUPLICATE ROW - HIGHLIGHTED) -->
+  <g transform="translate(0, 354)">
+    <!-- Emerald highlight background -->
+    <rect x="42" y="2" width="756" height="34" rx="6" fill="url(#dup-row-grad)" stroke="rgba(52, 211, 153, 0.3)" stroke-width="1" />
+
+    <!-- Duplicate icon -->
+    <rect x="59" y="11" width="9" height="11" rx="1.5" fill="none" stroke="#34d399" stroke-width="1.3" />
+    <path d="M62 9h6a1.5 1.5 0 0 1 1.5 1.5v8" fill="none" stroke="#34d399" stroke-width="1.3" />
+    <text x="79" y="22" class="font-base" font-size="12" font-weight="600" fill="#6ee7b7">favicon.png</text>
+    <text x="320" y="22" class="font-mono" font-size="11" fill="#a7f3d0">7.3 KB</text>
+    <text x="410" y="22" class="font-base" font-size="12" font-weight="600" fill="#34d399">📁 Duplicates/ (Quarantined)</text>
+    
+    <!-- Exact SHA-256 Duplicate badge -->
+    <rect x="640" y="9" width="140" height="20" rx="4" fill="rgba(52, 211, 153, 0.2)" stroke="rgba(52, 211, 153, 0.5)" />
+    <text x="710" y="23" class="font-base" font-size="10" font-weight="700" fill="#34d399" text-anchor="middle">Exact SHA-256 Match</text>
+  </g>
+
+  <!-- ==================== WINDOW FOOTER ==================== -->
+  <g transform="translate(0, 442)">
+    <!-- Left: Zero file loss / ready -->
+    <circle cx="56" cy="8" r="3.5" fill="#34d399" />
+    <text x="68" y="12" class="font-base" font-size="11.5" font-weight="600" fill="#34d399">Zero file loss guarantee</text>
+    <text x="210" y="12" class="font-base" font-size="11.5" fill="#86868b">•  Ready to organize</text>
+
+    <!-- Right: Offline & Reversible -->
+    <text x="784" y="12" class="font-base" font-size="11" fill="#86868b" text-anchor="end">100% Offline • Atomic Journaling • Reversible (Ctrl+Z)</text>
+  </g>
+</svg>

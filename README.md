@@ -1,42 +1,143 @@
+<div align="center">
+
 # ByteSift
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Tkinter](https://img.shields.io/badge/Tkinter-20232A?style=for-the-badge&logo=python&logoColor=white)
-![CLI](https://img.shields.io/badge/CLI-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
-![Version](https://img.shields.io/badge/Version-0.1.0-007ACC?style=for-the-badge)
+**Sort messy folders by what files *actually are*, not what their extensions claim.**
+
+Offline. Deterministic. No AI, no cloud, no telemetry, no dependencies.
+
+[![Release](https://img.shields.io/github/v/release/PramudithaN/bytesift?style=for-the-badge&color=007ACC)](https://github.com/PramudithaN/bytesift/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen?style=for-the-badge)
 [![Website](https://img.shields.io/badge/Website-GitHub%20Pages-0ea5e9?style=for-the-badge)](https://pramudithan.github.io/bytesift/)
 
-ByteSift is a lightweight, offline file classification and organization utility designed to inspect file contents directly rather than relying solely on file extensions. Operating without artificial intelligence, external network connectivity, or third-party dependencies, it provides deterministic, low-latency categorization and deduplication.
+[**Download**](https://github.com/PramudithaN/bytesift/releases/latest) ·
+[**Website**](https://pramudithan.github.io/bytesift/) ·
+[**Interactive demo**](#interactive-demo) ·
+[**Quick start**](#quick-start) ·
+[**How it works**](#how-it-works)
 
-Official Website & Download Hub: [ByteSift - Clean Up Messy Folders in Seconds](https://pramudithan.github.io/bytesift/)
+<br><br>
 
----
+<img src="docs/demo.svg" alt="ByteSift UI Preview — Offline File Organizer and Duplicate Quarantine" width="100%">
 
-## Overview
-
-Traditional file organizers depend heavily on file extensions, failing when extensions are incorrect, missing, or generic. ByteSift addresses this through a multi-tiered inspection pipeline:
-
-1. **Binary Magic Bytes:** Analyzes initial byte sequences to determine actual container and binary formats (e.g., PDF, JPEG, PNG, ZIP, Office OpenXML, executables).
-2. **Text Content Heuristics:** Evaluates bounded text samples (4-8 KB) against weighted keyword and structural patterns to identify invoices, resumes, contracts, source code, and system logs.
-3. **Metadata & Timestamp Parsing:** Extracts embedded timestamps (such as JPEG EXIF markers) to enable chronological archiving.
-4. **Content Deduplication:** Employs size-grouped SHA-256 hashing to identify identical files without unnecessary read cycles.
+</div>
 
 ---
 
-## Key Features
+## 🎬 Interactive Demo
 
-- **Offline and Private:** Executes entirely within local memory. No network requests, telemetry, or external models are used.
-- **Content-Driven Classification:** Reliably detects file formats regardless of file extension accuracy.
-- **Deterministic Heuristic Engine:** Classifies unstructured text and documents through pattern matching rather than statistical language models.
-- **Duplicate Isolation:** Automatically routes identical files into a designated duplicates directory.
-- **Collision Protection:** Automatically applies numerical suffixes (`filename (1).ext`) to prevent overwriting existing files.
-- **Reversible Operations:** Records each file relocation in a local transaction log (`.bytesift_history.json`), allowing full rollbacks.
-- **Zero External Dependencies:** Built using the standard library, ensuring low memory consumption (< 30 MB) and rapid startup times.
-- **Dual Interface:** Provides both a command-line interface (CLI) and a native modern desktop interface designed for macOS and Windows with automatic system Dark/Light mode detection.
+> **"Your unorganized folder, fixed in one click."**
+
+### 1. Before & After
+
+<p align="center">
+  <img src="docs/before-after.svg" alt="ByteSift Before &amp; After Showcase" width="100%">
+</p>
+
+### 2. Three steps. That is all.
+
+| Step | Action | Description |
+|:---:|:---|:---|
+| **1** | **Choose a folder** | Pick your Downloads, Desktop, or workspace. ByteSift discovers every file in milliseconds without modifying anything. |
+| **2** | **Preview the plan** | ByteSift inspects real content inside each file via magic bytes and text heuristics, flagging identical duplicate copies upfront. |
+| **3** | **Organize & Undo** | Click **Organize Files**. Files slot into neat folders instantly. Press <kbd>Ctrl</kbd>+<kbd>Z</kbd> (or `bytesift undo`) anytime to roll back. |
 
 ---
 
-## Architecture
+## The problem
+
+Your Downloads folder is full of `download`, `file (3).tmp`, `scan_final.bin`, and a PDF someone renamed to `.jpg`. Organizers that sort by extension can't help, because the extension is the part that's wrong.
+
+ByteSift opens each file, reads its first bytes and a small text sample, and decides what it really is. Then it moves it where it belongs. If you don't like the result, one command puts everything back.
+
+## Why ByteSift
+
+| | |
+|---|---|
+| **Content-aware** | Detects formats from magic bytes, so a mislabeled or extensionless file still lands in the right folder. |
+| **Reads documents, not just containers** | Spots invoices, resumes, contracts, source code, and system logs using weighted keyword and structure heuristics. |
+| **Fully offline and private** | No network requests, no telemetry, no models. Everything runs locally. |
+| **Fully reversible** | Every move is journaled, so `undo` restores your original layout. |
+| **Finds duplicates safely** | Size-grouped SHA-256 hashing, so unique files are never needlessly read. |
+| **Tiny and fast** | Standard library only, under 30 MB of memory, quick startup. |
+| **CLI and desktop GUI** | Native-feeling GUI for macOS and Windows with automatic Dark/Light mode. |
+
+## Install
+
+### Download (no Python needed)
+
+| Platform | Download |
+|---|---|
+| Windows (recommended) | [ByteSift-Setup-x64.exe](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Setup-x64.exe) |
+| Windows (portable) | [ByteSift-Windows-x64.zip](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.zip) |
+| macOS (Apple Silicon & Intel) | [ByteSift-macOS-Universal.dmg](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-macOS-Universal.dmg) |
+
+Checksums and all versions are on the [Releases page](https://github.com/PramudithaN/bytesift/releases).
+
+### From source
+
+Requires Python 3.9+ and nothing else.
+
+```bash
+git clone https://github.com/PramudithaN/bytesift.git
+cd bytesift
+pip install -e .   # optional: installs the command into your environment
+```
+
+## Quick start
+
+**1. Preview first. Nothing is moved.**
+
+```bash
+python -m bytesift.cli scan "/path/to/Downloads"
+```
+
+**2. Organize.**
+
+```bash
+python -m bytesift.cli organize "/path/to/Downloads"
+```
+
+**3. Changed your mind? Undo.**
+
+```bash
+python -m bytesift.cli undo "/path/to/Downloads"
+```
+
+Prefer clicking? Launch the desktop app:
+
+```bash
+python -m bytesift.cli gui
+```
+
+The GUI lets you pick a folder, preview the plan, run it, and roll back previous actions.
+
+<!-- TODO: add GUI screenshots (light + dark) -->
+<!--
+<p align="center">
+  <img src="docs/gui-light.png" width="48%" alt="ByteSift GUI, light mode">
+  <img src="docs/gui-dark.png" width="48%" alt="ByteSift GUI, dark mode">
+</p>
+-->
+
+## CLI options
+
+For `organize`:
+
+| Option | Description |
+|---|---|
+| `--yes` | Skip the interactive confirmation prompt. |
+| `--strategy [smart\|date\|type]` | Classification mode. Default: `smart`. |
+| `--group-by-date` | Add `YYYY-MM` subfolders for media assets. |
+| `--no-duplicates` | Disable duplicate detection. |
+| `-r`, `--recursive` | Process subdirectories recursively. |
+| `--dry-run` | Run the full analysis without changing the file system. |
+
+## How it works
+
+ByteSift classifies each file through a three-tier pipeline and stops at the first confident answer.
 
 ```
                     +--------------------+
@@ -59,125 +160,51 @@ Traditional file organizers depend heavily on file extensions, failing when exte
                      [Document/Code Type]             [Tier 3: Extension Fallback]
 ```
 
----
+1. **Binary magic bytes.** Reads the leading bytes to identify real formats such as PDF, JPEG, PNG, ZIP, Office OpenXML, and executables.
+2. **Text content heuristics.** Scores a bounded 4-8 KB sample against weighted keyword and structural patterns to recognize invoices, resumes, contracts, source code, and logs. It is pattern matching, not a language model.
+3. **Extension fallback.** Used only when content gives no answer.
 
-## Standalone Binaries & Downloads
+Two supporting steps run alongside:
 
-ByteSift is distributed as self-contained, zero-dependency standalone packages that do not require Python to be installed:
+- **Metadata and timestamps.** Embedded timestamps (such as JPEG EXIF) enable chronological archiving.
+- **Deduplication.** Files are grouped by size first, and only same-size candidates are hashed with SHA-256. Identical files are routed to a dedicated duplicates folder.
 
-* **Windows Setup Wizard (Recommended):** [Download ByteSift Windows Setup (.exe)](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Setup-x64.exe)
-* **Windows Portable (.zip):** [Download ByteSift Portable (.zip)](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.zip)
-* **macOS (Apple Silicon & Intel):** [Download ByteSift for Mac (.dmg)](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-macOS-Universal.dmg)
-* **All Releases & Checksums:** [GitHub Releases Page](https://github.com/PramudithaN/bytesift/releases)
+## Safety
 
----
+ByteSift is built so you can try it without worrying.
 
-## Requirements and Installation (From Source)
+- **Dry runs.** `scan` and `--dry-run` show the full plan without touching anything.
+- **Transaction journal.** Each completed session is recorded in `.bytesift_history.json`.
+- **Full rollback.** `undo` reverses moves in inverse order and cleans up empty directories.
+- **No overwrites.** Name collisions get numeric suffixes (`filename (1).ext`).
+- **Sensible exclusions.** Hidden directories and common dependency or VCS folders (`.git`, `node_modules`, `.venv`) are skipped by default.
 
-- **Python:** Version 3.9 or higher.
-- **Dependencies:** None (standard library only).
+## Development
 
-### Installation
-
-Clone the repository and run directly:
-
-```bash
-git clone https://github.com/PramudithaN/bytesift.git
-cd bytesift
-```
-
-To install the executable script into your active Python environment:
-
-```bash
-pip install -e .
-```
-
-### Packaging Standalone Binaries
-
-To build a standalone executable locally on Windows or macOS:
-
-```bash
-python scripts/build.py
-```
-Compiled binaries will be created in the `dist/` directory.
-
----
-
-## Usage
-
-### 1. Graphical Interface
-
-To launch the desktop interface:
-
-```bash
-python -m bytesift.cli gui
-```
-
-The GUI allows directory selection, preview of categorization plans, execution, and rollback of previous actions.
-
----
-
-### 2. Command Line Interface
-
-#### Preview Organization Plan (Dry Run)
-
-Scans the target directory and outputs planned operations without moving files:
-
-```bash
-python -m bytesift.cli scan "/path/to/directory"
-```
-
-#### Execute Organization
-
-Analyzes contents and moves files into categorized subdirectories:
-
-```bash
-python -m bytesift.cli organize "/path/to/directory"
-```
-
-**Options:**
-
-- `--yes`: Skips the interactive confirmation prompt.
-- `--strategy [smart|date|type]`: Selects classification mode (default: `smart`).
-- `--group-by-date`: Appends `YYYY-MM` subfolders for media assets.
-- `--no-duplicates`: Disables duplicate detection.
-- `-r, --recursive`: Processes subdirectories recursively.
-- `--dry-run`: Runs full analysis without altering the file system.
-
-#### Undo Previous Operation
-
-Restores all files from the latest session to their original paths and cleans up empty directories:
-
-```bash
-python -m bytesift.cli undo "/path/to/directory"
-```
-
----
-
-## Verification and Testing
-
-Execute the unit test suite:
+Run the test suite:
 
 ```bash
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
-The test suite covers:
+Tests cover magic-byte detection across common formats, text heuristics for structured documents and code, and end-to-end plan generation, collision handling, and rollback.
 
-- Binary magic byte validation across common formats.
-- Text heuristic detection across structured documents and code.
-- End-to-end plan generation, collision resolution, and transaction rollbacks.
+Build a standalone executable on Windows or macOS:
 
----
+```bash
+python scripts/build.py   # output goes to dist/
+```
 
-## Safety and Rollback Mechanism
+## Contributing
 
-1. **Transaction Journaling:** A session record is committed to `.bytesift_history.json` upon completion of file moves.
-2. **Safe Rollback:** The `undo` command reverses moves in inverse order, restoring original file locations.
-3. **Excluded Directories:** Hidden directories and standard version control/dependency folders (`.git`, `node_modules`, `.venv`) are ignored by default.
+Contributions are welcome. A good first contribution is adding a new file signature to the magic-byte table or a new text heuristic, each with a test. Please open an issue first for larger changes.
 
----
+<!-- TODO: add CONTRIBUTING.md and label starter issues "good first issue" -->
+
+## If ByteSift saved you time
+
+A star on the repo helps other people find it. Bug reports and format requests are just as valuable.
 
 ## License
 
-This project is licensed under the MIT License.
+[MIT](LICENSE)

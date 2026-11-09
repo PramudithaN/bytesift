@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 400" width="100%" height="100%">
+  <defs>
+    <filter id="card-shadow" x="-4%" y="-4%" width="108%" height="114%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#000000" flood-opacity="0.4" />
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000000" flood-opacity="0.2" />
+    </filter>
+
+    <linearGradient id="header-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#222225" />
+      <stop offset="100%" stop-color="#1a1a1c" />
+    </linearGradient>
+
+    <linearGradient id="dup-glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#064e3b" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#065f46" stop-opacity="0.25" />
+    </linearGradient>
+
+    <linearGradient id="arrow-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0071e3" />
+      <stop offset="100%" stop-color="#2997ff" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    .font-base { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .font-mono { font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace; }
+  </style>
+
+  <!-- Outer Card with Shadow -->
+  <g filter="url(#card-shadow)">
+    <rect x="20" y="16" width="800" height="368" rx="16" fill="#161618" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" />
+
+    <!-- Card Header / Segmented Bar -->
+    <path d="M 20 32 Q 20 16 36 16 L 804 16 Q 820 16 820 32 L 820 62 L 20 62 Z" fill="url(#header-grad)" />
+    <line x1="20" y1="62" x2="820" y2="62" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+
+    <!-- Segmented Toggle Pills -->
+    <rect x="36" y="26" width="186" height="26" rx="7" fill="#262629" stroke="rgba(255, 255, 255, 0.08)" />
+    <!-- Before pill -->
+    <rect x="38" y="28" width="84" height="22" rx="6" fill="#ffffff" />
+    <text x="80" y="43" class="font-base" font-size="11" font-weight="700" fill="#161618" text-anchor="middle">Before</text>
+    <!-- After pill -->
+    <text x="160" y="43" class="font-base" font-size="11" font-weight="600" fill="#a1a1a6" text-anchor="middle">After</text>
+
+    <!-- Header Right Badge -->
+    <rect x="664" y="26" width="140" height="24" rx="12" fill="rgba(16, 185, 129, 0.15)" stroke="rgba(52, 211, 153, 0.3)" />
+    <circle cx="678" cy="38" r="3.5" fill="#34d399" />
+    <text x="738" y="42" class="font-base" font-size="10.5" font-weight="600" fill="#34d399" text-anchor="middle">Sorted in 0.04s</text>
+  </g>
+
+  <!-- ==================== TWO COLUMNS: BEFORE & AFTER ==================== -->
+
+  <!-- LEFT COLUMN: CLUTTERED ROOT -->
+  <g transform="translate(36, 76)">
+    <!-- Column Header -->
+    <text x="0" y="16" class="font-base" font-size="12" font-weight="700" fill="#f5f5f7">📁 Downloads Folder</text>
+    <rect x="136" y="4" width="94" height="18" rx="9" fill="#242426" stroke="rgba(255, 255, 255, 0.08)" />
+    <text x="183" y="16" class="font-base" font-size="9.5" font-weight="600" fill="#86868b" text-anchor="middle">6 Unsorted Files</text>
+
+    <!-- Item 1: README.md -->
+    <rect x="0" y="28" width="350" height="34" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="49" class="font-base" font-size="12" fill="#f5f5f7">📄 README.md</text>
+    <text x="336" y="49" class="font-mono" font-size="11" fill="#86868b" text-anchor="end">7.3 KB</text>
+
+    <!-- Item 2: classifier.py -->
+    <rect x="0" y="68" width="350" height="34" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="89" class="font-base" font-size="12" fill="#f5f5f7">🐍 classifier.py</text>
+    <text x="336" y="89" class="font-mono" font-size="11" fill="#86868b" text-anchor="end">4.2 KB</text>
+
+    <!-- Item 3: icon_light.png -->
+    <rect x="0" y="108" width="350" height="34" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="129" class="font-base" font-size="12" fill="#f5f5f7">🖼️ icon_light.png</text>
+    <text x="336" y="129" class="font-mono" font-size="11" fill="#86868b" text-anchor="end">7.3 KB</text>
+
+    <!-- Item 4: favicon.png (Duplicate) -->
+    <rect x="0" y="148" width="350" height="34" rx="8" fill="#1c1c1e" stroke="rgba(245, 158, 11, 0.25)" />
+    <text x="14" y="169" class="font-base" font-size="12" font-weight="600" fill="#fbbf24">⚠️ favicon.png (Duplicate)</text>
+    <text x="336" y="169" class="font-mono" font-size="11" fill="#fbbf24" text-anchor="end">7.3 KB</text>
+
+    <!-- Item 5: pyproject.toml -->
+    <rect x="0" y="188" width="350" height="34" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="209" class="font-base" font-size="12" fill="#f5f5f7">⚙️ pyproject.toml</text>
+    <text x="336" y="209" class="font-mono" font-size="11" fill="#86868b" text-anchor="end">844 B</text>
+
+    <!-- Item 6: release.yml -->
+    <rect x="0" y="228" width="350" height="34" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="249" class="font-base" font-size="12" fill="#f5f5f7">📋 release.yml</text>
+    <text x="336" y="249" class="font-mono" font-size="11" fill="#86868b" text-anchor="end">5.4 KB</text>
+  </g>
+
+  <!-- CENTER DIVIDER WITH TRANSFORMATION ARROW -->
+  <g transform="translate(407, 190)">
+    <circle cx="13" cy="13" r="15" fill="#242426" stroke="rgba(255, 255, 255, 0.1)" />
+    <path d="M9 13h8M14 9l4 4-4 4" stroke="#2997ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+
+  <!-- RIGHT COLUMN: ORGANIZED RESULT -->
+  <g transform="translate(454, 76)">
+    <!-- Column Header -->
+    <text x="0" y="16" class="font-base" font-size="12" font-weight="700" fill="#34d399">✓ Clean Subfolders Created</text>
+    <rect x="186" y="4" width="100" height="18" rx="9" fill="rgba(41, 151, 255, 0.12)" stroke="rgba(41, 151, 255, 0.25)" />
+    <text x="236" y="16" class="font-base" font-size="9.5" font-weight="600" fill="#2997ff" text-anchor="middle">5 Categories</text>
+
+    <!-- Card 1: Documents -->
+    <rect x="0" y="28" width="350" height="42" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="47" class="font-base" font-size="12" font-weight="600" fill="#2997ff">📁 Documents/</text>
+    <text x="14" y="62" class="font-mono" font-size="10.5" fill="#86868b">README.md, release.yml</text>
+
+    <!-- Card 2: Code/Python -->
+    <rect x="0" y="76" width="350" height="42" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="95" class="font-base" font-size="12" font-weight="600" fill="#38bdf8">📁 Code/Python/</text>
+    <text x="14" y="110" class="font-mono" font-size="10.5" fill="#86868b">classifier.py</text>
+
+    <!-- Card 3: Images/PNG -->
+    <rect x="0" y="124" width="350" height="42" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="143" class="font-base" font-size="12" font-weight="600" fill="#a78bfa">📁 Images/PNG/</text>
+    <text x="14" y="158" class="font-mono" font-size="10.5" fill="#86868b">icon_light.png</text>
+
+    <!-- Card 4: Config/TOML -->
+    <rect x="0" y="172" width="350" height="42" rx="8" fill="#1c1c1e" stroke="rgba(255, 255, 255, 0.06)" />
+    <text x="14" y="191" class="font-base" font-size="12" font-weight="600" fill="#fbbf24">📁 Config/TOML/</text>
+    <text x="14" y="206" class="font-mono" font-size="10.5" fill="#86868b">pyproject.toml</text>
+
+    <!-- Card 5: Duplicates (Quarantined) - HIGHLIGHTED IN EMERALD -->
+    <rect x="0" y="220" width="350" height="42" rx="8" fill="url(#dup-glow)" stroke="rgba(52, 211, 153, 0.4)" stroke-width="1" />
+    <text x="14" y="239" class="font-base" font-size="12" font-weight="700" fill="#34d399">📁 Duplicates/ (Isolated)</text>
+    <text x="14" y="254" class="font-mono" font-size="10.5" fill="#a7f3d0">favicon.png (Exact SHA-256 copy)</text>
+  </g>
+
+  <!-- ==================== CARD FOOTER ==================== -->
+  <g transform="translate(36, 354)">
+    <circle cx="4" cy="12" r="3.5" fill="#34d399" />
+    <text x="16" y="16" class="font-base" font-size="11" font-weight="600" fill="#34d399">Zero file loss guarantee</text>
+    <text x="160" y="16" class="font-base" font-size="11" fill="#86868b">•  No network calls</text>
+
+    <text x="768" y="16" class="font-base" font-size="11" fill="#86868b" text-anchor="end">100% Offline • Instant Undo (Ctrl+Z)</text>
+  </g>
+</svg>
