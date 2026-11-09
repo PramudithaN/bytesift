@@ -102,8 +102,8 @@ class ByteSiftApp:
     def _apply_window_icon(self, is_dark: bool):
         """
         Applies theme-synchronized icons:
-        - White folder icon on dark background.
-        - Black folder icon on light background.
+        - White icon in dark mode (icon_dark.png).
+        - Black icon in light mode (icon_light.png).
         """
         # cspell:ignore MEIPASS
         bundle_dir = getattr(sys, "_MEIPASS", None)
@@ -114,7 +114,7 @@ class ByteSiftApp:
                 assets_dir = base_dir / "assets"
         else:
             assets_dir = Path(__file__).resolve().parent.parent / "assets"
-        suffix = "light" if is_dark else "dark"
+        suffix = "dark" if is_dark else "light"
         ico_path = assets_dir / f"icon_{suffix}.ico"
         png_path = assets_dir / f"icon_{suffix}.png"
 
