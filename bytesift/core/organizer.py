@@ -6,7 +6,10 @@ Generates execution plans, previews organization actions, and safely executes mo
 from dataclasses import dataclass
 from pathlib import Path
 import logging
+import os
 import shutil
+import stat
+import sys
 from typing import Callable, List, Optional, Set
 from bytesift.core.classifier import Classifier, Classification
 from bytesift.core.transaction import TransactionManager, FileMoveRecord
@@ -73,9 +76,27 @@ class Organizer:
         return collected
 
     def _is_ignored(self, item: Path, root: Path) -> bool:
-        """Determines if a file or any of its parents is in the ignored list."""
-        if item.name in self.ignored or item.name.startswith(".") or item.name.startswith("._"):
+        """
+        Determines if a file or any of its parents is in the ignored list.
+        Safely ignores OS-hidden/system files and anti-ransomware EDR canary bait decoys.
+        """
+        name = item.name
+        if name in self.ignored or name.startswith(".") or name.startswith("._"):
             return True
+
+        # Safety filter: Ignore EDR / Antivirus canary bait patterns (e.g. Cortex XDR / CrowdStrike)
+        if name.startswith("!!!!!") or name.startswith("ZZZZZ") or name.startswith("XORXOR"):
+            return True
+
+        # Safety filter: Ignore Windows Hidden and System files
+        if sys.platform == "win32":
+            try:
+                attrs = getattr(item.stat(), "st_file_attributes", 0)
+                if attrs & (stat.FILE_ATTRIBUTE_HIDDEN | stat.FILE_ATTRIBUTE_SYSTEM):
+                    return True
+            except (OSError, PermissionError):
+                return True
+
         for part in item.relative_to(root).parts[:-1]:
             if part in self.ignored or part.startswith(".") or part.startswith("._"):
                 return True

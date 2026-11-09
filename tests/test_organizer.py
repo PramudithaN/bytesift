@@ -63,5 +63,27 @@ class TestOrganizer(unittest.TestCase):
         finally:
             shutil.rmtree(temp_dir)
 
+    def test_ignore_canary_and_hidden_files(self):
+        temp_dir = Path(tempfile.mkdtemp())
+        try:
+            # Canary / Decoy files (EDR anti-ransomware traps)
+            canary1 = temp_dir / "!!!!!1938081838.doc"
+            canary1.write_text("decoy", encoding="utf-8")
+            canary2 = temp_dir / "ZZZZZ2630139219.doc"
+            canary2.write_text("decoy", encoding="utf-8")
+            canary3 = temp_dir / "XORXOR2071002061.doc"
+            canary3.write_text("decoy", encoding="utf-8")
+
+            # Normal user file
+            normal = temp_dir / "normal_invoice.txt"
+            normal.write_text("Invoice Total Due: $100", encoding="utf-8")
+
+            organizer = Organizer()
+            plan = organizer.generate_plan(temp_dir)
+            self.assertEqual(len(plan), 1)
+            self.assertEqual(plan[0].source.name, "normal_invoice.txt")
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
 if __name__ == "__main__":
     unittest.main()
