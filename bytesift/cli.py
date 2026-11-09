@@ -7,8 +7,10 @@ import argparse
 import sys
 from pathlib import Path
 from typing import List
+from bytesift import __version__
 from bytesift.core.organizer import Organizer, OrganizerConfig, PlanItem
 from bytesift.core.transaction import TransactionManager
+from bytesift.core.updater import check_for_updates
 
 def print_banner():
     banner = r"""
@@ -102,11 +104,17 @@ def cmd_undo(args):
         print(f"Error: Directory '{folder}' does not exist.")
         sys.exit(1)
 
-    mgr = TransactionManager(folder)
-    reverted, errors = mgr.undo_last_session()
+    transaction_mgr = TransactionManager(folder)
+    if not transaction_mgr.history_file.exists():
+        print(f"No previous organization session found in '{folder}'.")
+        return
+
+    reverted, errors = transaction_mgr.undo_last_session()
     if errors:
+        print(f"Encountered {len(errors)} error(s) during rollback:")
         for err in errors:
-            print(f"[!] {err}")
+            print(f"  - {err}")
+
     if reverted > 0:
         print(f"Successfully rolled back {reverted} file(s) to original locations.")
     else:
@@ -121,12 +129,33 @@ def cmd_gui(args):
         print(f"Error launching GUI: {e}")
         sys.exit(1)
 
+def cmd_check_update(args):
+    print(f"ByteSift v{__version__} - Checking for updates...")
+    info = check_for_updates(current_version=__version__)
+    if not info:
+        print("Could not reach GitHub Releases. Please check your internet connection.")
+        print("Manual download: https://github.com/PramudithaN/bytesift/releases/latest")
+        return
+
+    if info.has_update:
+        print(f"\n[UPDATE] A new version is available: v{info.latest_version} (Current: v{info.current_version})")
+        if info.release_name:
+            print(f"Title: {info.release_name}")
+        if info.release_notes:
+            print("\nRelease Notes:")
+            preview = info.release_notes[:400] + ("..." if len(info.release_notes) > 400 else "")
+            print(preview)
+        print(f"\nDownload: {info.download_url or info.html_url}")
+    else:
+        print(f"ByteSift is up to date (v{__version__}).")
+
 def main():
     parser = argparse.ArgumentParser(
         prog="bytesift",
         description="Lightweight, 100% offline file content examiner and organizer.",
         epilog="Website & Documentation: https://pramudithan.github.io/bytesift/"
     )
+    parser.add_argument("-v", "--version", action="version", version=f"ByteSift v{__version__}")
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 
     # Common options helper
@@ -160,6 +189,10 @@ def main():
     p_gui.add_argument("folder", nargs="?", default=None, help="Optional initial directory to open")
     p_gui.add_argument("--macos", "--mac", action="store_true", help="Launch GUI with macOS Aqua theme and styling")
     p_gui.set_defaults(func=cmd_gui)
+
+    # Check for updates command
+    p_update = subparsers.add_parser("check-update", help="Check if a newer version of ByteSift is available on GitHub")
+    p_update.set_defaults(func=cmd_check_update)
 
     if len(sys.argv) == 1:
         # Default to desktop GUI when launched without subcommands (e.g. double-clicked executable)

@@ -13,8 +13,10 @@ from tkinter import ttk, filedialog, messagebox
 from typing import List, Optional
 import webbrowser
 
+from bytesift import __version__
 from bytesift.core.organizer import Organizer, OrganizerConfig, PlanItem
 from bytesift.core.transaction import TransactionManager
+from bytesift.core.updater import UpdateInfo, check_for_updates
 from bytesift.ui.theme import (
     DARK_THEME,
     LIGHT_THEME,
@@ -79,6 +81,7 @@ class ByteSiftApp:
         self.recursive_var = tk.BooleanVar(value=False)
         self.theme_mode_var = tk.StringVar(value="System")
         self.current_theme: ThemeColors = DARK_THEME
+        self._latest_update_info: Optional[UpdateInfo] = None
 
         # Pre-load initial theme icon (white icon in dark mode, black icon in light mode)
         self._apply_window_icon(is_system_dark_theme())
@@ -95,6 +98,9 @@ class ByteSiftApp:
 
         # Start periodic background listener for system theme changes (macOS/Windows)
         self._schedule_system_theme_check()
+
+        # Non-blocking background check for newer releases
+        self._start_background_update_check()
 
         if initial_folder:
             self.on_scan()
@@ -195,6 +201,77 @@ class ByteSiftApp:
         # Force title bar update
         set_windows_titlebar_appearance(self.root, theme.name == "dark")
 
+    def _start_background_update_check(self):
+        """Non-blocking background release check that fails silently if offline."""
+        def worker():
+            try:
+                info = check_for_updates(current_version=__version__, timeout=3.5)
+                if info and info.has_update:
+                    self.root.after(0, lambda: self._notify_update_available(info))
+            except Exception:
+                pass
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _notify_update_available(self, info: UpdateInfo):
+        """Reveals the update button in the status bar when an update is found."""
+        self._latest_update_info = info
+        if hasattr(self, "update_btn"):
+            self.update_btn.configure(text=f"🚀 v{info.latest_version} Available")
+            self.update_btn.pack(side=tk.RIGHT, padx=(8, 0))
+
+    def on_show_update_dialog(self):
+        """Presents release notes and direct update link dialog."""
+        info = self._latest_update_info
+        if not info:
+            self.on_check_updates_manual()
+            return
+        self._prompt_update_dialog(info)
+
+    def on_check_updates_manual(self):
+        """Interactive update check triggered from the Help menu."""
+        self.status_var.set("Checking GitHub Releases for updates...")
+        def worker():
+            info = check_for_updates(current_version=__version__, timeout=5.0)
+            def done():
+                self.status_var.set("Ready.")
+                if not info:
+                    messagebox.showwarning(
+                        "Update Check",
+                        "Unable to connect to GitHub.\n\n"
+                        "Please check your internet connection or visit the releases page:\n"
+                        "https://github.com/PramudithaN/bytesift/releases"
+                    )
+                elif info.has_update:
+                    self._notify_update_available(info)
+                    self._prompt_update_dialog(info)
+                else:
+                    messagebox.showinfo(
+                        "ByteSift Up to Date",
+                        f"You're using the latest version of ByteSift (v{__version__}).\n\n"
+                        "No updates are currently available."
+                    )
+            self.root.after(0, done)
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _prompt_update_dialog(self, info: UpdateInfo):
+        notes_preview = ""
+        if info.release_notes:
+            first_lines = "\n".join(info.release_notes.strip().splitlines()[:6])
+            notes_preview = f"\n\nWhat's New:\n{first_lines}"
+            if len(info.release_notes.splitlines()) > 6:
+                notes_preview += "\n..."
+
+        resp = messagebox.askyesno(
+            "ByteSift Update Available",
+            f"A newer version of ByteSift is available!\n\n"
+            f"Current version: v{info.current_version}\n"
+            f"Latest version: v{info.latest_version} ({info.release_name})"
+            f"{notes_preview}\n\n"
+            f"Would you like to open the download page in your browser?"
+        )
+        if resp:
+            webbrowser.open(info.download_url or info.html_url)
+
     def _build_menu_bar(self):
         """Builds native top menu bar (integrated into macOS system menu on Mac)."""
         menubar = tk.Menu(self.root)
@@ -226,6 +303,7 @@ class ByteSiftApp:
 
         # Help Menu
         help_menu = tk.Menu(menubar, tearoff=0)
+        help_menu.add_command(label="Check for Updates...", command=self.on_check_updates_manual)
         help_menu.add_command(label="Visit Website...", command=lambda: webbrowser.open("https://pramudithan.github.io/bytesift/"))
         help_menu.add_separator()
         help_menu.add_command(label="About ByteSift", command=self.on_about)
@@ -241,9 +319,12 @@ class ByteSiftApp:
 
     def on_about(self):
         """Displays About ByteSift dialog."""
+        update_text = ""
+        if self._latest_update_info and self._latest_update_info.has_update:
+            update_text = f"\n\n🚀 Update v{self._latest_update_info.latest_version} is available!"
         messagebox.showinfo(
             "About ByteSift",
-            "ByteSift v0.1.0\n\n"
+            f"ByteSift v{__version__}{update_text}\n\n"
             "Lightweight, 100% offline file content examiner and organizer.\n"
             "Designed for macOS, Windows, and Linux without external dependencies.\n\n"
             "Official Website & Docs:\nhttps://pramudithan.github.io/bytesift/"
@@ -319,12 +400,13 @@ class ByteSiftApp:
         self.card_opts = ttk.Frame(container, style="CardContent.TFrame", padding="14")
         self.card_opts.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Label(self.card_opts, text="Configuration & Filters", style="Section.TLabel").pack(anchor=tk.W, pady=(0, 8))
+        ttk.Label(self.card_opts, text="Organization Strategy & Options", style="Section.TLabel").pack(anchor=tk.W, pady=(0, 8))
 
         opts_row = ttk.Frame(self.card_opts, style="CardContent.TFrame")
         opts_row.pack(fill=tk.X)
 
-        ttk.Label(opts_row, text="Strategy:", style="Card.TLabel").pack(side=tk.LEFT, padx=(0, 6))
+        ttk.Label(opts_row, text="Mode:", style="Subtitle.TLabel").pack(side=tk.LEFT, padx=(0, 6))
+
         strategy_combo = ttk.Combobox(
             opts_row,
             textvariable=self.strategy_var,
@@ -332,41 +414,57 @@ class ByteSiftApp:
             state="readonly",
             width=10
         )
-        strategy_combo.pack(side=tk.LEFT, padx=(0, 24))
-        strategy_combo.bind("<<ComboboxSelected>>", lambda e: self.on_scan())
+        strategy_combo.pack(side=tk.LEFT, padx=(0, 16))
 
-        ttk.Checkbutton(opts_row, text="Detect Duplicate Files", variable=self.duplicates_var, command=self.on_scan).pack(side=tk.LEFT, padx=(0, 16))
-        ttk.Checkbutton(opts_row, text="Group Media by Date", variable=self.group_date_var, command=self.on_scan).pack(side=tk.LEFT, padx=(0, 16))
-        ttk.Checkbutton(opts_row, text="Recursive Scan", variable=self.recursive_var, command=self.on_scan).pack(side=tk.LEFT)
+        date_chk = ttk.Checkbutton(opts_row, text="Group Media by Month", variable=self.group_date_var)
+        date_chk.pack(side=tk.LEFT, padx=(0, 16))
+
+        dup_chk = ttk.Checkbutton(opts_row, text="Detect Duplicate Files", variable=self.duplicates_var)
+        dup_chk.pack(side=tk.LEFT, padx=(0, 16))
+
+        rec_chk = ttk.Checkbutton(opts_row, text="Scan Subfolders Recursively", variable=self.recursive_var)
+        rec_chk.pack(side=tk.LEFT)
 
         # 4. Action Command Bar
         action_bar = ttk.Frame(container)
         action_bar.pack(fill=tk.X, pady=(0, 10))
 
-        self.scan_btn = ttk.Button(action_bar, text="Refresh Preview", command=self.on_scan)
-        self.scan_btn.pack(side=tk.LEFT, padx=(0, 10))
+        self.scan_btn = ttk.Button(
+            action_bar,
+            text="Inspect & Preview",
+            style="Accent.TButton",
+            command=self.on_scan
+        )
+        self.scan_btn.pack(side=tk.LEFT, padx=(0, 8))
 
         self.organize_btn = ttk.Button(
             action_bar,
             text="Organize Files",
-            style="Accent.TButton",
-            command=self.on_organize,
-            state=tk.DISABLED
+            style="Success.TButton",
+            state=tk.DISABLED,
+            command=self.on_organize
         )
-        self.organize_btn.pack(side=tk.LEFT, padx=(0, 10))
+        self.organize_btn.pack(side=tk.LEFT, padx=(0, 8))
 
-        self.undo_btn = ttk.Button(action_bar, text="Undo Last Session", command=self.on_undo)
+        self.undo_btn = ttk.Button(
+            action_bar,
+            text="Undo Last Session",
+            command=self.on_undo
+        )
         self.undo_btn.pack(side=tk.LEFT)
 
-        # 5. Card: Table of Execution Plan
-        self.card_table = ttk.Frame(container, style="CardContent.TFrame", padding="10")
+        # 5. Card: Preview Table
+        self.card_table = ttk.Frame(container, style="CardContent.TFrame", padding="2")
         self.card_table.pack(fill=tk.BOTH, expand=True)
 
         columns = ("file", "size", "category", "method")
-        self.tree = ttk.Treeview(self.card_table, columns=columns, show="headings", selectmode="browse")
-        
-        # Consistent text anchors ensure headers and cell content align seamlessly
-        self.tree.heading("file", text="File Name", anchor=tk.W)
+        self.tree = ttk.Treeview(
+            self.card_table,
+            columns=columns,
+            show="headings",
+            selectmode="extended"
+        )
+        self.tree.heading("file", text="Filename", anchor=tk.W)
         self.tree.heading("size", text="Size", anchor=tk.E)
         self.tree.heading("category", text="Target Folder", anchor=tk.W)
         self.tree.heading("method", text="Detected By", anchor=tk.W)
@@ -389,6 +487,13 @@ class ByteSiftApp:
         self.status_var = tk.StringVar(value="Ready. Select a target directory to begin.")
         status_lbl = ttk.Label(self.status_frame, textvariable=self.status_var, style="Status.TLabel")
         status_lbl.pack(side=tk.LEFT)
+
+        # Hidden by default; displayed when an update is available
+        self.update_btn = ttk.Button(
+            self.status_frame,
+            text="🚀 Update Available",
+            command=self.on_show_update_dialog
+        )
 
     def on_browse(self):
         folder = filedialog.askdirectory(title="Select Folder to Organize")
