@@ -12,6 +12,21 @@
   <meta property="og:type" content="website">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+
+  <!-- Instant Theme Loader (Prevents Flash of Unstyled Theme) -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,14 +38,20 @@
           colors: {
             apple: {
               blue: '#0071e3',
+              blueDark: '#2997ff',
               blueHover: '#0077ed',
               text: '#1d1d1f',
+              textDark: '#f5f5f7',
               subtext: '#86868b',
+              subtextDark: '#a1a1a6',
               card: '#ffffff',
+              cardDark: '#161618',
               bg: '#fbfbfd',
+              bgDark: '#000000',
               tint: '#f5f5f7',
+              tintDark: '#1c1c1e',
               border: '#d2d2d7',
-              borderLight: 'rgba(0, 0, 0, 0.08)',
+              borderDark: 'rgba(255, 255, 255, 0.08)',
             },
             accent: {
               emerald: '#10b981',
@@ -75,10 +96,9 @@
     }
 
     body {
-      background-color: #fbfbfd;
-      color: #1d1d1f;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
       letter-spacing: -0.011em;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     /* Top Global Scroll Progress */
@@ -92,18 +112,31 @@
       z-index: 100;
       transition: width 0.05s linear;
     }
+    .dark #global-progress {
+      background: #2997ff;
+    }
 
     /* Letter Organizer Style for Jumbled-to-Organized Animation */
     .char-locked {
       color: #1d1d1f;
       transition: color 0.25s ease-out;
     }
+    .dark .char-locked {
+      color: #f5f5f7;
+    }
     .char-locked-accent {
       color: #0071e3;
       transition: color 0.25s ease-out;
     }
+    .dark .char-locked-accent {
+      color: #2997ff;
+    }
     .char-sorting {
       color: #86868b;
+      opacity: 0.7;
+    }
+    .dark .char-sorting {
+      color: #a1a1a6;
       opacity: 0.7;
     }
 
@@ -145,7 +178,7 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-[#fbfbfd] antialiased text-[#1d1d1f] select-none overflow-x-hidden relative">
+<body class="bg-[#fbfbfd] dark:bg-[#000000] antialiased text-[#1d1d1f] dark:text-[#f5f5f7] select-none overflow-x-hidden relative">
 
   <!-- Top Global Scroll Progress Bar -->
   <div id="global-progress"></div>
@@ -153,7 +186,7 @@
   <!-- ========================================================================= -->
   <!-- APPLE-STYLE NAVIGATION BAR                                                -->
   <!-- ========================================================================= -->
-  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 border-b border-black/[0.06]">
+  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-black/80 border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between">
       
       <!-- Brand Logo -->
@@ -165,27 +198,40 @@
             <path d="M4 12h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
           </svg>
         </div>
-        <span class="font-bold text-base text-[#1d1d1f] tracking-tight">ByteSift</span>
+        <span class="font-bold text-base text-[#1d1d1f] dark:text-[#f5f5f7] tracking-tight">ByteSift</span>
       </a>
 
       <!-- Minimal Nav Links -->
-      <nav class="hidden md:flex items-center space-x-8 text-xs font-medium text-[#1d1d1f]/80">
-        <a href="#how-it-works" class="hover:text-[#0071e3] transition-colors">Overview</a>
-        <a href="#features" class="hover:text-[#0071e3] transition-colors">Features</a>
-        <a href="#interactive-demo" class="hover:text-[#0071e3] transition-colors">Demo</a>
-        <a href="#faq" class="hover:text-[#0071e3] transition-colors">Safety</a>
-        <a href="#download" class="hover:text-[#0071e3] transition-colors">Download</a>
-        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hover:text-[#0071e3] transition-colors flex items-center space-x-1 font-semibold text-[#1d1d1f]">
+      <nav class="hidden md:flex items-center space-x-8 text-xs font-medium text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80">
+        <a href="#how-it-works" class="hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors">Overview</a>
+        <a href="#features" class="hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors">Features</a>
+        <a href="#interactive-demo" class="hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors">Demo</a>
+        <a href="#faq" class="hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors">Safety</a>
+        <a href="#download" class="hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors">Download</a>
+        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors flex items-center space-x-1 font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
           <span>GitHub</span>
-          <span class="text-[10px] text-[#86868b]">↗</span>
+          <span class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">↗</span>
         </a>
       </nav>
 
-      <!-- Right Action CTA -->
-      <div class="flex items-center space-x-3">
+      <!-- Right Action CTA & Theme Toggle -->
+      <div class="flex items-center space-x-2.5">
+        
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark and light theme" class="w-8 h-8 rounded-full flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] bg-[#f5f5f7] dark:bg-[#1c1c1e] hover:bg-[#e8e8ed] dark:hover:bg-[#2c2c2e] transition border border-black/[0.04] dark:border-white/[0.08]" title="Toggle theme">
+          <!-- Sun Icon (visible in dark mode) -->
+          <svg id="theme-sun-icon" class="w-4 h-4 hidden dark:block fill-current" viewBox="0 0 24 24">
+            <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+          </svg>
+          <!-- Moon Icon (visible in light mode) -->
+          <svg id="theme-moon-icon" class="w-4 h-4 block dark:hidden fill-current" viewBox="0 0 24 24">
+            <path d="M12.3 2a10 10 0 0 0-.19 14 9.92 9.92 0 0 0 7.9 3.11 1 1 0 0 0 .8-1.57A10 10 0 0 1 12.3 2z"/>
+          </svg>
+        </button>
+
         <!-- Live GitHub Star Count -->
-        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center space-x-1.5 text-xs font-medium text-[#1d1d1f] hover:text-[#0071e3] px-3 py-1 rounded-full bg-[#f5f5f7] hover:bg-[#e8e8ed] transition">
-          <span class="text-[#0071e3]">★</span>
+        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center space-x-1.5 text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] hover:text-[#0071e3] dark:hover:text-[#2997ff] px-3 py-1 rounded-full bg-[#f5f5f7] dark:bg-[#1c1c1e] hover:bg-[#e8e8ed] dark:hover:bg-[#2c2c2e] transition border border-black/[0.04] dark:border-white/[0.08]">
+          <span class="text-[#0071e3] dark:text-[#2997ff]">★</span>
           <span id="nav-star-count" class="font-mono text-xs">Star</span>
         </a>
 
@@ -195,7 +241,7 @@
         </a>
 
         <!-- Mobile Menu Button -->
-        <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu" class="md:hidden p-1.5 rounded-lg text-[#1d1d1f] hover:bg-black/[0.04] transition">
+        <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu" class="md:hidden p-1.5 rounded-lg text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition">
           <svg id="menu-icon-open" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -208,19 +254,29 @@
     </div>
 
     <!-- Mobile Drawer -->
-    <div id="mobile-menu" class="hidden md:hidden border-b border-black/[0.06] bg-white/95 backdrop-blur-xl px-6 py-4 space-y-3">
-      <div class="flex flex-col space-y-2.5 text-sm font-medium text-[#1d1d1f]">
-        <a href="#how-it-works" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] transition">Overview</a>
-        <a href="#features" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] transition">Features</a>
-        <a href="#interactive-demo" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] transition">Interactive Demo</a>
-        <a href="#faq" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] transition">Safety &amp; Privacy</a>
-        <a href="#download" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] transition">Download</a>
-        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="py-1.5 hover:text-[#0071e3] transition flex items-center justify-between text-[#0071e3] font-semibold">
+    <div id="mobile-menu" class="hidden md:hidden border-b border-black/[0.06] dark:border-white/[0.08] bg-white/95 dark:bg-[#161618]/95 backdrop-blur-xl px-6 py-4 space-y-3">
+      <div class="flex flex-col space-y-2.5 text-sm font-medium text-[#1d1d1f] dark:text-[#f5f5f7]">
+        <a href="#how-it-works" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] dark:hover:text-[#2997ff] transition">Overview</a>
+        <a href="#features" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] dark:hover:text-[#2997ff] transition">Features</a>
+        <a href="#interactive-demo" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] dark:hover:text-[#2997ff] transition">Interactive Demo</a>
+        <a href="#faq" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] dark:hover:text-[#2997ff] transition">Safety &amp; Privacy</a>
+        <a href="#download" onclick="closeMobileMenu()" class="py-1.5 hover:text-[#0071e3] dark:hover:text-[#2997ff] transition">Download</a>
+        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="py-1.5 hover:text-[#0071e3] dark:hover:text-[#2997ff] transition flex items-center justify-between text-[#0071e3] dark:text-[#2997ff] font-semibold">
           <span>GitHub Repository</span>
           <span>↗</span>
         </a>
       </div>
-      <div class="pt-2 border-t border-black/[0.06]">
+
+      <!-- Mobile Theme Switcher Row -->
+      <div class="flex items-center justify-between py-2 border-t border-black/[0.06] dark:border-white/[0.08]">
+        <span class="text-xs font-medium text-[#86868b] dark:text-[#a1a1a6]">Theme</span>
+        <button onclick="toggleTheme()" class="flex items-center space-x-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-[#f5f5f7] dark:bg-[#1c1c1e] text-[#1d1d1f] dark:text-[#f5f5f7] border border-black/[0.06] dark:border-white/[0.08]">
+          <span class="block dark:hidden">Switch to Dark</span>
+          <span class="hidden dark:block">Switch to Light</span>
+        </button>
+      </div>
+
+      <div class="pt-2 border-t border-black/[0.06] dark:border-white/[0.08]">
         <a href="#download" onclick="closeMobileMenu()" class="block text-center text-xs font-semibold text-white bg-[#0071e3] hover:bg-[#0077ed] py-2 rounded-full transition">
           Download ByteSift Free
         </a>
@@ -235,23 +291,23 @@
     <div class="max-w-5xl mx-auto text-center space-y-6">
       
       <!-- Status Tag Pill -->
-      <div class="inline-flex items-center space-x-2 bg-white border border-black/[0.08] px-3.5 py-1 rounded-full text-xs font-medium text-[#1d1d1f] shadow-xs">
+      <div class="inline-flex items-center space-x-2 bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] px-3.5 py-1 rounded-full text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] shadow-xs">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
         <span>Free and Open Source &bull; <strong id="hero-version-tag">v0.1.7</strong></span>
       </div>
 
       <!-- Cinematic Headline -->
-      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#1d1d1f] leading-[1.08] max-w-4xl mx-auto">
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7] leading-[1.08] max-w-4xl mx-auto">
         <div id="anim-headline-line1">
           Your Downloads folder,
         </div>
-        <div id="anim-headline-line2" class="text-[#0071e3] mt-1">
+        <div id="anim-headline-line2" class="text-[#0071e3] dark:text-[#2997ff] mt-1">
           fixed in one click.
         </div>
       </h1>
 
       <!-- Short Plain Subtitle -->
-      <p class="text-lg sm:text-xl text-[#86868b] max-w-2xl mx-auto font-normal leading-relaxed">
+      <p class="text-lg sm:text-xl text-[#86868b] dark:text-[#a1a1a6] max-w-2xl mx-auto font-normal leading-relaxed">
         Sorts cluttered files into neat folders and isolates duplicates. Works 100% offline with instant one-click undo.
       </p>
 
@@ -265,73 +321,73 @@
         </a>
 
         <!-- Secondary GitHub Button -->
-        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-6 py-3 rounded-full bg-[#f5f5f7] hover:bg-[#e8e8ed] text-[#1d1d1f] font-medium text-sm transition flex items-center justify-center space-x-2 border border-black/[0.04]">
-          <svg class="w-4 h-4 fill-current text-[#1d1d1f]" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-6 py-3 rounded-full bg-[#f5f5f7] dark:bg-[#1c1c1e] hover:bg-[#e8e8ed] dark:hover:bg-[#2c2c2e] text-[#1d1d1f] dark:text-[#f5f5f7] font-medium text-sm transition flex items-center justify-center space-x-2 border border-black/[0.04] dark:border-white/[0.08]">
+          <svg class="w-4 h-4 fill-current text-[#1d1d1f] dark:text-[#f5f5f7]" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
           <span>View on GitHub</span>
-          <span id="hero-star-count" class="text-xs font-mono text-[#0071e3] font-semibold">★</span>
+          <span id="hero-star-count" class="text-xs font-mono text-[#0071e3] dark:text-[#2997ff] font-semibold">★</span>
         </a>
       </div>
 
       <!-- Quick Platform Link -->
-      <div class="text-xs text-[#86868b] pt-1">
-        Also available for <a href="#download" class="text-[#0071e3] font-medium hover:underline">macOS (.dmg)</a> and <a href="#download" class="text-[#0071e3] font-medium hover:underline">Portable Windows (.zip)</a>.
+      <div class="text-xs text-[#86868b] dark:text-[#a1a1a6] pt-1">
+        Also available for <a href="#download" class="text-[#0071e3] dark:text-[#2997ff] font-medium hover:underline">macOS (.dmg)</a> and <a href="#download" class="text-[#0071e3] dark:text-[#2997ff] font-medium hover:underline">Portable Windows (.zip)</a>.
       </div>
 
     </div>
 
     <!-- Before / After Card Showcase -->
     <div class="max-w-4xl mx-auto mt-12 sm:mt-16">
-      <div class="rounded-3xl bg-white border border-black/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden">
+      <div class="rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_20px_50px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden transition-colors duration-300">
         
         <!-- Segmented Tab Header -->
-        <div class="p-3 bg-[#f5f5f7] border-b border-black/[0.06] flex items-center justify-between">
-          <div class="flex items-center space-x-1 p-1 rounded-xl bg-white border border-black/[0.06] text-xs">
-            <button id="tab-btn-before" onclick="setHeroTab('before')" class="px-3.5 py-1 rounded-lg text-xs font-semibold bg-[#1d1d1f] text-white shadow-xs transition">
+        <div class="p-3 bg-[#f5f5f7] dark:bg-[#1c1c1e] border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+          <div class="flex items-center space-x-1 p-1 rounded-xl bg-white dark:bg-[#2c2c2e] border border-black/[0.06] dark:border-white/[0.08] text-xs">
+            <button id="tab-btn-before" onclick="setHeroTab('before')" class="px-3.5 py-1 rounded-lg text-xs font-semibold bg-[#1d1d1f] dark:bg-white text-white dark:text-[#1d1d1f] shadow-xs transition">
               Before
             </button>
-            <button id="tab-btn-after" onclick="setHeroTab('after')" class="px-3.5 py-1 rounded-lg text-xs font-semibold text-[#86868b] hover:text-[#1d1d1f] transition">
+            <button id="tab-btn-after" onclick="setHeroTab('after')" class="px-3.5 py-1 rounded-lg text-xs font-semibold text-[#86868b] dark:text-[#a1a1a6] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] transition">
               After: Organized
             </button>
           </div>
-          <span class="text-xs text-[#86868b] font-medium hidden sm:inline">Try toggling Before &amp; After</span>
+          <span class="text-xs text-[#86868b] dark:text-[#a1a1a6] font-medium hidden sm:inline">Try toggling Before &amp; After</span>
         </div>
 
         <!-- Before View -->
         <div id="hero-view-before" class="p-5 sm:p-6 space-y-3 transition-opacity duration-300">
-          <div class="flex items-center justify-between text-xs text-[#86868b] pb-2 border-b border-black/[0.04]">
-            <span class="font-semibold text-[#1d1d1f]">📁 Downloads Folder (6 Unsorted Files)</span>
-            <span class="text-[11px] bg-[#f5f5f7] px-2.5 py-0.5 rounded-full font-medium">Cluttered Root</span>
+          <div class="flex items-center justify-between text-xs text-[#86868b] dark:text-[#a1a1a6] pb-2 border-b border-black/[0.04] dark:border-white/[0.06]">
+            <span class="font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">📁 Downloads Folder (6 Unsorted Files)</span>
+            <span class="text-[11px] bg-[#f5f5f7] dark:bg-[#1c1c1e] px-2.5 py-0.5 rounded-full font-medium">Cluttered Root</span>
           </div>
 
           <div class="grid sm:grid-cols-2 gap-2 text-xs font-mono">
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans truncate">README.md</span>
-              <span class="text-[#86868b]">7.3 KB</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans truncate">README.md</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">7.3 KB</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans truncate">classifier.py</span>
-              <span class="text-[#86868b]">4.2 KB</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans truncate">classifier.py</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">4.2 KB</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans truncate">icon_light.png</span>
-              <span class="text-[#86868b]">7.3 KB</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans truncate">icon_light.png</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">7.3 KB</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans truncate">favicon.png (Duplicate)</span>
-              <span class="text-[#86868b]">7.3 KB</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans truncate">favicon.png (Duplicate)</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">7.3 KB</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans truncate">pyproject.toml</span>
-              <span class="text-[#86868b]">844 B</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans truncate">pyproject.toml</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">844 B</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans truncate">release.yml</span>
-              <span class="text-[#86868b]">5.4 KB</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans truncate">release.yml</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">5.4 KB</span>
             </div>
           </div>
 
           <div class="pt-2 text-center">
-            <button onclick="setHeroTab('after')" class="text-xs font-semibold text-[#0071e3] hover:underline">
+            <button onclick="setHeroTab('after')" class="text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] hover:underline">
               Click to see the organized result &rarr;
             </button>
           </div>
@@ -339,44 +395,44 @@
 
         <!-- After View -->
         <div id="hero-view-after" class="p-5 sm:p-6 space-y-3 hidden transition-opacity duration-300">
-          <div class="flex items-center justify-between text-xs text-[#86868b] pb-2 border-b border-black/[0.04]">
-            <span class="font-semibold text-emerald-700">✓ Clean Subfolders Created</span>
-            <span class="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full font-medium">Sorted in 0.04s</span>
+          <div class="flex items-center justify-between text-xs text-[#86868b] dark:text-[#a1a1a6] pb-2 border-b border-black/[0.04] dark:border-white/[0.06]">
+            <span class="font-semibold text-emerald-700 dark:text-emerald-400">✓ Clean Subfolders Created</span>
+            <span class="text-[11px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 rounded-full font-medium">Sorted in 0.04s</span>
           </div>
 
           <div class="grid sm:grid-cols-2 gap-2 text-xs font-mono">
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans font-medium">📁 Documents/</span>
-              <span class="text-[#86868b]">README.md, release.yml</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans font-medium">📁 Documents/</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">README.md, release.yml</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans font-medium">📁 Code/Python/</span>
-              <span class="text-[#86868b]">classifier.py</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans font-medium">📁 Code/Python/</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">classifier.py</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans font-medium">📁 Images/PNG/</span>
-              <span class="text-[#86868b]">icon_light.png</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans font-medium">📁 Images/PNG/</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">icon_light.png</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-[#f5f5f7] flex items-center justify-between">
-              <span class="text-[#1d1d1f] font-sans font-medium">📁 Config/TOML/</span>
-              <span class="text-[#86868b]">pyproject.toml</span>
+            <div class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-between">
+              <span class="text-[#1d1d1f] dark:text-[#f5f5f7] font-sans font-medium">📁 Config/TOML/</span>
+              <span class="text-[#86868b] dark:text-[#a1a1a6]">pyproject.toml</span>
             </div>
-            <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 sm:col-span-2 flex items-center justify-between">
-              <span class="text-emerald-900 font-sans font-semibold">📁 Duplicates/ (Isolated)</span>
-              <span class="text-emerald-700 font-medium">favicon.png (Exact SHA-256 copy)</span>
+            <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 sm:col-span-2 flex items-center justify-between">
+              <span class="text-emerald-900 dark:text-emerald-300 font-sans font-semibold">📁 Duplicates/ (Isolated)</span>
+              <span class="text-emerald-700 dark:text-emerald-400 font-medium">favicon.png (Exact SHA-256 copy)</span>
             </div>
           </div>
 
           <div class="pt-2 text-center">
-            <button onclick="setHeroTab('before')" class="text-xs font-semibold text-[#86868b] hover:text-[#1d1d1f] hover:underline">
+            <button onclick="setHeroTab('before')" class="text-xs font-semibold text-[#86868b] dark:text-[#a1a1a6] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] hover:underline">
               Switch back to messy view
             </button>
           </div>
         </div>
 
         <!-- Card Footer -->
-        <div class="p-3 bg-[#f5f5f7] border-t border-black/[0.06] flex items-center justify-between text-xs text-[#86868b]">
-          <span class="text-emerald-700 font-semibold flex items-center space-x-1">
+        <div class="p-3 bg-[#f5f5f7] dark:bg-[#1c1c1e] border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between text-xs text-[#86868b] dark:text-[#a1a1a6]">
+          <span class="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center space-x-1">
             <span>✓</span>
             <span>Zero file loss guarantee</span>
           </span>
@@ -390,49 +446,49 @@
   <!-- ========================================================================= -->
   <!-- 4 VALUE PILLARS (APPLE ICON GRID)                                         -->
   <!-- ========================================================================= -->
-  <section class="border-y border-black/[0.06] bg-white py-12 px-4 sm:px-6">
+  <section class="border-y border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-[#121214] py-12 px-4 sm:px-6 transition-colors duration-300">
     <div class="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
       
       <!-- Pillar 1 -->
       <div class="space-y-1.5">
-        <div class="w-9 h-9 rounded-xl bg-[#f5f5f7] flex items-center justify-center text-[#0071e3] font-bold text-base mb-3">
+        <div class="w-9 h-9 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-center text-[#0071e3] dark:text-[#2997ff] font-bold text-base mb-3">
           🔒
         </div>
-        <h3 class="text-sm font-bold text-[#1d1d1f]">100% Offline</h3>
-        <p class="text-xs text-[#86868b] leading-relaxed">
+        <h3 class="text-sm font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">100% Offline</h3>
+        <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
           Files never leave your computer. Zero cloud servers, telemetry, or account logins.
         </p>
       </div>
 
       <!-- Pillar 2 -->
       <div class="space-y-1.5">
-        <div class="w-9 h-9 rounded-xl bg-[#f5f5f7] flex items-center justify-center text-emerald-600 font-bold text-base mb-3">
+        <div class="w-9 h-9 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-base mb-3">
           ↩
         </div>
-        <h3 class="text-sm font-bold text-[#1d1d1f]">One-Click Undo</h3>
-        <p class="text-xs text-[#86868b] leading-relaxed">
+        <h3 class="text-sm font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">One-Click Undo</h3>
+        <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
           Press Command-Z (or Ctrl+Z) to reverse any session and restore files to original paths.
         </p>
       </div>
 
       <!-- Pillar 3 -->
       <div class="space-y-1.5">
-        <div class="w-9 h-9 rounded-xl bg-[#f5f5f7] flex items-center justify-center text-[#0071e3] font-bold text-base mb-3">
+        <div class="w-9 h-9 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-center text-[#0071e3] dark:text-[#2997ff] font-bold text-base mb-3">
           ⚡
         </div>
-        <h3 class="text-sm font-bold text-[#1d1d1f]">Lightning Fast</h3>
-        <p class="text-xs text-[#86868b] leading-relaxed">
+        <h3 class="text-sm font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Lightning Fast</h3>
+        <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
           Sorts 1,000 files in under 0.4 seconds. Uses less than 30 MB of memory.
         </p>
       </div>
 
       <!-- Pillar 4 -->
       <div class="space-y-1.5">
-        <div class="w-9 h-9 rounded-xl bg-[#f5f5f7] flex items-center justify-center text-[#1d1d1f] font-bold text-base mb-3">
+        <div class="w-9 h-9 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] font-bold text-base mb-3">
           ★
         </div>
-        <h3 class="text-sm font-bold text-[#1d1d1f]">Free &amp; Open Source</h3>
-        <p class="text-xs text-[#86868b] leading-relaxed">
+        <h3 class="text-sm font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Free &amp; Open Source</h3>
+        <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
           MIT licensed. Clean, inspectable Python code available publicly on GitHub.
         </p>
       </div>
@@ -447,10 +503,10 @@
     <div class="max-w-5xl mx-auto space-y-12">
       
       <div class="text-center space-y-2">
-        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f]">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">
           Three steps. That is all.
         </h2>
-        <p class="text-[#86868b] text-base max-w-lg mx-auto">
+        <p class="text-[#86868b] dark:text-[#a1a1a6] text-base max-w-lg mx-auto">
           No complex rules or configuration required.
         </p>
       </div>
@@ -458,34 +514,34 @@
       <div class="grid md:grid-cols-3 gap-6">
         
         <!-- Step 1 -->
-        <div class="p-7 rounded-3xl bg-white border border-black/[0.06] shadow-xs space-y-4">
-          <div class="w-8 h-8 rounded-full bg-[#f5f5f7] text-[#1d1d1f] font-bold text-sm flex items-center justify-center">
+        <div class="p-7 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs space-y-4 transition-colors duration-300">
+          <div class="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-[#1c1c1e] text-[#1d1d1f] dark:text-[#f5f5f7] font-bold text-sm flex items-center justify-center">
             1
           </div>
-          <h3 class="text-lg font-bold text-[#1d1d1f]">Choose a folder</h3>
-          <p class="text-xs text-[#86868b] leading-relaxed">
+          <h3 class="text-lg font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Choose a folder</h3>
+          <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             Pick your Downloads, Desktop, or workspace. ByteSift discovers every file in milliseconds without modifying anything.
           </p>
         </div>
 
         <!-- Step 2 -->
-        <div class="p-7 rounded-3xl bg-white border border-black/[0.06] shadow-xs space-y-4">
-          <div class="w-8 h-8 rounded-full bg-[#f5f5f7] text-[#1d1d1f] font-bold text-sm flex items-center justify-center">
+        <div class="p-7 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs space-y-4 transition-colors duration-300">
+          <div class="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-[#1c1c1e] text-[#1d1d1f] dark:text-[#f5f5f7] font-bold text-sm flex items-center justify-center">
             2
           </div>
-          <h3 class="text-lg font-bold text-[#1d1d1f]">Preview the plan</h3>
-          <p class="text-xs text-[#86868b] leading-relaxed">
+          <h3 class="text-lg font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Preview the plan</h3>
+          <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             ByteSift inspects real content inside each file and flags identical duplicate copies so you see what happens upfront.
           </p>
         </div>
 
         <!-- Step 3 -->
-        <div class="p-7 rounded-3xl bg-white border border-black/[0.06] shadow-xs space-y-4">
-          <div class="w-8 h-8 rounded-full bg-[#f5f5f7] text-emerald-600 font-bold text-sm flex items-center justify-center">
+        <div class="p-7 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs space-y-4 transition-colors duration-300">
+          <div class="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-[#1c1c1e] text-emerald-600 dark:text-emerald-400 font-bold text-sm flex items-center justify-center">
             3
           </div>
-          <h3 class="text-lg font-bold text-[#1d1d1f]">Organize</h3>
-          <p class="text-xs text-[#86868b] leading-relaxed">
+          <h3 class="text-lg font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Organize</h3>
+          <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             Click Organize Files. Files slot into neat folders instantly. Press Ctrl+Z anytime if you change your mind.
           </p>
         </div>
@@ -498,14 +554,14 @@
   <!-- ========================================================================= -->
   <!-- FEATURES & USE CASES                                                      -->
   <!-- ========================================================================= -->
-  <section id="features" class="py-20 sm:py-28 px-4 sm:px-6 bg-[#f5f5f7] border-y border-black/[0.06]">
+  <section id="features" class="py-20 sm:py-28 px-4 sm:px-6 bg-[#f5f5f7] dark:bg-[#0d0d0f] border-y border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
     <div class="max-w-5xl mx-auto space-y-12">
       
       <div class="text-center space-y-2">
-        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f]">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">
           Built for everyday files
         </h2>
-        <p class="text-[#86868b] text-base max-w-lg mx-auto">
+        <p class="text-[#86868b] dark:text-[#a1a1a6] text-base max-w-lg mx-auto">
           Whatever lands in your downloads, ByteSift knows how to handle it.
         </p>
       </div>
@@ -513,37 +569,37 @@
       <div class="grid sm:grid-cols-2 gap-6">
         
         <!-- Card 1 -->
-        <div class="p-7 rounded-3xl bg-white border border-black/[0.06] space-y-3">
+        <div class="p-7 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] space-y-3 transition-colors duration-300">
           <div class="text-2xl">📁</div>
-          <h3 class="text-base font-bold text-[#1d1d1f]">Downloads Chaos</h3>
-          <p class="text-xs text-[#86868b] leading-relaxed">
+          <h3 class="text-base font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Downloads Chaos</h3>
+          <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             Installers, ZIP archives, spreadsheets, and configuration files sorted cleanly into their own subfolders.
           </p>
         </div>
 
         <!-- Card 2 -->
-        <div class="p-7 rounded-3xl bg-white border border-black/[0.06] space-y-3">
+        <div class="p-7 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] space-y-3 transition-colors duration-300">
           <div class="text-2xl">🖼️</div>
-          <h3 class="text-base font-bold text-[#1d1d1f]">Photos &amp; Graphics</h3>
-          <p class="text-xs text-[#86868b] leading-relaxed">
+          <h3 class="text-base font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Photos &amp; Graphics</h3>
+          <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             PNGs, JPEGs, and icons organized into Images folders, keeping project assets and photo dumps neat.
           </p>
         </div>
 
         <!-- Card 3 -->
-        <div class="p-7 rounded-3xl bg-white border border-black/[0.06] space-y-3">
+        <div class="p-7 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] space-y-3 transition-colors duration-300">
           <div class="text-2xl">📄</div>
-          <h3 class="text-base font-bold text-[#1d1d1f]">Invoices &amp; Documents</h3>
-          <p class="text-xs text-[#86868b] leading-relaxed">
+          <h3 class="text-base font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Invoices &amp; Documents</h3>
+          <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             PDF statements, notes, and text files categorized cleanly so you can find important paperwork instantly.
           </p>
         </div>
 
         <!-- Card 4 -->
-        <div class="p-7 rounded-3xl bg-white border border-black/[0.06] space-y-3">
+        <div class="p-7 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] space-y-3 transition-colors duration-300">
           <div class="text-2xl">👯</div>
-          <h3 class="text-base font-bold text-[#1d1d1f]">Duplicate Isolation</h3>
-          <p class="text-xs text-[#86868b] leading-relaxed">
+          <h3 class="text-base font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Duplicate Isolation</h3>
+          <p class="text-xs text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             Identifies exact identical copies using cryptographic SHA-256 hashes and isolates them safely without deleting.
           </p>
         </div>
@@ -561,14 +617,14 @@
     <!-- Pinned Scattered Files Runway -->
     <div id="scatter-runway" class="relative h-[220vh] z-20">
       
-      <div id="scatter-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-4 sm:px-6 py-14 sm:py-20 overflow-hidden bg-white border-b border-black/[0.06]">
+      <div id="scatter-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-4 sm:px-6 py-14 sm:py-20 overflow-hidden bg-white dark:bg-[#000000] border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
         
         <!-- Header -->
         <div class="max-w-3xl mx-auto w-full text-center space-y-2 z-20">
-          <h2 class="text-2xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f]">
+          <h2 class="text-2xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">
             Watch your files sort themselves
           </h2>
-          <p class="text-xs sm:text-sm text-[#86868b]">
+          <p class="text-xs sm:text-sm text-[#86868b] dark:text-[#a1a1a6]">
             Scroll down to watch scattered files glide into destination folders.
           </p>
         </div>
@@ -578,36 +634,36 @@
           
           <!-- 4 Folders -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 z-20">
-            <div id="target-folder-docs" class="p-3.5 rounded-2xl bg-[#f5f5f7] border border-black/[0.04] text-center space-y-1">
+            <div id="target-folder-docs" class="p-3.5 rounded-2xl bg-[#f5f5f7] dark:bg-[#161618] border border-black/[0.04] dark:border-white/[0.08] text-center space-y-1">
               <div class="text-lg">📁</div>
-              <div class="text-xs font-bold text-[#1d1d1f]">Documents</div>
-              <div id="counter-docs" class="text-[10px] text-[#86868b] font-mono">0 files</div>
+              <div class="text-xs font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Documents</div>
+              <div id="counter-docs" class="text-[10px] text-[#86868b] dark:text-[#a1a1a6] font-mono">0 files</div>
             </div>
-            <div id="target-folder-imgs" class="p-3.5 rounded-2xl bg-[#f5f5f7] border border-black/[0.04] text-center space-y-1">
+            <div id="target-folder-imgs" class="p-3.5 rounded-2xl bg-[#f5f5f7] dark:bg-[#161618] border border-black/[0.04] dark:border-white/[0.08] text-center space-y-1">
               <div class="text-lg">📁</div>
-              <div class="text-xs font-bold text-[#1d1d1f]">Images</div>
-              <div id="counter-imgs" class="text-[10px] text-[#86868b] font-mono">0 files</div>
+              <div class="text-xs font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Images</div>
+              <div id="counter-imgs" class="text-[10px] text-[#86868b] dark:text-[#a1a1a6] font-mono">0 files</div>
             </div>
-            <div id="target-folder-code" class="p-3.5 rounded-2xl bg-[#f5f5f7] border border-black/[0.04] text-center space-y-1">
+            <div id="target-folder-code" class="p-3.5 rounded-2xl bg-[#f5f5f7] dark:bg-[#161618] border border-black/[0.04] dark:border-white/[0.08] text-center space-y-1">
               <div class="text-lg">📁</div>
-              <div class="text-xs font-bold text-[#1d1d1f]">Code</div>
-              <div id="counter-code" class="text-[10px] text-[#86868b] font-mono">0 files</div>
+              <div class="text-xs font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Code</div>
+              <div id="counter-code" class="text-[10px] text-[#86868b] dark:text-[#a1a1a6] font-mono">0 files</div>
             </div>
-            <div id="target-folder-dups" class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-1">
+            <div id="target-folder-dups" class="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-center space-y-1">
               <div class="text-lg">📁</div>
-              <div class="text-xs font-bold text-emerald-900">Duplicates</div>
-              <div id="counter-dups" class="text-[10px] text-emerald-700 font-mono">0 files</div>
+              <div class="text-xs font-bold text-emerald-900 dark:text-emerald-300">Duplicates</div>
+              <div id="counter-dups" class="text-[10px] text-emerald-700 dark:text-emerald-400 font-mono">0 files</div>
             </div>
           </div>
 
           <!-- Success State -->
           <div id="organized-success-view" class="absolute inset-x-0 top-6 sm:top-10 mx-auto max-w-md px-4 flex flex-col items-center justify-center text-center z-10 pointer-events-none opacity-0">
-            <div class="p-6 rounded-3xl bg-white border border-black/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.08)] w-full space-y-3">
-              <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 font-bold text-lg mx-auto flex items-center justify-center">
+            <div class="p-6 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full space-y-3">
+              <div class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold text-lg mx-auto flex items-center justify-center">
                 ✓
               </div>
-              <h3 class="text-xl font-bold text-[#1d1d1f]">All files organized</h3>
-              <p class="text-xs text-[#86868b]">
+              <h3 class="text-xl font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">All files organized</h3>
+              <p class="text-xs text-[#86868b] dark:text-[#a1a1a6]">
                 Separated cleanly by type, duplicates safely isolated.
               </p>
             </div>
@@ -616,83 +672,83 @@
           <!-- 10 File Chips -->
           <div id="chips-flight-layer" class="absolute inset-0 pointer-events-none">
             
-            <div id="chip-1" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-1" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">📄</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">README.md</div>
-                <div class="text-[10px] text-[#86868b]">Markdown &bull; 7.3 KB</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">README.md</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Markdown &bull; 7.3 KB</div>
               </div>
             </div>
 
-            <div id="chip-2" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-2" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">🖼️</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">icon_light.png</div>
-                <div class="text-[10px] text-[#86868b]">PNG Image &bull; 7.3 KB</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">icon_light.png</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">PNG Image &bull; 7.3 KB</div>
               </div>
             </div>
 
-            <div id="chip-3" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-3" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">💻</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">classifier.py</div>
-                <div class="text-[10px] text-[#86868b]">Python &bull; 4.2 KB</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">classifier.py</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Python &bull; 4.2 KB</div>
               </div>
             </div>
 
-            <div id="chip-4" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-4" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">💻</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">organizer.py</div>
-                <div class="text-[10px] text-[#86868b]">Python &bull; 7.7 KB</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">organizer.py</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Python &bull; 7.7 KB</div>
               </div>
             </div>
 
-            <div id="chip-5" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-5" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">📄</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">release.yml</div>
-                <div class="text-[10px] text-[#86868b]">YAML Config &bull; 5.4 KB</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">release.yml</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">YAML Config &bull; 5.4 KB</div>
               </div>
             </div>
 
-            <div id="chip-6" class="absolute p-2.5 rounded-2xl bg-emerald-50 border border-emerald-300 shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-6" class="absolute p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">👯</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-emerald-900 truncate">favicon.png</div>
-                <div class="text-[10px] text-emerald-700 font-semibold">Exact Duplicate</div>
+                <div class="text-xs font-semibold text-emerald-900 dark:text-emerald-300 truncate">favicon.png</div>
+                <div class="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">Exact Duplicate</div>
               </div>
             </div>
 
-            <div id="chip-7" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-7" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">💻</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">pyproject.toml</div>
-                <div class="text-[10px] text-[#86868b]">TOML Config &bull; 844 B</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">pyproject.toml</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">TOML Config &bull; 844 B</div>
               </div>
             </div>
 
-            <div id="chip-8" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-8" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">💻</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">magic_bytes.py</div>
-                <div class="text-[10px] text-[#86868b]">Python &bull; 3.6 KB</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">magic_bytes.py</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Python &bull; 3.6 KB</div>
               </div>
             </div>
 
-            <div id="chip-9" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-9" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">🖼️</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">icon_dark.ico</div>
-                <div class="text-[10px] text-[#86868b]">Icon Asset &bull; 15 KB</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">icon_dark.ico</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Icon Asset &bull; 15 KB</div>
               </div>
             </div>
 
-            <div id="chip-10" class="absolute p-2.5 rounded-2xl bg-white border border-black/[0.08] shadow-md flex items-center space-x-2.5 w-52">
+            <div id="chip-10" class="absolute p-2.5 rounded-2xl bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.1] shadow-md flex items-center space-x-2.5 w-52">
               <span class="text-sm">📄</span>
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-semibold text-[#1d1d1f] truncate">LICENSE</div>
-                <div class="text-[10px] text-[#86868b]">MIT Text &bull; 1.1 KB</div>
+                <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] truncate">LICENSE</div>
+                <div class="text-[10px] text-[#86868b] dark:text-[#a1a1a6]">MIT Text &bull; 1.1 KB</div>
               </div>
             </div>
 
@@ -700,7 +756,7 @@
 
         </div>
 
-        <div class="text-center text-xs text-[#86868b]">
+        <div class="text-center text-xs text-[#86868b] dark:text-[#a1a1a6]">
           <span>Scroll down to continue &darr;</span>
         </div>
 
@@ -710,21 +766,21 @@
     <!-- Pinned Desktop App Walkthrough -->
     <div id="app-workflow-runway" class="relative h-[250vh] z-20">
       
-      <div id="app-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-4 sm:px-6 py-14 sm:py-20 overflow-hidden bg-[#fbfbfd] border-b border-black/[0.06]">
+      <div id="app-pinned-stage" class="sticky top-0 h-screen w-full flex flex-col justify-between px-4 sm:px-6 py-14 sm:py-20 overflow-hidden bg-[#fbfbfd] dark:bg-[#0d0d0f] border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
         
         <div class="max-w-2xl mx-auto w-full text-center space-y-2 z-20">
-          <h2 class="text-2xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f]">
+          <h2 class="text-2xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">
             Simple desktop interface
           </h2>
-          <div id="wf-status-banner" class="p-3 rounded-2xl bg-white border border-black/[0.06] text-left flex items-center space-x-3 shadow-xs">
+          <div id="wf-status-banner" class="p-3 rounded-2xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] text-left flex items-center space-x-3 shadow-xs">
             <div id="wf-banner-num" class="w-6 h-6 rounded-full bg-[#0071e3] text-white font-bold text-xs flex items-center justify-center shrink-0">
               1
             </div>
             <div>
-              <div id="wf-banner-title" class="font-bold text-[#1d1d1f] text-xs sm:text-sm">
+              <div id="wf-banner-title" class="font-bold text-[#1d1d1f] dark:text-[#f5f5f7] text-xs sm:text-sm">
                 1. Open ByteSift
               </div>
-              <div id="wf-banner-desc" class="text-xs text-[#86868b]">
+              <div id="wf-banner-desc" class="text-xs text-[#86868b] dark:text-[#a1a1a6]">
                 Click Browse Folder to choose any directory.
               </div>
             </div>
@@ -733,40 +789,40 @@
 
         <!-- The App Window -->
         <div class="max-w-3xl w-full mx-auto my-auto z-10">
-          <div id="mock-app-window" class="rounded-2xl bg-white border border-black/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden relative">
+          <div id="mock-app-window" class="rounded-2xl bg-white dark:bg-[#161618] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden relative transition-colors duration-300">
             
             <!-- Mouse Cursor -->
             <div id="workflow-mouse-cursor" class="absolute top-0 left-0 pointer-events-none z-50 select-none opacity-0 transition-opacity duration-200">
               <div class="relative">
                 <svg class="w-5 h-5 drop-shadow-sm" viewBox="0 0 28 28" fill="none">
-                  <path d="M5 3L13 23L16.5 15.5L24 12.5L5 3Z" fill="#1d1d1f" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M5 3L13 23L16.5 15.5L24 12.5L5 3Z" fill="#1d1d1f" class="dark:fill-[#f5f5f7]" stroke="#ffffff" class="dark:stroke-[#1d1d1f]" stroke-width="2" stroke-linejoin="round"/>
                 </svg>
-                <div id="cursor-click-ripple" class="absolute -top-1 -left-1 w-6 h-6 rounded-full border-2 border-[#0071e3] opacity-0 scale-50 transition-all duration-150 pointer-events-none"></div>
+                <div id="cursor-click-ripple" class="absolute -top-1 -left-1 w-6 h-6 rounded-full border-2 border-[#0071e3] dark:border-[#2997ff] opacity-0 scale-50 transition-all duration-150 pointer-events-none"></div>
               </div>
             </div>
 
             <!-- Titlebar -->
-            <div class="h-8 px-4 bg-[#f5f5f7] border-b border-black/[0.06] flex items-center justify-between">
-              <div class="flex items-center space-x-2 text-xs font-semibold text-[#1d1d1f]">
+            <div class="h-8 px-4 bg-[#f5f5f7] dark:bg-[#1c1c1e] border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+              <div class="flex items-center space-x-2 text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
                 <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-                <span class="pl-2 text-xs text-[#86868b] font-normal truncate">ByteSift &bull; Offline File Organizer</span>
+                <span class="pl-2 text-xs text-[#86868b] dark:text-[#a1a1a6] font-normal truncate">ByteSift &bull; Offline File Organizer</span>
               </div>
-              <div class="text-[11px] text-[#86868b] font-mono">v0.1.7</div>
+              <div class="text-[11px] text-[#86868b] dark:text-[#a1a1a6] font-mono">v0.1.7</div>
             </div>
 
             <!-- App Body -->
-            <div class="p-4 space-y-3 bg-white">
+            <div class="p-4 space-y-3 bg-white dark:bg-[#161618]">
               
-              <div id="live-folder-box" class="p-2.5 rounded-xl bg-[#f5f5f7] space-y-1">
-                <div class="flex items-center justify-between text-[10px] font-semibold text-[#86868b] uppercase tracking-wider">
+              <div id="live-folder-box" class="p-2.5 rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] space-y-1">
+                <div class="flex items-center justify-between text-[10px] font-semibold text-[#86868b] dark:text-[#a1a1a6] uppercase tracking-wider">
                   <span>Folder to Organize:</span>
                   <span id="live-folder-status">None selected</span>
                 </div>
                 <div class="flex gap-2">
-                  <input id="live-folder-input" type="text" readonly value="" placeholder="Choose a folder..." class="flex-1 bg-white border border-black/[0.08] rounded-lg px-3 py-1.5 text-xs font-mono text-[#1d1d1f]">
-                  <button id="live-btn-browse" class="px-3.5 py-1.5 bg-white text-[#1d1d1f] text-xs font-semibold rounded-lg border border-black/[0.08] hover:bg-[#f5f5f7] transition shadow-2xs">
+                  <input id="live-folder-input" type="text" readonly value="" placeholder="Choose a folder..." class="flex-1 bg-white dark:bg-[#2c2c2e] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-3 py-1.5 text-xs font-mono text-[#1d1d1f] dark:text-[#f5f5f7]">
+                  <button id="live-btn-browse" class="px-3.5 py-1.5 bg-white dark:bg-[#2c2c2e] text-[#1d1d1f] dark:text-[#f5f5f7] text-xs font-semibold rounded-lg border border-black/[0.08] dark:border-white/[0.1] hover:bg-[#f5f5f7] dark:hover:bg-[#3a3a3c] transition shadow-2xs">
                     Browse Folder
                   </button>
                 </div>
@@ -775,57 +831,57 @@
               <!-- Buttons -->
               <div class="flex items-center justify-between pt-1">
                 <div class="flex items-center space-x-2">
-                  <button id="live-btn-organize" class="px-3 py-1.5 bg-[#e8e8ed] text-[#86868b] text-xs font-semibold rounded-lg transition-all cursor-not-allowed">
+                  <button id="live-btn-organize" class="px-3 py-1.5 bg-[#e8e8ed] dark:bg-[#2c2c2e] text-[#86868b] dark:text-[#a1a1a6] text-xs font-semibold rounded-lg transition-all cursor-not-allowed">
                     Organize Files
                   </button>
-                  <button id="live-btn-undo" class="px-3 py-1.5 bg-[#f5f5f7] text-[#86868b] text-xs font-medium rounded-lg transition-all cursor-not-allowed">
+                  <button id="live-btn-undo" class="px-3 py-1.5 bg-[#f5f5f7] dark:bg-[#1c1c1e] text-[#86868b] dark:text-[#a1a1a6] text-xs font-medium rounded-lg transition-all cursor-not-allowed">
                     Undo (Ctrl+Z)
                   </button>
                 </div>
-                <div id="live-badge-count" class="text-xs font-mono text-[#86868b]">
+                <div id="live-badge-count" class="text-xs font-mono text-[#86868b] dark:text-[#a1a1a6]">
                   0 files
                 </div>
               </div>
 
               <!-- Table -->
-              <div class="relative min-h-[160px] rounded-xl border border-black/[0.06] overflow-hidden bg-[#fbfbfd]">
+              <div class="relative min-h-[160px] rounded-xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden bg-[#fbfbfd] dark:bg-[#121214]">
                 <div id="live-view-empty" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center space-y-1">
-                  <div class="text-xs font-semibold text-[#1d1d1f]">No folder selected yet</div>
-                  <div class="text-[11px] text-[#86868b]">Scroll down to see files discovered</div>
+                  <div class="text-xs font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">No folder selected yet</div>
+                  <div class="text-[11px] text-[#86868b] dark:text-[#a1a1a6]">Scroll down to see files discovered</div>
                 </div>
 
                 <div id="live-view-table" class="opacity-0 transition-opacity duration-300 overflow-x-auto no-scrollbar">
                   <div class="min-w-[420px]">
-                    <div class="grid grid-cols-12 px-3 py-1.5 font-semibold text-[#86868b] bg-[#f5f5f7] text-[10px]">
+                    <div class="grid grid-cols-12 px-3 py-1.5 font-semibold text-[#86868b] dark:text-[#a1a1a6] bg-[#f5f5f7] dark:bg-[#1c1c1e] text-[10px]">
                       <div class="col-span-5">File</div>
                       <div class="col-span-2 text-right">Size</div>
                       <div class="col-span-3 pl-3">Destination</div>
                       <div class="col-span-2 text-right">Status</div>
                     </div>
-                    <div class="divide-y divide-black/[0.04] text-xs font-mono">
+                    <div class="divide-y divide-black/[0.04] dark:divide-white/[0.06] text-xs font-mono">
                       <div class="grid grid-cols-12 px-3 py-1.5 items-center">
-                        <div class="col-span-5 font-sans truncate text-[#1d1d1f]">README.md</div>
-                        <div class="col-span-2 text-right text-[#86868b]">7.3 KB</div>
-                        <div id="live-target-1" class="col-span-3 pl-3 font-sans text-[#86868b]">Pending...</div>
-                        <div id="live-type-1" class="col-span-2 text-right text-[10px] text-[#86868b]">Reading...</div>
+                        <div class="col-span-5 font-sans truncate text-[#1d1d1f] dark:text-[#f5f5f7]">README.md</div>
+                        <div class="col-span-2 text-right text-[#86868b] dark:text-[#a1a1a6]">7.3 KB</div>
+                        <div id="live-target-1" class="col-span-3 pl-3 font-sans text-[#86868b] dark:text-[#a1a1a6]">Pending...</div>
+                        <div id="live-type-1" class="col-span-2 text-right text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Reading...</div>
                       </div>
                       <div class="grid grid-cols-12 px-3 py-1.5 items-center">
-                        <div class="col-span-5 font-sans truncate text-[#1d1d1f]">icon_light.png</div>
-                        <div class="col-span-2 text-right text-[#86868b]">7.3 KB</div>
-                        <div id="live-target-2" class="col-span-3 pl-3 font-sans text-[#86868b]">Pending...</div>
-                        <div id="live-type-2" class="col-span-2 text-right text-[10px] text-[#86868b]">Reading...</div>
+                        <div class="col-span-5 font-sans truncate text-[#1d1d1f] dark:text-[#f5f5f7]">icon_light.png</div>
+                        <div class="col-span-2 text-right text-[#86868b] dark:text-[#a1a1a6]">7.3 KB</div>
+                        <div id="live-target-2" class="col-span-3 pl-3 font-sans text-[#86868b] dark:text-[#a1a1a6]">Pending...</div>
+                        <div id="live-type-2" class="col-span-2 text-right text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Reading...</div>
                       </div>
                       <div class="grid grid-cols-12 px-3 py-1.5 items-center">
-                        <div class="col-span-5 font-sans truncate text-[#1d1d1f]">classifier.py</div>
-                        <div class="col-span-2 text-right text-[#86868b]">4.2 KB</div>
-                        <div id="live-target-3" class="col-span-3 pl-3 font-sans text-[#86868b]">Pending...</div>
-                        <div id="live-type-3" class="col-span-2 text-right text-[10px] text-[#86868b]">Reading...</div>
+                        <div class="col-span-5 font-sans truncate text-[#1d1d1f] dark:text-[#f5f5f7]">classifier.py</div>
+                        <div class="col-span-2 text-right text-[#86868b] dark:text-[#a1a1a6]">4.2 KB</div>
+                        <div id="live-target-3" class="col-span-3 pl-3 font-sans text-[#86868b] dark:text-[#a1a1a6]">Pending...</div>
+                        <div id="live-type-3" class="col-span-2 text-right text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Reading...</div>
                       </div>
                       <div id="live-row-dup" class="grid grid-cols-12 px-3 py-1.5 items-center">
-                        <div class="col-span-5 font-sans truncate text-[#1d1d1f]">favicon.png</div>
-                        <div class="col-span-2 text-right text-[#86868b]">7.3 KB</div>
-                        <div id="live-target-4" class="col-span-3 pl-3 font-sans text-[#86868b]">Pending...</div>
-                        <div id="live-type-4" class="col-span-2 text-right text-[10px] text-[#86868b]">Reading...</div>
+                        <div class="col-span-5 font-sans truncate text-[#1d1d1f] dark:text-[#f5f5f7]">favicon.png</div>
+                        <div class="col-span-2 text-right text-[#86868b] dark:text-[#a1a1a6]">7.3 KB</div>
+                        <div id="live-target-4" class="col-span-3 pl-3 font-sans text-[#86868b] dark:text-[#a1a1a6]">Pending...</div>
+                        <div id="live-type-4" class="col-span-2 text-right text-[10px] text-[#86868b] dark:text-[#a1a1a6]">Reading...</div>
                       </div>
                     </div>
                   </div>
@@ -833,7 +889,7 @@
               </div>
 
               <!-- Footer -->
-              <div class="flex items-center justify-between text-[10px] text-[#86868b] pt-1">
+              <div class="flex items-center justify-between text-[10px] text-[#86868b] dark:text-[#a1a1a6] pt-1">
                 <span id="live-footer-msg">Ready.</span>
                 <span>100% Offline &bull; Reversible</span>
               </div>
@@ -843,7 +899,7 @@
           </div>
         </div>
 
-        <div class="text-center text-xs text-[#86868b]">
+        <div class="text-center text-xs text-[#86868b] dark:text-[#a1a1a6]">
           <span>Scroll down to continue &darr;</span>
         </div>
 
@@ -859,61 +915,61 @@
     <div class="max-w-3xl mx-auto space-y-8">
       
       <div class="text-center space-y-2">
-        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f]">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">
           Questions &amp; answers
         </h2>
-        <p class="text-[#86868b] text-sm">
+        <p class="text-[#86868b] dark:text-[#a1a1a6] text-sm">
           Everything you need to know about safety and privacy.
         </p>
       </div>
 
       <div class="space-y-3">
         
-        <details class="group p-5 rounded-2xl bg-white border border-black/[0.06] shadow-xs" open>
-          <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm sm:text-base text-[#1d1d1f]">
+        <details class="group p-5 rounded-2xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs" open>
+          <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm sm:text-base text-[#1d1d1f] dark:text-[#f5f5f7]">
             <span>Does ByteSift delete anything?</span>
-            <span class="text-[#86868b] group-open:rotate-180 transition-transform">
+            <span class="text-[#86868b] dark:text-[#a1a1a6] group-open:rotate-180 transition-transform">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </span>
           </summary>
-          <div class="pt-3 text-xs sm:text-sm text-[#86868b] leading-relaxed">
-            <strong class="text-emerald-700">Never.</strong> ByteSift does not delete, alter, or overwrite files. It only organizes files into clean subfolders within the folder you choose.
+          <div class="pt-3 text-xs sm:text-sm text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
+            <strong class="text-emerald-700 dark:text-emerald-400">Never.</strong> ByteSift does not delete, alter, or overwrite files. It only organizes files into clean subfolders within the folder you choose.
           </div>
         </details>
 
-        <details class="group p-5 rounded-2xl bg-white border border-black/[0.06] shadow-xs">
-          <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm sm:text-base text-[#1d1d1f]">
+        <details class="group p-5 rounded-2xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs">
+          <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm sm:text-base text-[#1d1d1f] dark:text-[#f5f5f7]">
             <span>What happens to duplicates?</span>
-            <span class="text-[#86868b] group-open:rotate-180 transition-transform">
+            <span class="text-[#86868b] dark:text-[#a1a1a6] group-open:rotate-180 transition-transform">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </span>
           </summary>
-          <div class="pt-3 text-xs sm:text-sm text-[#86868b] leading-relaxed">
+          <div class="pt-3 text-xs sm:text-sm text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             ByteSift identifies identical copies using cryptographic SHA-256 hashes and isolates them into a dedicated Duplicates folder. You can review them safely anytime.
           </div>
         </details>
 
-        <details class="group p-5 rounded-2xl bg-white border border-black/[0.06] shadow-xs">
-          <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm sm:text-base text-[#1d1d1f]">
+        <details class="group p-5 rounded-2xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs">
+          <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm sm:text-base text-[#1d1d1f] dark:text-[#f5f5f7]">
             <span>How do I undo an organization?</span>
-            <span class="text-[#86868b] group-open:rotate-180 transition-transform">
+            <span class="text-[#86868b] dark:text-[#a1a1a6] group-open:rotate-180 transition-transform">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </span>
           </summary>
-          <div class="pt-3 text-xs sm:text-sm text-[#86868b] leading-relaxed">
+          <div class="pt-3 text-xs sm:text-sm text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
             Press Ctrl+Z (or Command-Z on macOS) or click Undo Last Session. ByteSift keeps an atomic local journal that restores every file to its previous location.
           </div>
         </details>
 
-        <details class="group p-5 rounded-2xl bg-white border border-black/[0.06] shadow-xs">
-          <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm sm:text-base text-[#1d1d1f]">
+        <details class="group p-5 rounded-2xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs">
+          <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm sm:text-base text-[#1d1d1f] dark:text-[#f5f5f7]">
             <span>Why did Windows or Edge show &quot;isn&apos;t commonly downloaded&quot;?</span>
-            <span class="text-[#86868b] group-open:rotate-180 transition-transform">
+            <span class="text-[#86868b] dark:text-[#a1a1a6] group-open:rotate-180 transition-transform">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </span>
           </summary>
-          <div class="pt-3 text-xs sm:text-sm text-[#86868b] leading-relaxed">
-            ByteSift is a free community open-source tool without expensive commercial certificates. When newly compiled, Windows displays a standard reputation warning until thousands have downloaded it. Click <strong class="text-[#1d1d1f]">More info</strong> &rarr; <strong class="text-[#1d1d1f]">Run anyway</strong>. All code is public on GitHub.
+          <div class="pt-3 text-xs sm:text-sm text-[#86868b] dark:text-[#a1a1a6] leading-relaxed">
+            ByteSift is a free community open-source tool without expensive commercial certificates. When newly compiled, Windows displays a standard reputation warning until thousands have downloaded it. Click <strong class="text-[#1d1d1f] dark:text-[#f5f5f7]">More info</strong> &rarr; <strong class="text-[#1d1d1f] dark:text-[#f5f5f7]">Run anyway</strong>. All code is public on GitHub.
           </div>
         </details>
 
@@ -925,14 +981,14 @@
   <!-- ========================================================================= -->
   <!-- DOWNLOAD HUB                                                              -->
   <!-- ========================================================================= -->
-  <section id="download" class="py-20 sm:py-28 px-4 sm:px-6 bg-[#f5f5f7] border-t border-black/[0.06]">
+  <section id="download" class="py-20 sm:py-28 px-4 sm:px-6 bg-[#f5f5f7] dark:bg-[#0d0d0f] border-t border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
     <div class="max-w-4xl mx-auto space-y-8 text-center">
       
       <div class="space-y-2">
-        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight text-[#1d1d1f]">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">
           Get ByteSift Free
         </h2>
-        <p class="text-[#86868b] text-sm sm:text-base max-w-md mx-auto">
+        <p class="text-[#86868b] dark:text-[#a1a1a6] text-sm sm:text-base max-w-md mx-auto">
           Available for Windows and macOS. Free under the MIT license.
         </p>
       </div>
@@ -940,41 +996,41 @@
       <div class="grid sm:grid-cols-2 gap-5 max-w-2xl mx-auto text-left">
         
         <!-- Windows Card -->
-        <div class="p-6 rounded-3xl bg-white border border-black/[0.06] shadow-xs space-y-4 flex flex-col justify-between">
+        <div class="p-6 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs space-y-4 flex flex-col justify-between transition-colors duration-300">
           <div class="space-y-2">
-            <div class="w-10 h-10 rounded-2xl bg-[#f5f5f7] flex items-center justify-center text-[#0071e3]">
+            <div class="w-10 h-10 rounded-2xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-center text-[#0071e3] dark:text-[#2997ff]">
               <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.799"/></svg>
             </div>
-            <h3 class="text-lg font-bold text-[#1d1d1f]">Windows</h3>
-            <p class="text-xs text-[#86868b]">Windows 10 and 11. Standard installer wizard.</p>
+            <h3 class="text-lg font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">Windows</h3>
+            <p class="text-xs text-[#86868b] dark:text-[#a1a1a6]">Windows 10 and 11. Standard installer wizard.</p>
           </div>
           <div class="space-y-2 pt-2">
             <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Setup-x64.exe" download="ByteSift-Setup-x64.exe" class="w-full py-2.5 px-4 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-xs transition flex items-center justify-center space-x-2">
               <span>Download for Windows</span>
             </a>
-            <div class="flex justify-between text-[11px] text-[#86868b] px-1">
+            <div class="flex justify-between text-[11px] text-[#86868b] dark:text-[#a1a1a6] px-1">
               <span>v0.1.7 Installer</span>
-              <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.zip" download="ByteSift-Windows-x64.zip" class="text-[#0071e3] hover:underline">Portable (.zip)</a>
+              <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.zip" download="ByteSift-Windows-x64.zip" class="text-[#0071e3] dark:text-[#2997ff] hover:underline">Portable (.zip)</a>
             </div>
           </div>
         </div>
 
         <!-- macOS Card -->
-        <div class="p-6 rounded-3xl bg-white border border-black/[0.06] shadow-xs space-y-4 flex flex-col justify-between">
+        <div class="p-6 rounded-3xl bg-white dark:bg-[#161618] border border-black/[0.06] dark:border-white/[0.08] shadow-xs space-y-4 flex flex-col justify-between transition-colors duration-300">
           <div class="space-y-2">
-            <div class="w-10 h-10 rounded-2xl bg-[#f5f5f7] flex items-center justify-center text-[#1d1d1f]">
+            <div class="w-10 h-10 rounded-2xl bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7]">
               <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.67-.82 1.13-1.96.99-3.1-.97.05-2.16.66-2.84 1.46-.61.7-.1.14 1.83 1.01 2.99 1.07-.05 2.18-.62 2.84-1.35"/></svg>
             </div>
-            <h3 class="text-lg font-bold text-[#1d1d1f]">macOS</h3>
-            <p class="text-xs text-[#86868b]">Apple Silicon (M1-M4) and Intel Macs.</p>
+            <h3 class="text-lg font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">macOS</h3>
+            <p class="text-xs text-[#86868b] dark:text-[#a1a1a6]">Apple Silicon (M1-M4) and Intel Macs.</p>
           </div>
           <div class="space-y-2 pt-2">
-            <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-macOS-Universal.dmg" download="ByteSift-macOS-Universal.dmg" class="w-full py-2.5 px-4 rounded-full bg-[#1d1d1f] hover:bg-black text-white font-semibold text-xs transition flex items-center justify-center space-x-2">
+            <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-macOS-Universal.dmg" download="ByteSift-macOS-Universal.dmg" class="w-full py-2.5 px-4 rounded-full bg-[#1d1d1f] dark:bg-white hover:bg-black dark:hover:bg-[#e8e8ed] text-white dark:text-[#1d1d1f] font-semibold text-xs transition flex items-center justify-center space-x-2">
               <span>Download for Mac (.dmg)</span>
             </a>
-            <div class="flex justify-between text-[11px] text-[#86868b] px-1">
+            <div class="flex justify-between text-[11px] text-[#86868b] dark:text-[#a1a1a6] px-1">
               <span>Universal DMG</span>
-              <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="text-[#0071e3] hover:underline">Releases</a>
+              <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="text-[#0071e3] dark:text-[#2997ff] hover:underline">Releases</a>
             </div>
           </div>
         </div>
@@ -987,18 +1043,18 @@
   <!-- ========================================================================= -->
   <!-- APPLE MINIMALIST FOOTER                                                   -->
   <!-- ========================================================================= -->
-  <footer class="py-8 px-4 sm:px-6 bg-[#f5f5f7] text-[#86868b] text-xs">
+  <footer class="py-8 px-4 sm:px-6 bg-[#f5f5f7] dark:bg-[#000000] text-[#86868b] dark:text-[#a1a1a6] text-xs border-t border-black/[0.04] dark:border-white/[0.06] transition-colors duration-300">
     <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center space-x-2">
-        <span class="font-bold text-[#1d1d1f]">ByteSift</span>
+        <span class="font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">ByteSift</span>
         <span>&bull;</span>
         <span>Free Open Source Software (MIT License)</span>
       </div>
       <div class="flex items-center space-x-6">
-        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d1d1f] transition">GitHub</a>
-        <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d1d1f] transition">Releases</a>
-        <a href="https://github.com/PramudithaN/bytesift/issues" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d1d1f] transition">Issues</a>
-        <a href="https://github.com/PramudithaN/bytesift/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d1d1f] transition">License</a>
+        <a href="https://github.com/PramudithaN/bytesift" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] transition">GitHub</a>
+        <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] transition">Releases</a>
+        <a href="https://github.com/PramudithaN/bytesift/issues" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] transition">Issues</a>
+        <a href="https://github.com/PramudithaN/bytesift/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] transition">License</a>
       </div>
     </div>
   </footer>
@@ -1007,6 +1063,50 @@
   <!-- JAVASCRIPT                                                                -->
   <!-- ========================================================================= -->
   <script>
+    // 0. THEME TOGGLE HANDLER
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      updateThemeButtonState();
+    }
+
+    function updateThemeButtonState() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const sunIcon = document.getElementById('theme-sun-icon');
+      const moonIcon = document.getElementById('theme-moon-icon');
+      if (sunIcon && moonIcon) {
+        if (isDark) {
+          sunIcon.classList.remove('hidden');
+          sunIcon.classList.add('block');
+          moonIcon.classList.remove('block');
+          moonIcon.classList.add('hidden');
+        } else {
+          sunIcon.classList.remove('block');
+          sunIcon.classList.add('hidden');
+          moonIcon.classList.remove('hidden');
+          moonIcon.classList.add('block');
+        }
+      }
+    }
+
+    // Listen to OS theme changes if user has not set a preference
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        if (e.matches) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+        updateThemeButtonState();
+      }
+    });
+
     // 1. JUMBLED HEADLINE SOLVER
     function scrambleString(str) {
       const chars = str.split("");
@@ -1070,16 +1170,19 @@
       const btnBefore = document.getElementById('tab-btn-before');
       const btnAfter = document.getElementById('tab-btn-after');
 
+      const activeClass = 'px-3.5 py-1 rounded-lg text-xs font-semibold bg-[#1d1d1f] dark:bg-white text-white dark:text-[#1d1d1f] shadow-xs transition';
+      const inactiveClass = 'px-3.5 py-1 rounded-lg text-xs font-semibold text-[#86868b] dark:text-[#a1a1a6] hover:text-[#1d1d1f] dark:hover:text-[#f5f5f7] transition';
+
       if (mode === 'before') {
         vBefore.classList.remove('hidden');
         vAfter.classList.add('hidden');
-        btnBefore.className = 'px-3.5 py-1 rounded-lg text-xs font-semibold bg-[#1d1d1f] text-white shadow-xs transition';
-        btnAfter.className = 'px-3.5 py-1 rounded-lg text-xs font-semibold text-[#86868b] hover:text-[#1d1d1f] transition';
+        btnBefore.className = activeClass;
+        btnAfter.className = inactiveClass;
       } else {
         vBefore.classList.add('hidden');
         vAfter.classList.remove('hidden');
-        btnAfter.className = 'px-3.5 py-1 rounded-lg text-xs font-semibold bg-[#1d1d1f] text-white shadow-xs transition';
-        btnBefore.className = 'px-3.5 py-1 rounded-lg text-xs font-semibold text-[#86868b] hover:text-[#1d1d1f] transition';
+        btnAfter.className = activeClass;
+        btnBefore.className = inactiveClass;
       }
     }
 
@@ -1323,8 +1426,8 @@
 
         if (liveFolderInput) liveFolderInput.value = "";
         if (liveFolderStatus) liveFolderStatus.innerText = "None selected";
-        if (liveBtnOrganize) liveBtnOrganize.className = "px-3 py-1.5 bg-[#e8e8ed] text-[#86868b] text-xs font-semibold rounded-lg cursor-not-allowed";
-        if (liveBtnUndo) liveBtnUndo.className = "px-3 py-1.5 bg-[#f5f5f7] text-[#86868b] text-xs font-medium rounded-lg cursor-not-allowed";
+        if (liveBtnOrganize) liveBtnOrganize.className = "px-3 py-1.5 bg-[#e8e8ed] dark:bg-[#2c2c2e] text-[#86868b] dark:text-[#a1a1a6] text-xs font-semibold rounded-lg cursor-not-allowed";
+        if (liveBtnUndo) liveBtnUndo.className = "px-3 py-1.5 bg-[#f5f5f7] dark:bg-[#1c1c1e] text-[#86868b] dark:text-[#a1a1a6] text-xs font-medium rounded-lg cursor-not-allowed";
         if (liveBadgeCount) liveBadgeCount.innerText = "0 files";
 
         if (liveViewEmpty) liveViewEmpty.style.opacity = "1";
@@ -1338,8 +1441,8 @@
 
         if (liveFolderInput) liveFolderInput.value = "C:\\Users\\Downloads";
         if (liveFolderStatus) liveFolderStatus.innerText = "4 files found";
-        if (liveBtnOrganize) liveBtnOrganize.className = "px-3 py-1.5 bg-[#e8e8ed] text-[#86868b] text-xs font-semibold rounded-lg cursor-not-allowed";
-        if (liveBtnUndo) liveBtnUndo.className = "px-3 py-1.5 bg-[#f5f5f7] text-[#86868b] text-xs font-medium rounded-lg cursor-not-allowed";
+        if (liveBtnOrganize) liveBtnOrganize.className = "px-3 py-1.5 bg-[#e8e8ed] dark:bg-[#2c2c2e] text-[#86868b] dark:text-[#a1a1a6] text-xs font-semibold rounded-lg cursor-not-allowed";
+        if (liveBtnUndo) liveBtnUndo.className = "px-3 py-1.5 bg-[#f5f5f7] dark:bg-[#1c1c1e] text-[#86868b] dark:text-[#a1a1a6] text-xs font-medium rounded-lg cursor-not-allowed";
         if (liveBadgeCount) liveBadgeCount.innerText = "4 files";
 
         if (liveViewEmpty) liveViewEmpty.style.opacity = "0";
@@ -1365,7 +1468,7 @@
         if (liveFolderInput) liveFolderInput.value = "C:\\Users\\Downloads";
         if (liveFolderStatus) liveFolderStatus.innerText = "Preview Ready";
         if (liveBtnOrganize) liveBtnOrganize.className = "px-3 py-1.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-lg cursor-pointer shadow-xs";
-        if (liveBtnUndo) liveBtnUndo.className = "px-3 py-1.5 bg-[#f5f5f7] text-[#86868b] text-xs font-medium rounded-lg cursor-not-allowed";
+        if (liveBtnUndo) liveBtnUndo.className = "px-3 py-1.5 bg-[#f5f5f7] dark:bg-[#1c1c1e] text-[#86868b] dark:text-[#a1a1a6] text-xs font-medium rounded-lg cursor-not-allowed";
         if (liveBadgeCount) liveBadgeCount.innerText = "4 planned (1 dup)";
 
         if (liveViewEmpty) liveViewEmpty.style.opacity = "0";
@@ -1381,7 +1484,7 @@
         if (liveType3) liveType3.innerText = "Python";
         if (liveType4) liveType4.innerText = "Exact Match";
 
-        if (liveRowDup) liveRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-emerald-50 text-emerald-900";
+        if (liveRowDup) liveRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300";
         if (liveFooterMsg) liveFooterMsg.innerText = "Ready to organize.";
       } else if (phase === 4) {
         if (bNum) bNum.innerText = "4";
@@ -1391,7 +1494,7 @@
         if (liveFolderInput) liveFolderInput.value = "C:\\Users\\Downloads";
         if (liveFolderStatus) liveFolderStatus.innerText = "Complete";
         if (liveBtnOrganize) liveBtnOrganize.className = "px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg cursor-default";
-        if (liveBtnUndo) liveBtnUndo.className = "px-3 py-1.5 bg-white border border-black/[0.08] text-[#1d1d1f] text-xs font-semibold rounded-lg cursor-pointer hover:bg-[#f5f5f7]";
+        if (liveBtnUndo) liveBtnUndo.className = "px-3 py-1.5 bg-white dark:bg-[#2c2c2e] border border-black/[0.08] dark:border-white/[0.1] text-[#1d1d1f] dark:text-[#f5f5f7] text-xs font-semibold rounded-lg cursor-pointer hover:bg-[#f5f5f7] dark:hover:bg-[#3a3a3c]";
         if (liveBadgeCount) liveBadgeCount.innerText = "3 sorted, 1 dup";
 
         if (liveViewEmpty) liveViewEmpty.style.opacity = "0";
@@ -1407,7 +1510,7 @@
         if (liveType3) liveType3.innerText = "Reversible";
         if (liveType4) liveType4.innerText = "Reversible";
 
-        if (liveRowDup) liveRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-emerald-50 text-emerald-900";
+        if (liveRowDup) liveRowDup.className = "grid grid-cols-12 px-3 py-1.5 items-center bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300";
         if (liveFooterMsg) liveFooterMsg.innerText = "All files organized. Press Ctrl+Z to undo anytime.";
       }
     }
@@ -1516,6 +1619,7 @@
 
     // 8. INITIALIZATION
     document.addEventListener('DOMContentLoaded', () => {
+      updateThemeButtonState();
       runHeadlineSolver();
       detectUserOS();
       setupScatterPinAnimation();
