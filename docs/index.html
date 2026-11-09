@@ -187,7 +187,7 @@
       <!-- Top Tag Badge -->
       <div class="inline-flex items-center space-x-2 bg-white/[0.04] border border-white/[0.08] px-3.5 py-1 rounded-full text-xs font-medium text-slate-300">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>Free & Open Source Desktop App</span>
+        <span>Free & Open Source Desktop App • <strong id="hero-version-tag" class="text-white">v0.1.7</strong></span>
       </div>
 
       <!-- ANIMATED HEADING: Characters begin in the wrong jumbled order and sort into place -->
@@ -892,15 +892,16 @@
   <section id="download" class="py-24 px-6 border-t border-surface-border bg-[#09090b] z-30 layer-card">
     <div class="max-w-4xl mx-auto space-y-8">
       
-      <div class="text-center space-y-2">
-        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-300 bg-white/[0.05] px-3.5 py-1 rounded-full inline-block border border-white/[0.08]">
-          Get Started
-        </h2>
+      <div class="text-center space-y-3">
+        <div class="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Available to Download: <strong id="latest-version-tag" class="text-white font-bold">v0.1.7</strong> (Stable)</span>
+        </div>
         <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Download ByteSift for Windows & Mac.
+          Download ByteSift for Windows & Mac
         </h3>
         <p class="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto">
-          Free, open-source under the MIT license, and ready to run immediately.
+          Free, open-source under the MIT license, and ready to install immediately.
         </p>
       </div>
 
@@ -913,7 +914,10 @@
             <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center mx-auto">
               <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.799"/></svg>
             </div>
-            <h4 class="text-lg font-bold text-white">Windows 10 / 11</h4>
+            <div class="flex items-center justify-center space-x-2">
+              <h4 class="text-lg font-bold text-white">Windows 10 / 11</h4>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 font-semibold border border-brand-500/30">v0.1.7</span>
+            </div>
             <p class="text-xs text-slate-400">Standard setup installer. Installs cleanly with Desktop & Start shortcuts.</p>
           </div>
 
@@ -923,7 +927,7 @@
               <span>Download Windows Setup (.exe)</span>
             </a>
             <div class="flex items-center justify-between text-[10px] text-slate-500 px-1">
-              <span>Version 0.1.0 • Installer</span>
+              <span id="win-version-tag">Version 0.1.7 • Installer</span>
               <a href="https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.zip" download="ByteSift-Windows-x64.zip" class="text-brand-400 hover:underline">Portable (.zip)</a>
             </div>
           </div>
@@ -935,7 +939,10 @@
             <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center mx-auto">
               <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.67-.82 1.13-1.96.99-3.1-.97.05-2.16.66-2.84 1.46-.61.7-.1.14 1.83 1.01 2.99 1.07-.05 2.18-.62 2.84-1.35"/></svg>
             </div>
-            <h4 class="text-lg font-bold text-white">macOS</h4>
+            <div class="flex items-center justify-center space-x-2">
+              <h4 class="text-lg font-bold text-white">macOS</h4>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 font-semibold border border-brand-500/30">v0.1.7</span>
+            </div>
             <p class="text-xs text-slate-400">Universal package for Apple Silicon (M1-M4) & Intel Macs.</p>
           </div>
 
@@ -945,7 +952,7 @@
               <span>Download for Mac (.dmg)</span>
             </a>
             <div class="flex items-center justify-between text-[10px] text-slate-500 px-1">
-              <span>Universal (M1-M4 & Intel)</span>
+              <span id="mac-version-tag">Version 0.1.7 • Universal DMG</span>
               <a href="https://github.com/PramudithaN/bytesift/releases" target="_blank" rel="noopener noreferrer" class="text-brand-400 hover:underline">Releases & Hash</a>
             </div>
           </div>
@@ -1530,6 +1537,25 @@
       setupScatterPinAnimation();
       setupAppWorkflowPinAnimation();
       applyWorkflowPhase(1);
+
+      // Dynamically sync latest release version from GitHub API (graceful offline fallback)
+      fetch('https://api.github.com/repos/PramudithaN/bytesift/releases/latest')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.tag_name) {
+            const tag = data.tag_name;
+            const cleanVer = tag.replace(/^v/, '');
+            const el1 = document.getElementById('latest-version-tag');
+            const elWin = document.getElementById('win-version-tag');
+            const elMac = document.getElementById('mac-version-tag');
+            const elHero = document.getElementById('hero-version-tag');
+            if (el1) el1.innerText = `${tag} (Stable)`;
+            if (elWin) elWin.innerText = `Version ${cleanVer} • Installer`;
+            if (elMac) elMac.innerText = `Version ${cleanVer} • Universal DMG`;
+            if (elHero) elHero.innerText = tag;
+          }
+        })
+        .catch(() => {});
     });
   </script>
 </body>
