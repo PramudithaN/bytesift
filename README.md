@@ -63,9 +63,10 @@ Traditional file organizers depend heavily on file extensions, failing when exte
 
 ## Standalone Binaries & Downloads
 
-ByteSift is distributed as self-contained, zero-dependency standalone binaries that do not require Python to be installed:
+ByteSift is distributed as self-contained, zero-dependency standalone packages that do not require Python to be installed:
 
-* **Windows 10 / 11:** [Download ByteSift for Windows (.exe)](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.exe)
+* **Windows Setup Wizard (Recommended):** [Download ByteSift Windows Setup (.exe)](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Setup-x64.exe)
+* **Windows Portable (.zip):** [Download ByteSift Portable (.zip)](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.zip)
 * **macOS (Apple Silicon & Intel):** [Download ByteSift for Mac (.dmg)](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-macOS-Universal.dmg)
 * **All Releases & Checksums:** [GitHub Releases Page](https://github.com/PramudithaN/bytesift/releases)
 

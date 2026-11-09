@@ -39,7 +39,29 @@ def main():
     if sys.platform.startswith("win"):
         icon_path = assets_dir / "icon_light.ico"
         version_file = root_dir / "scripts" / "version_info.txt"
-        cmd = [
+        iss_path = root_dir / "scripts" / "installer.iss"
+
+        # 1. Build Onedir directory bundle (required for clean Inno Setup installer)
+        cmd_dir = [
+            sys.executable, "-m", "PyInstaller",
+            "--noconfirm",
+            "--clean",
+            "--onedir",
+            "--windowed",
+            "--name", "ByteSift",
+            "--icon", str(icon_path),
+            "--add-data", add_data_arg,
+        ]
+        if version_file.exists():
+            cmd_dir.extend(["--version-file", str(version_file)])
+        cmd_dir.append(str(entry_point))
+
+        print("\n[*] Executing Windows Directory Build (Clean Onedir):")
+        print(" ".join(cmd_dir))
+        subprocess.check_call(cmd_dir)
+
+        # 2. Build Single-file portable executable
+        cmd_onefile = [
             sys.executable, "-m", "PyInstaller",
             "--noconfirm",
             "--clean",
@@ -50,14 +72,13 @@ def main():
             "--add-data", add_data_arg,
         ]
         if version_file.exists():
-            cmd.extend(["--version-file", str(version_file)])
-        cmd.append(str(entry_point))
+            cmd_onefile.extend(["--version-file", str(version_file)])
+        cmd_onefile.append(str(entry_point))
 
-        print("\n[*] Executing Windows Build:")
-        print(" ".join(cmd))
-        subprocess.check_call(cmd)
+        print("\n[*] Executing Windows Standalone Executable Build:")
+        print(" ".join(cmd_onefile))
+        subprocess.check_call(cmd_onefile)
 
-        # Copy to ByteSift.exe for convenience
         src_exe = dist_dir / "ByteSift-Windows-x64.exe"
         dest_exe = dist_dir / "ByteSift.exe"
         if src_exe.exists():
@@ -65,16 +86,47 @@ def main():
             print(f"\n[+] Created: {src_exe}")
             print(f"[+] Created mirror: {dest_exe}")
 
-            # Package into ZIP archive for browser download safety
-            zip_path = dist_dir / "ByteSift-Windows-x64.zip"
+        # 3. Package Directory into ZIP Archive (Portable Bundle)
+        zip_path = dist_dir / "ByteSift-Windows-x64.zip"
+        onedir_path = dist_dir / "ByteSift"
+        if onedir_path.is_dir():
+            print("\n[*] Creating Portable ZIP Archive...")
             import zipfile
             with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-                zf.write(dest_exe, arcname="ByteSift.exe")
+                for root, _, files in os.walk(onedir_path):
+                    for file in files:
+                        full_path = Path(root) / file
+                        arcname = full_path.relative_to(dist_dir)
+                        zf.write(full_path, arcname=str(arcname))
                 if (root_dir / "README.md").exists():
-                    zf.write(root_dir / "README.md", arcname="README.md")
+                    zf.write(root_dir / "README.md", arcname="ByteSift/README.md")
                 if (root_dir / "LICENSE").exists():
-                    zf.write(root_dir / "LICENSE", arcname="LICENSE.txt")
-            print(f"[+] Created ZIP package: {zip_path}")
+                    zf.write(root_dir / "LICENSE", arcname="ByteSift/LICENSE.txt")
+            print(f"[+] Created Portable ZIP package: {zip_path}")
+
+        # 4. Compile Inno Setup Installer (if ISCC is present)
+        iscc_path = shutil.which("iscc") or shutil.which("ISCC.exe")
+        if not iscc_path:
+            for potential_path in [
+                r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe",
+                r"C:\Program Files\Inno Setup 6\ISCC.exe",
+                r"C:\Program Files (x86)\Inno Setup 5\ISCC.exe",
+            ]:
+                if Path(potential_path).exists():
+                    iscc_path = potential_path
+                    break
+
+        if iscc_path and iss_path.exists() and onedir_path.is_dir():
+            print(f"\n[*] Found Inno Setup Compiler: {iscc_path}")
+            print("[*] Compiling Windows Setup Installer Wizard...")
+            subprocess.check_call([iscc_path, str(iss_path)])
+            setup_exe = dist_dir / "ByteSift-Setup-x64.exe"
+            if setup_exe.exists():
+                shutil.copyfile(setup_exe, dist_dir / "ByteSift-Setup.exe")
+                print(f"[+] Created Windows Installer: {setup_exe}")
+                print(f"[+] Created mirror: {dist_dir / 'ByteSift-Setup.exe'}")
+        else:
+            print("\n[-] Inno Setup compiler (ISCC) not found locally. Skipping installer compilation.")
 
     elif sys.platform == "darwin":
         icns_path = assets_dir / "icon_light.icns"

@@ -33,7 +33,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pyinstaller
 
-      - name: Compile Windows Executable
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y --no-progress
+          echo "C:\Program Files (x86)\Inno Setup 6" >> $env:GITHUB_PATH
+
+      - name: Compile Windows Executable & Setup Installer
         run: |
           python scripts/build.py
 
@@ -42,9 +47,11 @@ jobs:
         with:
           name: windows-binaries
           path: |
+            dist/ByteSift-Setup-x64.exe
+            dist/ByteSift-Setup.exe
+            dist/ByteSift-Windows-x64.zip
             dist/ByteSift-Windows-x64.exe
             dist/ByteSift.exe
-            dist/ByteSift-Windows-x64.zip
 
   build-macos:
     name: Build macOS Application & DMG (.dmg)
