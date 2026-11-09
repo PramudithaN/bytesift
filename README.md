@@ -160,8 +160,8 @@ ByteSift classifies each file through a three-tier pipeline and stops at the fir
                      [Document/Code Type]             [Tier 3: Extension Fallback]
 ```
 
-1. **Binary magic bytes.** Reads the leading bytes to identify real formats such as PDF, JPEG, PNG, ZIP, Office OpenXML, and executables.
-2. **Text content heuristics.** Scores a bounded 4-8 KB sample against weighted keyword and structural patterns to recognize invoices, resumes, contracts, source code, and logs. It is pattern matching, not a language model.
+1. **Binary magic bytes.** Reads the leading bytes to identify real formats such as Photoshop (PSD/PSB), Blender, After Effects, Premiere Pro, InDesign, Figma, 3D FBX/GLTF, Unity assets, video containers (MP4, MKV, MOV, WebM, WMV, AVI), PDF, JPEG, PNG, ZIP, Office OpenXML, and executables.
+2. **Text content heuristics.** Scores a bounded 4-8 KB sample against weighted keyword and structural patterns to recognize invoices, resumes, contracts, CapCut project drafts, Unity YAML scenes/prefabs, DaVinci Resolve timelines, subtitles, playlists, source code, and logs. It is pattern matching, not a language model.
 3. **Extension fallback.** Used only when content gives no answer.
 
 Two supporting steps run alongside:

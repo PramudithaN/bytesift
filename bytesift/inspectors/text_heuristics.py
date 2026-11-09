@@ -110,6 +110,70 @@ TEXT_RULES: list[Tuple[str, str, list[str], int, Optional[re.Pattern]]] = [
         2,
         re.compile(r"^#{1,3}\s+[a-zA-Z0-9]+", re.MULTILINE)
     ),
+    # Game Development: Unity YAML (Scenes, Prefabs, Assets)
+    (
+        "Game_Development",
+        "Unity",
+        ["tag:unity3d.com", "monobehaviour:", "gameobject:", "transform:", "prefabinstance:"],
+        2,
+        re.compile(r"(%TAG\s+!u!\s+tag:unity3d\.com|--- !u!\d+ &\d+)", re.IGNORECASE)
+    ),
+    # Video Projects: CapCut Drafts & JSON
+    (
+        "Video_Projects",
+        "CapCut",
+        ["draft_materials", "canvas_config", "draft_fold_path", "draft_id", "capcut", "draft_timeline"],
+        2,
+        re.compile(r"(\"draft_materials\"|\"canvas_config\"|\"capcut\")", re.IGNORECASE)
+    ),
+    # Video Projects: Adobe After Effects XML Project (.aepx)
+    (
+        "Video_Projects",
+        "After_Effects",
+        ["aftereffectsproject", "adobe after effects", "bparam", "pinpoint", "composition"],
+        2,
+        re.compile(r"(<AfterEffectsProject|<string>Adobe After Effects)", re.IGNORECASE)
+    ),
+    # Video Projects: DaVinci Resolve Timeline / Project XML
+    (
+        "Video_Projects",
+        "DaVinci_Resolve",
+        ["davinci resolve", "davinci", "resolveversion", "sm2project", "timeline"],
+        2,
+        re.compile(r"(<DaVinciResolve|<xmeml|<fcpxml|ResolveVersion)", re.IGNORECASE)
+    ),
+    # Videos: Subtitles
+    (
+        "Videos",
+        "Subtitles",
+        ["-->", "dialogue:", "format: layered", "style: default", "webvtt"],
+        1,
+        re.compile(r"(^\d+\r?\n\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}|WEBVTT|\[Script Info\])", re.MULTILINE)
+    ),
+    # Videos: Playlists (M3U / M3U8)
+    (
+        "Videos",
+        "Playlists",
+        ["#extm3u", "#extinf:", "#ext-x-targetduration", "<playlist", "#ext-x-stream-inf"],
+        1,
+        re.compile(r"^#EXTM3U", re.MULTILINE)
+    ),
+    # 3D Models: Wavefront OBJ
+    (
+        "3D_Models",
+        "Wavefront_OBJ",
+        ["# wavefront obj", "mtllib ", "usemtl ", "vt ", "vn "],
+        2,
+        re.compile(r"^(v\s+[-0-9\.]+|vn\s+[-0-9\.]+|f\s+\d+/\d+)", re.MULTILINE)
+    ),
+    # 3D Models: STL (ASCII format)
+    (
+        "3D_Models",
+        "STL",
+        ["solid ", "facet normal", "outer loop", "vertex ", "endloop", "endfacet", "endsolid"],
+        3,
+        re.compile(r"^solid\s+.*?\s+facet\s+normal", re.DOTALL | re.IGNORECASE)
+    ),
 ]
 
 def is_text_file(filepath: Path) -> bool:
