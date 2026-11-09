@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import logging
 import os
+import re
 import shutil
 import stat
 import sys
@@ -17,6 +18,10 @@ from bytesift.inspectors.hasher import find_duplicate_groups
 from bytesift.inspectors.metadata import get_date_category
 
 logger = logging.getLogger(__name__)
+
+# Palo Alto Cortex XDR, CrowdStrike, and other EDR anti-ransomware canary decoy patterns
+EDR_CANARY_REGEX = re.compile(r"^(?:!+|Z{3,}|XORXOR|[A-Za-z0-9]{4,12})\d{9,12}$")
+CANARY_PREFIXES = ("!!!!!", "ZZZZZ", "XORXOR", "@@@@@", "#####", "$$$$$", "~$")
 
 DEFAULT_IGNORED_NAMES: Set[str] = {
     ".git", ".svn", ".hg", "node_modules", "__pycache__", ".venv", "venv",
@@ -85,7 +90,15 @@ class Organizer:
             return True
 
         # Safety filter: Ignore EDR / Antivirus canary bait patterns (e.g. Cortex XDR / CrowdStrike)
-        if name.startswith("!!!!!") or name.startswith("ZZZZZ") or name.startswith("XORXOR"):
+        if name.startswith(CANARY_PREFIXES) or name.startswith("!"):
+            return True
+
+        stem = item.stem
+        if EDR_CANARY_REGEX.match(stem):
+            return True
+
+        stem_lower = stem.lower()
+        if "canary" in stem_lower or "decoy" in stem_lower:
             return True
 
         # Safety filter: Ignore Windows Hidden and System files

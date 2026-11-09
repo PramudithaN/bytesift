@@ -66,13 +66,22 @@ class TestOrganizer(unittest.TestCase):
     def test_ignore_canary_and_hidden_files(self):
         temp_dir = Path(tempfile.mkdtemp())
         try:
-            # Canary / Decoy files (EDR anti-ransomware traps)
-            canary1 = temp_dir / "!!!!!1938081838.doc"
-            canary1.write_text("decoy", encoding="utf-8")
-            canary2 = temp_dir / "ZZZZZ2630139219.doc"
-            canary2.write_text("decoy", encoding="utf-8")
-            canary3 = temp_dir / "XORXOR2071002061.doc"
-            canary3.write_text("decoy", encoding="utf-8")
+            # Canary / Decoy files (EDR anti-ransomware traps from Cortex XDR, CrowdStrike, etc.)
+            canaries = [
+                "!!!!!1938081838.doc",
+                "ZZZZZ2630139219.doc",
+                "XORXOR2071002061.doc",
+                "cSGHkfrL2252328440.txt",
+                "ZZZZZ2650290038.docx",
+                "!!!!!2268491667.pem",
+                "XORXOR4225553402.jpg",
+                "cSGHkfrL4189288086.png",
+                "ZZZZZ1193787285.bmp",
+                "!!!!!2987833660.eml",
+                "canary_decoy_trap.docx",
+            ]
+            for c_name in canaries:
+                (temp_dir / c_name).write_text("decoy bait content", encoding="utf-8")
 
             # Normal user file
             normal = temp_dir / "normal_invoice.txt"
