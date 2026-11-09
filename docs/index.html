@@ -10,9 +10,10 @@
   <meta property="og:description" content="ByteSift organizes your cluttered files, separates duplicates, and restores order in one click. 100% private, works offline with one-click undo.">
   <meta property="og:url" content="https://pramudithan.github.io/bytesift/">
   <meta property="og:type" content="website">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico?v=3">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon_white.png?v=3">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon_white.png?v=3">
+  <link rel="apple-touch-icon" href="favicon_white.png?v=3">
 
   <!-- Instant Theme Loader (Prevents Flash of Unstyled Theme) -->
   <script>
@@ -1125,10 +1126,10 @@
           moonIcon.classList.add('block');
         }
       }
-      // Website icon intentionally maintains light theme icon across themes
+      // Browser icon intentionally maintains white icon for clear contrast on dark tabs
       const favPng = document.querySelector('link[rel="icon"][type="image/png"]');
       if (favPng) {
-        favPng.href = 'favicon.png';
+        favPng.href = 'favicon_white.png?v=3';
       }
     }
 
