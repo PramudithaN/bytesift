@@ -102,18 +102,27 @@ class ByteSiftApp:
     def _apply_window_icon(self, is_dark: bool):
         """
         Applies theme-synchronized icons:
-        - White icon in dark mode (icon_dark.png).
-        - Black icon in light mode (icon_light.png).
+        - White icon in dark mode (icon_dark.png / icon_dark.ico).
+        - Black icon in light mode (icon_light.png / icon_light.ico).
         """
-        # cspell:ignore MEIPASS
+        # Resolve assets directory across frozen executables and development environments
+        candidates = []
         bundle_dir = getattr(sys, "_MEIPASS", None)
-        if getattr(sys, "frozen", False) and bundle_dir:
-            base_dir = Path(bundle_dir)
-            assets_dir = base_dir / "bytesift" / "assets"
-            if not assets_dir.exists():
-                assets_dir = base_dir / "assets"
-        else:
-            assets_dir = Path(__file__).resolve().parent.parent / "assets"
+        if getattr(sys, "frozen", False):
+            if bundle_dir:
+                candidates.extend([
+                    Path(bundle_dir) / "bytesift" / "assets",
+                    Path(bundle_dir) / "assets",
+                ])
+            exe_dir = Path(sys.executable).resolve().parent
+            candidates.extend([
+                exe_dir / "bytesift" / "assets",
+                exe_dir / "_internal" / "bytesift" / "assets",
+                exe_dir / "assets",
+            ])
+        candidates.append(Path(__file__).resolve().parent.parent / "assets")
+        assets_dir = next((c for c in candidates if c.exists()), candidates[-1])
+
         suffix = "dark" if is_dark else "light"
         ico_path = assets_dir / f"icon_{suffix}.ico"
         png_path = assets_dir / f"icon_{suffix}.png"
@@ -121,11 +130,12 @@ class ByteSiftApp:
         # Apply native Windows ICO to title bar and taskbar
         if ico_path.exists():
             try:
+                self.root.iconbitmap(str(ico_path))
                 self.root.iconbitmap(default=str(ico_path))
             except (tk.TclError, OSError):
                 pass
 
-        # Apply PhotoImage icon for window and dialogs
+        # Apply PhotoImage icon for window, dialogs, and UI header
         if png_path.exists():
             try:
                 self._icon_img = tk.PhotoImage(file=str(png_path))
@@ -134,6 +144,7 @@ class ByteSiftApp:
                 self._header_icon = self._icon_img.subsample(18, 18)
                 if hasattr(self, "logo_lbl"):
                     self.logo_lbl.configure(image=self._header_icon)
+                    self.logo_lbl.image = self._header_icon
             except (tk.TclError, OSError):
                 pass
 

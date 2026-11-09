@@ -60,6 +60,12 @@ def main():
         print(" ".join(cmd_dir))
         subprocess.check_call(cmd_dir)
 
+        # Mirror assets to dist/ByteSift/bytesift/assets so shortcuts and onedir always find them
+        onedir_assets = dist_dir / "ByteSift" / "bytesift" / "assets"
+        onedir_assets.mkdir(parents=True, exist_ok=True)
+        for item in assets_dir.glob("*"):
+            shutil.copy2(item, onedir_assets / item.name)
+
         # 2. Build Single-file portable executable
         cmd_onefile = [
             sys.executable, "-m", "PyInstaller",

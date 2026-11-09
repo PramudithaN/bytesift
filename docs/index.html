@@ -12,6 +12,7 @@
   <meta property="og:type" content="website">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
 
   <!-- Instant Theme Loader (Prevents Flash of Unstyled Theme) -->
   <script>
@@ -1124,9 +1125,10 @@
           moonIcon.classList.add('block');
         }
       }
+      // Website icon intentionally maintains light theme icon across themes
       const favPng = document.querySelector('link[rel="icon"][type="image/png"]');
       if (favPng) {
-        favPng.href = isDark ? 'favicon_dark.png' : 'favicon.png';
+        favPng.href = 'favicon.png';
       }
     }
 
