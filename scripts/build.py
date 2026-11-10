@@ -125,7 +125,14 @@ def main():
         if iscc_path and iss_path.exists() and onedir_path.is_dir():
             print(f"\n[*] Found Inno Setup Compiler: {iscc_path}")
             print("[*] Compiling Windows Setup Installer Wizard...")
-            subprocess.check_call([iscc_path, str(iss_path)])
+            app_version = "0.1.8"
+            init_file = root_dir / "bytesift" / "__init__.py"
+            if init_file.exists():
+                for line in init_file.read_text(encoding="utf-8").splitlines():
+                    if line.startswith("__version__"):
+                        app_version = line.split("=")[1].strip().strip('"\'')
+                        break
+            subprocess.check_call([iscc_path, f"/DMyAppVersion={app_version}", str(iss_path)])
             setup_exe = dist_dir / "ByteSift-Setup-x64.exe"
             if setup_exe.exists():
                 shutil.copyfile(setup_exe, dist_dir / "ByteSift-Setup.exe")
