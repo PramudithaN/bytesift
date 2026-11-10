@@ -3,17 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ByteSift - Your unorganized folder, fixed in one click</title>
-  <meta name="description" content="ByteSift organizes your cluttered files, separates duplicates, and restores order in one click. 100% private, works offline with one-click undo.">
+  <title>ByteSift - Fast, Private Offline Desktop File Organizer &amp; Duplicate Finder</title>
+  
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="ByteSift - Fast, Private Offline Desktop File Organizer &amp; Duplicate Finder">
+  <meta name="description" content="ByteSift is a free, 100% offline desktop file organizer and duplicate finder for Windows &amp; macOS. Sort messy downloads, isolate duplicates, and undo anytime.">
+  <meta name="keywords" content="file organizer, desktop file organizer, duplicate file finder, sort downloads folder, offline file organizer, file manager, organize files, deduplication, sha256 duplicate finder, windows file organizer, macos file organizer, open source file sorter, bytesift">
+  <meta name="author" content="Pramuditha Nakandala">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="application-name" content="ByteSift">
+  <meta name="apple-mobile-web-app-title" content="ByteSift">
+  <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="https://pramudithan.github.io/bytesift/">
-  <meta property="og:title" content="ByteSift - Your unorganized folder, fixed in one click">
-  <meta property="og:description" content="ByteSift organizes your cluttered files, separates duplicates, and restores order in one click. 100% private, works offline with one-click undo.">
-  <meta property="og:url" content="https://pramudithan.github.io/bytesift/">
+
+  <!-- Open Graph / Facebook / LinkedIn / Discord -->
+  <meta property="og:site_name" content="ByteSift">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pramudithan.github.io/bytesift/">
+  <meta property="og:title" content="ByteSift - Fast, Private Offline Desktop File Organizer &amp; Duplicate Finder">
+  <meta property="og:description" content="Sort messy downloads, isolate duplicate files with SHA-256 hashes, and restore order in one click. 100% private, offline, with instant undo.">
+  <meta property="og:image" content="https://pramudithan.github.io/bytesift/og-image.png">
+  <meta property="og:image:secure_url" content="https://pramudithan.github.io/bytesift/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="ByteSift - Free Offline Desktop File Organizer and Duplicate Isolator">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://pramudithan.github.io/bytesift/">
+  <meta name="twitter:title" content="ByteSift - Fast, Private Offline Desktop File Organizer &amp; Duplicate Finder">
+  <meta name="twitter:description" content="Tame cluttered folders, isolate duplicates, and restore order in one click. 100% private, offline, with instant undo.">
+  <meta name="twitter:image" content="https://pramudithan.github.io/bytesift/og-image.png">
+  <meta name="twitter:image:alt" content="ByteSift - Free Offline Desktop File Organizer and Duplicate Isolator">
+
+  <!-- Favicon & Touch Icons -->
   <link rel="icon" type="image/x-icon" href="favicon.ico?v=3">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon_white.png?v=3">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon_white.png?v=3">
   <link rel="apple-touch-icon" href="favicon_white.png?v=3">
+
+  <!-- Structured Data (JSON-LD) for Search Engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://pramudithan.github.io/bytesift/#website",
+        "url": "https://pramudithan.github.io/bytesift/",
+        "name": "ByteSift",
+        "description": "Free, fast and 100% offline desktop file organizer and duplicate finder.",
+        "inLanguage": "en-US",
+        "publisher": {
+          "@type": "Organization",
+          "name": "ByteSift",
+          "url": "https://pramudithan.github.io/bytesift/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://pramudithan.github.io/bytesift/favicon_white.png"
+          }
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://pramudithan.github.io/bytesift/#software",
+        "name": "ByteSift",
+        "operatingSystem": "Windows 10, Windows 11, macOS, Linux",
+        "applicationCategory": "UtilitiesApplication",
+        "applicationSubCategory": "File Management",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Fast, private desktop file organizer and duplicate isolator. Organizes messy folders, categorizes files by magic bytes, detects duplicates with SHA-256 hashes, and supports 1-click atomic undo.",
+        "url": "https://pramudithan.github.io/bytesift/",
+        "downloadUrl": "https://github.com/PramudithaN/bytesift/releases",
+        "softwareVersion": "0.1.7",
+        "license": "https://github.com/PramudithaN/bytesift/blob/main/LICENSE",
+        "image": "https://pramudithan.github.io/bytesift/og-image.png",
+        "screenshot": "https://pramudithan.github.io/bytesift/og-image.png",
+        "featureList": [
+          "100% Offline execution without cloud uploads or telemetry",
+          "Deep inspection using binary magic bytes and metadata",
+          "Cryptographic SHA-256 duplicate quarantine",
+          "Atomic 1-click undo transaction journal",
+          "Windows 10/11 installer and standalone portable build",
+          "macOS Apple Silicon and Intel support"
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://pramudithan.github.io/bytesift/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Does ByteSift delete anything?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Never. ByteSift does not delete, alter, or overwrite files. It only organizes files into clean subfolders within the folder you choose."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What happens to duplicates?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ByteSift identifies identical copies using cryptographic SHA-256 hashes and isolates them into a dedicated Duplicates folder. You can review them safely anytime."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I undo an organization?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Press Ctrl+Z (or Command-Z on macOS) or click Undo Last Session. ByteSift keeps an atomic local journal that restores every file to its previous location."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why did Windows or Edge show 'isn't commonly downloaded'?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ByteSift is a free community open-source tool without expensive commercial certificates. When newly compiled, Windows displays a standard reputation warning until thousands have downloaded it. Click More info -> Run anyway. All code is public on GitHub."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- Instant Theme Loader (Prevents Flash of Unstyled Theme) -->
   <script>
@@ -181,6 +303,8 @@
   </style>
 </head>
 <body class="bg-[#fbfbfd] dark:bg-[#000000] antialiased text-[#1d1d1f] dark:text-[#f5f5f7] select-none overflow-x-hidden relative">
+  <!-- Skip link for keyboard and screen-reader accessibility -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#0071e3] focus:text-white focus:rounded-lg focus:shadow-lg focus:text-xs focus:font-semibold">Skip to main content</a>
 
   <!-- Top Global Scroll Progress Bar -->
   <div id="global-progress"></div>
@@ -308,6 +432,8 @@
       </div>
     </div>
   </header>
+
+  <main id="main-content">
 
   <!-- ========================================================================= -->
   <!-- HERO SECTION: APPLE MINIMALIST PROBLEM-FIRST                              -->
@@ -833,8 +959,8 @@
                 <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
                 <div class="w-3.5 h-3.5 ml-1.5 flex items-center justify-center shrink-0">
-                  <img src="favicon.png" class="w-3.5 h-3.5 dark:hidden object-contain" alt="">
-                  <img src="favicon_dark.png" class="w-3.5 h-3.5 hidden dark:block object-contain" alt="">
+                  <img src="favicon.png" class="w-3.5 h-3.5 dark:hidden object-contain" alt="ByteSift app icon">
+                  <img src="favicon_dark.png" class="w-3.5 h-3.5 hidden dark:block object-contain" alt="ByteSift app icon">
                 </div>
                 <span class="pl-0.5 text-xs text-[#86868b] dark:text-[#a1a1a6] font-normal truncate">ByteSift &bull; Offline File Organizer</span>
               </div>
@@ -1068,6 +1194,8 @@
 
     </div>
   </section>
+
+  </main>
 
   <!-- ========================================================================= -->
   <!-- APPLE MINIMALIST FOOTER                                                   -->
