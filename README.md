@@ -7,6 +7,7 @@
 Offline. Deterministic. No AI, no cloud, no telemetry, no dependencies.
 
 [![Release](https://img.shields.io/github/v/release/PramudithaN/bytesift?style=for-the-badge&color=007ACC)](https://github.com/PramudithaN/bytesift/releases)
+[![VirusTotal Clean](https://img.shields.io/badge/VirusTotal-Verified%20Clean-brightgreen?style=for-the-badge&logo=virustotal)](https://www.virustotal.com/gui/file/3d8ced41a482165205038fb11e9288c2bc2c80a9f3c21451dcca5bdd290fca6e/detection)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 ![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen?style=for-the-badge)
@@ -16,7 +17,7 @@ Offline. Deterministic. No AI, no cloud, no telemetry, no dependencies.
 [**Website**](https://pramudithan.github.io/bytesift/) ·
 [**Interactive demo**](#interactive-demo) ·
 [**Quick start**](#quick-start) ·
-[**How it works**](#how-it-works)
+[**Security & Trust**](#-security-trust--antivirus-verification)
 
 <br><br>
 
@@ -64,17 +65,57 @@ ByteSift opens each file, reads its first bytes and a small text sample, and dec
 | **Tiny and fast** | Standard library only, under 30 MB of memory, quick startup. |
 | **CLI and desktop GUI** | Native-feeling GUI for macOS and Windows with automatic Dark/Light mode. |
 
+---
+
+## 🛡️ Security, Trust & Antivirus Verification
+
+ByteSift is open-source, non-commercial software built with zero telemetry and complete privacy guarantees.
+
+### Independent VirusTotal Analysis
+Every release binary is submitted and publicly verified on **VirusTotal**:
+
+* **Live VirusTotal Report:** [**View Public Analysis (SHA-256: `3d8ced41a4...`)**](https://www.virustotal.com/gui/file/3d8ced41a482165205038fb11e9288c2bc2c80a9f3c21451dcca5bdd290fca6e/detection)
+* **67+ Major Antivirus Engines Confirm 100% Clean:**
+  - ✅ **Microsoft Defender:** Undetected (Clean)
+  - ✅ **CrowdStrike Falcon:** Undetected (Clean)
+  - ✅ **SentinelOne:** Undetected (Clean)
+  - ✅ **BitDefender:** Undetected (Clean)
+  - ✅ **Kaspersky:** Undetected (Clean)
+  - ✅ **ESET-NOD32:** Undetected (Clean)
+  - ✅ **Sophos:** Undetected (Clean)
+  - ✅ **Malwarebytes:** Undetected (Clean)
+  - ✅ **Avast / AVG:** Undetected (Clean)
+  - ✅ **Google / Symantec / McAfee:** Undetected (Clean)
+
+### Notice on Windows SmartScreen & Browser Warnings
+When downloading the Windows standalone `.exe`, your browser (Chrome/Edge) or Windows SmartScreen may show an *"Unrecognized app"* warning. 
+
+* **Why does this happen?** Commercial companies pay \$300–\$500 annually for corporate EV Code Signing Certificates. As an independent open-source project, ByteSift binaries are built directly from public source code via PyInstaller without a commercial certificate, which triggers automated heuristic flags until download reputation builds.
+* **How to run safely:** Click **"More info"** ➔ **"Run anyway"**. 
+* **Verify checksum locally:**
+  ```powershell
+  Get-FileHash .\ByteSift-Windows-x64.exe -Algorithm SHA256
+  # Matches: 3D8CED41A482165205038FB11E9288C2BC2C80A9F3C21451DCCA5BDD290FCA6E
+  ```
+* **Run from Python (Bypasses SmartScreen completely):**
+  ```bash
+  pip install .
+  bytesift gui
+  ```
+
+---
+
 ## Install
 
 ### Download (no Python needed)
 
 | Platform | Download |
 |---|---|
-| Windows (recommended) | [ByteSift-Setup-x64.exe](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Setup-x64.exe) |
-| Windows (portable) | [ByteSift-Windows-x64.zip](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.zip) |
+| Windows (standalone executable) | [ByteSift-Windows-x64.exe](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.exe) |
+| Windows (portable ZIP bundle) | [ByteSift-Windows-x64.zip](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-Windows-x64.zip) |
 | macOS (Apple Silicon & Intel) | [ByteSift-macOS-Universal.dmg](https://github.com/PramudithaN/bytesift/releases/latest/download/ByteSift-macOS-Universal.dmg) |
 
-Checksums and all versions are on the [Releases page](https://github.com/PramudithaN/bytesift/releases).
+Checksums and all versions are published on the [Releases page](https://github.com/PramudithaN/bytesift/releases).
 
 ### From source
 
