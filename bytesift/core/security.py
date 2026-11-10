@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import stat
 import sys
+import tempfile
 from typing import Set, Tuple
 
 WIN32_RESERVED_NAMES = {
@@ -16,10 +17,13 @@ WIN32_RESERVED_NAMES = {
     *(f"LPT{i}" for i in range(1, 10)),
 }
 
-# Critical Unix and macOS directory trees that must never be targeted or modified
+# Critical Unix and macOS directory trees that must never be targeted or modified.
+# Note: /var as a whole is excluded because macOS hosts per-user temp storage in /var/folders.
+# Specific sensitive /var system subdirectories are listed instead.
 UNIX_CRITICAL_DIRS = {
     "/bin", "/sbin", "/boot", "/dev", "/etc", "/lib", "/lib32", "/lib64",
-    "/libx32", "/lost+found", "/proc", "/root", "/run", "/sys", "/usr", "/var",
+    "/libx32", "/lost+found", "/proc", "/root", "/run", "/sys", "/usr",
+    "/var/log", "/var/root", "/var/db", "/var/audit",
     "/System", "/Library", "/Applications"
 }
 
@@ -57,6 +61,7 @@ def get_protected_system_paths() -> Set[Path]:
 def is_critical_system_path(path: Path) -> bool:
     """
     Checks if path is an OS-critical directory, a drive root, or inside system files.
+    Always permits user temporary directories (e.g. /tmp, /var/folders on macOS, %TEMP%).
     """
     try:
         resolved = path.resolve()
@@ -67,7 +72,15 @@ def is_critical_system_path(path: Path) -> bool:
     if resolved == resolved.parent:
         return True
 
-    # 2. Specific OS protected system trees (e.g. C:\Windows, C:\Program Files, /etc)
+    # 2. Allow system temporary directories (cross-platform, including macOS /var/folders)
+    try:
+        temp_root = Path(tempfile.gettempdir()).resolve()
+        if resolved == temp_root or resolved.is_relative_to(temp_root):
+            return False
+    except (OSError, ValueError):
+        pass
+
+    # 3. Specific OS protected system trees (e.g. C:\Windows, C:\Program Files, /etc, /System)
     protected = get_protected_system_paths()
     for prot in protected:
         if resolved == prot:
