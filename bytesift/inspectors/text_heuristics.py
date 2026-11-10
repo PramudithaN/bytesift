@@ -1,8 +1,10 @@
 """
 ByteSift Text Heuristics Inspector
 Fast regex and keyword frequency scoring for text files and plain documents.
+Includes symlink isolation to prevent reading out-of-bounds files.
 """
 
+import os
 from pathlib import Path
 import re
 from typing import Optional, Tuple
@@ -178,6 +180,9 @@ TEXT_RULES: list[Tuple[str, str, list[str], int, Optional[re.Pattern]]] = [
 
 def is_text_file(filepath: Path) -> bool:
     """Checks if a file is plain text by reading a small chunk and checking byte values."""
+    if filepath.is_symlink() or os.path.islink(filepath) or not filepath.is_file():
+        return False
+
     try:
         with open(filepath, "rb") as f:
             chunk = f.read(1024)

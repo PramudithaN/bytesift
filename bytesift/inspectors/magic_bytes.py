@@ -1,8 +1,10 @@
 """
 ByteSift Magic Bytes Inspector
 Examines raw initial bytes to determine true file formats independent of extensions.
+Includes defenses against symlink traversal and decompression bombs.
 """
 
+import os
 from pathlib import Path
 from typing import Optional, Tuple
 import zipfile
@@ -176,6 +178,7 @@ def inspect_zip_based_format(filepath: Path) -> Tuple[str, str]:
     """
     Inspects ZIP container contents to distinguish DOCX, XLSX, PPTX, EPUB,
     DaVinci Resolve projects, CapCut drafts, InDesign IDML, Sketch, Figma, or general ZIP.
+    Uses bounded streaming reads to prevent decompression bomb memory exhaustion.
     """
     ext = filepath.suffix.lower()
     if ext in (".drp", ".drt", ".dra", ".drb"):
@@ -194,12 +197,13 @@ def inspect_zip_based_format(filepath: Path) -> Tuple[str, str]:
             namelist = set(z.namelist())
             lower_names = {n.lower() for n in namelist}
 
-            # DaVinci Resolve project check
+            # DaVinci Resolve project check (safe streaming read)
             if any(name in lower_names for name in ("project.xml", "project/project.xml")):
                 try:
                     for xml_name in ("project.xml", "Project.xml", "project/project.xml"):
                         if xml_name in namelist:
-                            sample = z.read(xml_name)[:2048]
+                            with z.open(xml_name, "r") as f_in:
+                                sample = f_in.read(2048)
                             if any(k in sample for k in (b"Sm2Project", b"Resolve", b"DaVinci", b"timeline", b"Timeline")):
                                 return ("Video_Projects", "DaVinci_Resolve")
                 except Exception:
@@ -217,10 +221,11 @@ def inspect_zip_based_format(filepath: Path) -> Tuple[str, str]:
             if "document.json" in lower_names and "meta.json" in lower_names:
                 return ("Design", "Sketch")
 
-            # EPUB check
+            # EPUB check (safe bounded read)
             if "mimetype" in namelist:
                 try:
-                    mime = z.read("mimetype").decode("utf-8", errors="ignore").strip()
+                    with z.open("mimetype", "r") as f_in:
+                        mime = f_in.read(256).decode("utf-8", errors="ignore").strip()
                     if "epub" in mime:
                         return ("Documents", "EPUB")
                     if "indesign" in mime:
@@ -244,8 +249,12 @@ def inspect_zip_based_format(filepath: Path) -> Tuple[str, str]:
 def inspect_magic_bytes(filepath: Path) -> Optional[Tuple[str, str]]:
     """
     Reads the initial bytes of a file to determine category and subcategory.
+    Rejects symlinks, directory links, or non-regular files to prevent out-of-bounds reads.
     Returns (category, subcategory) or None if unknown.
     """
+    if filepath.is_symlink() or os.path.islink(filepath) or not filepath.is_file():
+        return None
+
     try:
         with open(filepath, "rb") as f:
             header = f.read(64)

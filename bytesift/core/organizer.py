@@ -1,6 +1,7 @@
 """
 ByteSift Organizer Engine
 Generates execution plans, previews organization actions, and safely executes moves.
+Features strict OS system directory protection and crash-safe transaction logging.
 """
 
 from dataclasses import dataclass
@@ -13,6 +14,7 @@ import stat
 import sys
 from typing import Callable, List, Optional, Set
 from bytesift.core.classifier import Classifier, Classification
+from bytesift.core.security import is_critical_system_path, is_safe_target_directory, is_safe_file_to_process
 from bytesift.core.transaction import TransactionManager, FileMoveRecord
 from bytesift.inspectors.hasher import find_duplicate_groups
 from bytesift.inspectors.metadata import get_date_category
@@ -25,7 +27,7 @@ CANARY_PREFIXES = ("!!!!!", "ZZZZZ", "XORXOR", "@@@@@", "#####", "$$$$$", "~$")
 
 DEFAULT_IGNORED_NAMES: Set[str] = {
     ".git", ".svn", ".hg", "node_modules", "__pycache__", ".venv", "venv",
-    ".bytesift_history.json", "desktop.ini", ".DS_Store", "Thumbs.db",
+    ".bytesift_history.json", ".bytesift_history.tmp", "desktop.ini", ".DS_Store", "Thumbs.db",
     ".localized", ".Trashes", ".fseventsd", ".Spotlight-V100"
 }
 
@@ -68,15 +70,19 @@ class Organizer:
         self.classifier = Classifier(enable_content_heuristics=(self.config.strategy in ("smart", "heuristics")))
 
     def scan_files(self, folder: Path) -> List[Path]:
-        """Collects files in folder, respecting recursive flag and ignore list."""
+        """Collects files in folder, respecting recursive flag, ignore list, and security filters."""
+        safe, err = is_safe_target_directory(folder)
+        if not safe:
+            raise PermissionError(err)
+
         collected: List[Path] = []
         if self.config.recursive:
             for item in folder.rglob("*"):
-                if item.is_file() and not self._is_ignored(item, folder):
+                if is_safe_file_to_process(item, folder) and not self._is_ignored(item, folder):
                     collected.append(item)
         else:
             for item in folder.iterdir():
-                if item.is_file() and not self._is_ignored(item, folder):
+                if is_safe_file_to_process(item, folder) and not self._is_ignored(item, folder):
                     collected.append(item)
         return collected
 
@@ -118,7 +124,12 @@ class Organizer:
     def generate_plan(self, folder: Path, progress_cb: Optional[Callable[[int, int], None]] = None) -> List[PlanItem]:
         """
         Builds the complete execution plan without modifying any files.
+        Verifies directory boundaries to protect system and root folders.
         """
+        safe, err = is_safe_target_directory(folder)
+        if not safe:
+            raise PermissionError(err)
+
         files = self.scan_files(folder)
         total = len(files)
         plan: List[PlanItem] = []
@@ -186,27 +197,55 @@ class Organizer:
 
     def execute_plan(self, folder: Path, plan: List[PlanItem]) -> int:
         """
-        Executes the plan by moving files and journaling every move for rollback.
+        Executes the plan by moving files and journaling each move atomically (WAL).
+        Protects against TOCTOU race conditions and system directory contamination.
         Returns the number of files successfully moved.
         """
+        safe, err = is_safe_target_directory(folder)
+        if not safe:
+            raise PermissionError(err)
+
         if not plan:
             return 0
 
+        folder_resolved = folder.resolve()
         transaction_mgr = TransactionManager(folder)
-        records: List[FileMoveRecord] = []
+        transaction_mgr.start_session()
         moved_count = 0
 
         for item in plan:
+            # Pre-move security verification
+            if not is_safe_file_to_process(item.source, folder):
+                logger.warning("Skipping unsafe or permission-restricted file: %s", item.source)
+                continue
+
+            target = item.target_path
             try:
-                item.target_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.move(str(item.source), str(item.target_path))
-                records.append(FileMoveRecord(
+                target_resolved = target.resolve()
+                if not target_resolved.is_relative_to(folder_resolved):
+                    logger.error("Blocked out-of-bounds target path: %s", target)
+                    continue
+                if is_critical_system_path(target_resolved):
+                    logger.error("Blocked modification of protected system path: %s", target)
+                    continue
+            except (OSError, RuntimeError) as e:
+                logger.error("Path resolution error for target %s: %s", target, e)
+                continue
+
+            # TOCTOU Collision check: re-verify target path existence immediately before move
+            if target.exists() and target.resolve() != item.source.resolve():
+                target = resolve_target_collision(target, set())
+
+            try:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(item.source), str(target))
+                record = FileMoveRecord(
                     original_path=str(item.source.resolve()),
-                    target_path=str(item.target_path.resolve())
-                ))
+                    target_path=str(target.resolve())
+                )
+                transaction_mgr.record_move(record)
                 moved_count += 1
             except (OSError, shutil.Error) as e:
-                logger.error("Failed to move %s -> %s: %s", item.source.name, item.target_path, e)
+                logger.error("Failed to move %s -> %s: %s", item.source.name, target, e)
 
-        transaction_mgr.save_session(records)
         return moved_count

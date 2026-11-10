@@ -169,15 +169,17 @@ Two supporting steps run alongside:
 - **Metadata and timestamps.** Embedded timestamps (such as JPEG EXIF) enable chronological archiving.
 - **Deduplication.** Files are grouped by size first, and only same-size candidates are hashed with SHA-256. Identical files are routed to a dedicated duplicates folder.
 
-## Safety
+## Security & System Safety Guardrails
 
-ByteSift is built so you can try it without worrying.
+ByteSift is engineered to operate safely on host operating systems without risking system stability or exposing files:
 
-- **Dry runs.** `scan` and `--dry-run` show the full plan without touching anything.
-- **Transaction journal.** Each completed session is recorded in `.bytesift_history.json`.
-- **Full rollback.** `undo` reverses moves in inverse order and cleans up empty directories.
-- **No overwrites.** Name collisions get numeric suffixes (`filename (1).ext`).
-- **Sensible exclusions.** Hidden directories and common dependency or VCS folders (`.git`, `node_modules`, `.venv`) are skipped by default.
+- **OS System Directory Protection.** Refuses to organize or modify filesystem drive roots (`C:\`, `/`) or operating system directory trees (`C:\Windows`, `C:\Program Files`, `/etc`, `/bin`, `/usr`).
+- **Symlink & Junction Isolation.** Disallows scanning, inspecting, hashing, or moving symbolic links and junction points, eliminating symlink loop Denial-of-Service and out-of-bounds traversal risks.
+- **Path Traversal & Rollback Confinement.** Strict boundary checking ensures undo operations cannot be hijacked or poisoned to relocate files outside the target directory.
+- **Write-Ahead Logging (WAL) & Crash Resilience.** Move transactions are committed incrementally to an atomic journal with `fsync`, guaranteeing recovery even if power or process termination occurs midway.
+- **Decompression Bomb Protection.** ZIP container inspection uses bounded streaming reads (under 2 KB) to prevent Out-Of-Memory (OOM) memory exhaustion from maliciously crafted archives.
+- **Collision & TOCTOU Defense.** Targets are verified immediately prior to movement, auto-suffixing candidate names (`filename (1).ext`) to ensure zero accidental file overwrites.
+- **Device & EDR Decoy Handling.** Automatically filters Windows reserved device names (`CON`, `PRN`, `AUX`, `NUL`) and anti-ransomware EDR canary bait files.
 
 ## Development
 
@@ -187,7 +189,7 @@ Run the test suite:
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
-Tests cover magic-byte detection across common formats, text heuristics for structured documents and code, and end-to-end plan generation, collision handling, and rollback.
+Tests cover magic-byte detection across common formats, text heuristics for structured documents and code, security guardrails, collision handling, and rollback.
 
 Build a standalone executable on Windows or macOS:
 

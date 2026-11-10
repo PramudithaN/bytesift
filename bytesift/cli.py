@@ -1,6 +1,7 @@
 """
 ByteSift Command Line Interface
 Fast, lightweight, offline file organizer CLI.
+Enforces operating system directory protection and safe transaction boundaries.
 """
 
 import argparse
@@ -9,6 +10,7 @@ from pathlib import Path
 from typing import List
 from bytesift import __version__
 from bytesift.core.organizer import Organizer, OrganizerConfig, PlanItem
+from bytesift.core.security import is_safe_target_directory
 from bytesift.core.transaction import TransactionManager
 from bytesift.core.updater import check_for_updates
 
@@ -49,8 +51,9 @@ def display_plan(plan: List[PlanItem], base_folder: Path):
 
 def cmd_scan(args):
     folder = Path(args.folder).resolve()
-    if not folder.is_dir():
-        print(f"Error: Directory '{folder}' does not exist.")
+    safe, err = is_safe_target_directory(folder)
+    if not safe:
+        print(f"Error: {err}")
         sys.exit(1)
 
     config = OrganizerConfig(
@@ -60,14 +63,20 @@ def cmd_scan(args):
         recursive=args.recursive
     )
     organizer = Organizer(config)
-    plan = organizer.generate_plan(folder)
+    try:
+        plan = organizer.generate_plan(folder)
+    except PermissionError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
     display_plan(plan, folder)
     print("\nRun 'bytesift organize' to apply these changes.")
 
 def cmd_organize(args):
     folder = Path(args.folder).resolve()
-    if not folder.is_dir():
-        print(f"Error: Directory '{folder}' does not exist.")
+    safe, err = is_safe_target_directory(folder)
+    if not safe:
+        print(f"Error: {err}")
         sys.exit(1)
 
     config = OrganizerConfig(
@@ -77,7 +86,12 @@ def cmd_organize(args):
         recursive=args.recursive
     )
     organizer = Organizer(config)
-    plan = organizer.generate_plan(folder)
+    try:
+        plan = organizer.generate_plan(folder)
+    except PermissionError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
     display_plan(plan, folder)
 
     if not plan:
@@ -94,14 +108,20 @@ def cmd_organize(args):
             return
 
     print("\nMoving files...")
-    moved = organizer.execute_plan(folder, plan)
+    try:
+        moved = organizer.execute_plan(folder, plan)
+    except PermissionError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
     print(f"Successfully organized {moved} file(s).")
     print("To revert anytime, run: bytesift undo \"{folder}\"")
 
 def cmd_undo(args):
     folder = Path(args.folder).resolve()
-    if not folder.is_dir():
-        print(f"Error: Directory '{folder}' does not exist.")
+    safe, err = is_safe_target_directory(folder)
+    if not safe:
+        print(f"Error: {err}")
         sys.exit(1)
 
     transaction_mgr = TransactionManager(folder)
@@ -195,15 +215,13 @@ def main():
     p_update.set_defaults(func=cmd_check_update)
 
     if len(sys.argv) == 1:
-        # Default to desktop GUI when launched without subcommands (e.g. double-clicked executable)
         try:
             from bytesift.ui.gui import launch_gui
             launch_gui()
-            sys.exit(0)
-        except Exception:
-            print_banner()
-            parser.print_help()
-            sys.exit(0)
+            return
+        except Exception as e:
+            print(f"Error launching ByteSift GUI: {e}")
+            sys.exit(1)
 
     args = parser.parse_args()
     if hasattr(args, "func"):

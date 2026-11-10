@@ -1,6 +1,7 @@
 """
 ByteSift Modern Windows Desktop GUI
 Engineered for Windows 10/11 with Fluent cards, High-DPI support, and automatic system theme detection.
+Includes security boundaries to protect operating system directories and guard against race conditions.
 """
 
 import ctypes
@@ -15,8 +16,9 @@ import webbrowser
 
 from bytesift import __version__
 from bytesift.core.organizer import Organizer, OrganizerConfig, PlanItem
+from bytesift.core.security import is_safe_target_directory
 from bytesift.core.transaction import TransactionManager
-from bytesift.core.updater import UpdateInfo, check_for_updates
+from bytesift.core.updater import UpdateInfo, check_for_updates, is_safe_update_url
 from bytesift.ui.theme import (
     DARK_THEME,
     LIGHT_THEME,
@@ -72,7 +74,8 @@ class ByteSiftApp:
             except (AttributeError, OSError):
                 pass
 
-        # State Variables
+        # State Variables & Concurrency Guard
+        self._is_busy: bool = False
         self.current_plan: List[PlanItem] = []
         self.selected_folder = tk.StringVar(value=initial_folder or "")
         self.strategy_var = tk.StringVar(value="smart")
@@ -111,7 +114,6 @@ class ByteSiftApp:
         - White icon in dark mode (icon_dark.png / icon_dark.ico).
         - Black icon in light mode (icon_light.png / icon_light.ico).
         """
-        # Resolve assets directory across frozen executables and development environments
         candidates = []
         bundle_dir = getattr(sys, "_MEIPASS", None)
         if getattr(sys, "frozen", False):
@@ -148,55 +150,53 @@ class ByteSiftApp:
                 self.root.iconphoto(True, self._icon_img)
                 # Subsample 512x512 down to crisp ~28x28 for UI header
                 self._header_icon = self._icon_img.subsample(18, 18)
-                if hasattr(self, "logo_lbl"):
-                    self.logo_lbl.configure(image=self._header_icon)
-                    self.logo_lbl.image = self._header_icon
-            except (tk.TclError, OSError):
+            except Exception:
                 pass
 
     def _sync_theme(self):
-        """Resolves theme mode setting and applies color scheme."""
+        """Resolves active theme based on user selection or system preference."""
         mode = self.theme_mode_var.get()
-        if mode == "Dark":
-            is_dark = True
-        elif mode == "Light":
-            is_dark = False
-        else:  # "System"
+        if mode == "System":
             is_dark = is_system_dark_theme()
+        else:
+            is_dark = (mode == "Dark")
 
         if self.force_macos:
             self.current_theme = MACOS_DARK if is_dark else MACOS_LIGHT
         else:
             self.current_theme = DARK_THEME if is_dark else LIGHT_THEME
+
         apply_fluent_theme(self.root, self.current_theme)
         self._apply_window_icon(is_dark)
         self._update_widget_colors()
 
     def _schedule_system_theme_check(self):
-        """Polls system theme every 2.5 seconds when in System mode."""
+        """Polls for OS theme change every 2.5 seconds when 'System' theme is active."""
         if self.theme_mode_var.get() == "System":
-            sys_dark = is_system_dark_theme()
+            is_dark = is_system_dark_theme()
             current_is_dark = (self.current_theme.name == "dark")
-            if sys_dark != current_is_dark:
+            if is_dark != current_is_dark:
                 self._sync_theme()
         self.root.after(2500, self._schedule_system_theme_check)
 
     def _update_widget_colors(self):
         """Applies dynamic theme colors to custom frames and treeview tags."""
         theme = self.current_theme
+        if hasattr(self, "card_dir"):
+            self.card_dir.configure(style="CardContent.TFrame")
+            self.card_opts.configure(style="CardContent.TFrame")
+            self.card_actions.configure(style="CardContent.TFrame")
+            self.card_tree.configure(style="CardContent.TFrame")
+            self.status_frame.configure(style="Status.TFrame")
 
-        # Treeview row styling
-        self.tree.tag_configure("even", background=theme.table_bg, foreground=theme.text_primary)
-        self.tree.tag_configure("odd", background=theme.table_alt_bg, foreground=theme.text_primary)
-        self.tree.tag_configure("duplicate", background=theme.warning_bg, foreground=theme.warning_text)
-
-        # Re-apply tag colors to any existing items in the table
-        for idx, item in enumerate(self.tree.get_children()):
-            values = self.tree.item(item, "values")
-            if len(values) >= 4 and "Duplicate" in str(values[3]):
-                self.tree.item(item, tags=("duplicate",))
-            else:
-                self.tree.item(item, tags=("odd" if idx % 2 == 1 else "even",))
+        if hasattr(self, "tree"):
+            self.tree.tag_configure("odd", background=theme.table_alt_bg, foreground=theme.text_primary)
+            self.tree.tag_configure("even", background=theme.table_bg, foreground=theme.text_primary)
+            self.tree.tag_configure("duplicate", background=theme.warning_bg, foreground=theme.warning_text)
+            for idx, item in enumerate(self.tree.get_children()):
+                tags = self.tree.item(item, "tags")
+                if "duplicate" not in tags:
+                    self.tree.item(item, tags=("odd" if idx % 2 == 1 else "even",))
 
         # Force title bar update
         set_windows_titlebar_appearance(self.root, theme.name == "dark")
@@ -256,7 +256,7 @@ class ByteSiftApp:
     def _prompt_update_dialog(self, info: UpdateInfo):
         notes_preview = ""
         if info.release_notes:
-            first_lines = "\n".join(info.release_notes.strip().splitlines()[:6])
+            first_lines = "\n".join(info.release_notes.splitlines()[:6])
             notes_preview = f"\n\nWhat's New:\n{first_lines}"
             if len(info.release_notes.splitlines()) > 6:
                 notes_preview += "\n..."
@@ -270,7 +270,11 @@ class ByteSiftApp:
             f"Would you like to open the download page in your browser?"
         )
         if resp:
-            webbrowser.open(info.download_url or info.html_url)
+            target_url = info.download_url or info.html_url
+            if is_safe_update_url(target_url):
+                webbrowser.open(target_url)
+            else:
+                webbrowser.open("https://github.com/PramudithaN/bytesift/releases/latest")
 
     def _build_menu_bar(self):
         """Builds native top menu bar (integrated into macOS system menu on Mac)."""
@@ -281,22 +285,18 @@ class ByteSiftApp:
 
         # File Menu
         file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(label="Open Folder...", accelerator=f"{mod}+O", command=self.on_browse)
-        file_menu.add_command(label="Refresh Preview", accelerator=f"{mod}+R", command=self.on_scan)
-        open_lbl = "Reveal in Finder" if sys.platform == "darwin" else "Open in File Explorer"
-        file_menu.add_command(label=open_lbl, command=self.on_open_in_explorer)
+        file_menu.add_command(label="Select Target Folder...", accelerator=f"{mod}+O", command=self.on_browse)
+        file_menu.add_command(label="Scan & Preview", accelerator=f"{mod}+R", command=self.on_scan)
+        file_menu.add_command(label="Execute Organization", accelerator=f"{mod}+Return", command=self.on_organize)
         file_menu.add_separator()
-        file_menu.add_command(label="Organize Files", accelerator=f"{mod}+Enter", command=self.on_organize)
+        file_menu.add_command(label="Roll Back Last Session", accelerator=f"{mod}+Z", command=self.on_undo)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.root.quit)
         menubar.add_cascade(label="File", menu=file_menu)
-
-        # Edit Menu
-        edit_menu = tk.Menu(menubar, tearoff=0)
-        edit_menu.add_command(label="Undo Organization", accelerator=f"{mod}+Z", command=self.on_undo)
-        menubar.add_cascade(label="Edit", menu=edit_menu)
 
         # View Menu
         view_menu = tk.Menu(menubar, tearoff=0)
-        view_menu.add_radiobutton(label="System Theme", variable=self.theme_mode_var, value="System", command=self._sync_theme)
+        view_menu.add_radiobutton(label="System Default", variable=self.theme_mode_var, value="System", command=self._sync_theme)
         view_menu.add_radiobutton(label="Dark Mode", variable=self.theme_mode_var, value="Dark", command=self._sync_theme)
         view_menu.add_radiobutton(label="Light Mode", variable=self.theme_mode_var, value="Light", command=self._sync_theme)
         menubar.add_cascade(label="View", menu=view_menu)
@@ -400,13 +400,13 @@ class ByteSiftApp:
         self.card_opts = ttk.Frame(container, style="CardContent.TFrame", padding="14")
         self.card_opts.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Label(self.card_opts, text="Organization Strategy & Options", style="Section.TLabel").pack(anchor=tk.W, pady=(0, 8))
+        ttk.Label(self.card_opts, text="Organization Strategy & Rules", style="Section.TLabel").pack(anchor=tk.W, pady=(0, 8))
 
         opts_row = ttk.Frame(self.card_opts, style="CardContent.TFrame")
         opts_row.pack(fill=tk.X)
 
-        ttk.Label(opts_row, text="Mode:", style="Subtitle.TLabel").pack(side=tk.LEFT, padx=(0, 6))
-
+        # Strategy selector
+        ttk.Label(opts_row, text="Strategy:", style="Subtitle.TLabel").pack(side=tk.LEFT, padx=(0, 6))
         strategy_combo = ttk.Combobox(
             opts_row,
             textvariable=self.strategy_var,
@@ -414,75 +414,69 @@ class ByteSiftApp:
             state="readonly",
             width=10
         )
-        strategy_combo.pack(side=tk.LEFT, padx=(0, 16))
+        strategy_combo.pack(side=tk.LEFT, padx=(0, 18))
 
-        date_chk = ttk.Checkbutton(opts_row, text="Group Media by Month", variable=self.group_date_var)
-        date_chk.pack(side=tk.LEFT, padx=(0, 16))
+        # Checkboxes
+        chk_dup = ttk.Checkbutton(opts_row, text="Detect Duplicates", variable=self.duplicates_var)
+        chk_dup.pack(side=tk.LEFT, padx=(0, 16))
 
-        dup_chk = ttk.Checkbutton(opts_row, text="Detect Duplicate Files", variable=self.duplicates_var)
-        dup_chk.pack(side=tk.LEFT, padx=(0, 16))
+        chk_date = ttk.Checkbutton(opts_row, text="Group Media by Date", variable=self.group_date_var)
+        chk_date.pack(side=tk.LEFT, padx=(0, 16))
 
-        rec_chk = ttk.Checkbutton(opts_row, text="Scan Subfolders Recursively", variable=self.recursive_var)
-        rec_chk.pack(side=tk.LEFT)
+        chk_rec = ttk.Checkbutton(opts_row, text="Include Subfolders (Recursive)", variable=self.recursive_var)
+        chk_rec.pack(side=tk.LEFT)
 
-        # 4. Action Command Bar
-        action_bar = ttk.Frame(container)
-        action_bar.pack(fill=tk.X, pady=(0, 10))
+        # 4. Action Bar (Scan, Organize, Rollback)
+        self.card_actions = ttk.Frame(container, style="CardContent.TFrame", padding="10 12")
+        self.card_actions.pack(fill=tk.X, pady=(0, 10))
 
-        self.scan_btn = ttk.Button(
-            action_bar,
-            text="Inspect & Preview",
-            style="Accent.TButton",
-            command=self.on_scan
-        )
+        self.scan_btn = ttk.Button(self.card_actions, text="🔍  Scan & Preview Plan", command=self.on_scan)
         self.scan_btn.pack(side=tk.LEFT, padx=(0, 8))
 
         self.organize_btn = ttk.Button(
-            action_bar,
-            text="Organize Files",
-            style="Success.TButton",
-            state=tk.DISABLED,
-            command=self.on_organize
+            self.card_actions,
+            text="⚡  Execute Organization",
+            style="Accent.TButton",
+            command=self.on_organize,
+            state=tk.DISABLED
         )
         self.organize_btn.pack(side=tk.LEFT, padx=(0, 8))
 
-        self.undo_btn = ttk.Button(
-            action_bar,
-            text="Undo Last Session",
-            command=self.on_undo
-        )
+        self.undo_btn = ttk.Button(self.card_actions, text="↩  Roll Back Last Run", command=self.on_undo)
         self.undo_btn.pack(side=tk.LEFT)
 
-        # 5. Card: Preview Table
-        self.card_table = ttk.Frame(container, style="CardContent.TFrame", padding="2")
-        self.card_table.pack(fill=tk.BOTH, expand=True)
+        # 5. Card: Preview Table / Treeview
+        self.card_tree = ttk.Frame(container, style="CardContent.TFrame", padding="12")
+        self.card_tree.pack(fill=tk.BOTH, expand=True)
 
-        columns = ("file", "size", "category", "method")
-        self.tree = ttk.Treeview(
-            self.card_table,
-            columns=columns,
-            show="headings",
-            selectmode="extended"
-        )
-        self.tree.heading("file", text="Filename", anchor=tk.W)
+        columns = ("name", "size", "destination", "detection")
+        self.tree = ttk.Treeview(self.card_tree, columns=columns, show="headings", selectmode="browse")
+
+        self.tree.heading("name", text="File Name", anchor=tk.W)
         self.tree.heading("size", text="Size", anchor=tk.E)
-        self.tree.heading("category", text="Target Folder", anchor=tk.W)
-        self.tree.heading("method", text="Detected By", anchor=tk.W)
+        self.tree.heading("destination", text="Categorized Destination", anchor=tk.W)
+        self.tree.heading("detection", text="Inspection Source", anchor=tk.W)
 
-        self.tree.column("file", width=340, anchor=tk.W)
-        self.tree.column("size", width=95, anchor=tk.E)
-        self.tree.column("category", width=230, anchor=tk.W)
-        self.tree.column("method", width=190, anchor=tk.W)
+        self.tree.column("name", width=260, minwidth=140, anchor=tk.W)
+        self.tree.column("size", width=80, minwidth=60, anchor=tk.E)
+        self.tree.column("destination", width=260, minwidth=160, anchor=tk.W)
+        self.tree.column("detection", width=180, minwidth=120, anchor=tk.W)
 
-        scroll_y = ttk.Scrollbar(self.card_table, orient=tk.VERTICAL, command=self.tree.yview)
-        self.tree.configure(yscrollcommand=scroll_y.set)
+        # Modern Scrollbars
+        scroll_y = ttk.Scrollbar(self.card_tree, orient=tk.VERTICAL, command=self.tree.yview)
+        scroll_x = ttk.Scrollbar(self.card_tree, orient=tk.HORIZONTAL, command=self.tree.xview)
+        self.tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
 
-        self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        scroll_y.grid(row=0, column=1, sticky="ns")
+        scroll_x.grid(row=1, column=0, sticky="ew")
 
-        # 6. Modern Status Bar
-        self.status_frame = ttk.Frame(self.root, style="Status.TFrame", padding="16 8")
-        self.status_frame.pack(side=tk.BOTTOM, fill=tk.X)
+        self.card_tree.grid_rowconfigure(0, weight=1)
+        self.card_tree.grid_columnconfigure(0, weight=1)
+
+        # 6. Status Bar
+        self.status_frame = ttk.Frame(self.root, style="Status.TFrame", padding="14 6")
+        self.status_frame.pack(fill=tk.X, side=tk.BOTTOM)
 
         self.status_var = tk.StringVar(value="Ready. Select a target directory to begin.")
         status_lbl = ttk.Label(self.status_frame, textvariable=self.status_var, style="Status.TLabel")
@@ -503,27 +497,39 @@ class ByteSiftApp:
 
     def on_open_in_explorer(self):
         folder_str = self.selected_folder.get().strip()
-        if not folder_str or not Path(folder_str).is_dir():
+        if not folder_str:
             messagebox.showwarning("Notice", "Please select a valid folder first.")
             return
+
+        folder_path = Path(folder_str)
+        safe, err = is_safe_target_directory(folder_path)
+        if not safe:
+            messagebox.showwarning("Notice", err)
+            return
+
         if sys.platform == "win32":
-            subprocess.Popen(["explorer", str(Path(folder_str).resolve())])
+            subprocess.Popen(["explorer", str(folder_path.resolve())])
         elif sys.platform == "darwin":
-            subprocess.Popen(["open", str(Path(folder_str).resolve())])
+            subprocess.Popen(["open", str(folder_path.resolve())])
         else:
-            subprocess.Popen(["xdg-open", str(Path(folder_str).resolve())])
+            subprocess.Popen(["xdg-open", str(folder_path.resolve())])
 
     def on_scan(self):
+        if self._is_busy:
+            return
+
         folder_str = self.selected_folder.get().strip()
         if not folder_str:
             messagebox.showwarning("Notice", "Please select a target folder.")
             return
 
         folder = Path(folder_str)
-        if not folder.is_dir():
-            messagebox.showerror("Error", f"Folder does not exist:\n{folder_str}")
+        safe, err = is_safe_target_directory(folder)
+        if not safe:
+            messagebox.showerror("Security Warning", err)
             return
 
+        self._is_busy = True
         self.status_var.set("Inspecting directory contents...")
         self.scan_btn.config(state=tk.DISABLED)
         self.tree.delete(*self.tree.get_children())
@@ -538,26 +544,17 @@ class ByteSiftApp:
             organizer = Organizer(config)
             try:
                 plan = organizer.generate_plan(folder)
-            except PermissionError:
+            except PermissionError as e:
                 def alert_permission():
+                    self._is_busy = False
                     self.scan_btn.config(state=tk.NORMAL)
                     self.status_var.set("Access denied by system security.")
-                    if sys.platform == "darwin":
-                        messagebox.showwarning(
-                            "macOS Permission Required",
-                            f"ByteSift was denied access to '{folder.name}'.\n\n"
-                            "macOS requires explicit permission for user folders (Documents, Downloads, Desktop).\n\n"
-                            "To grant access:\n"
-                            "1. Open Apple Menu > System Settings.\n"
-                            "2. Navigate to 'Privacy & Security' > 'Files and Folders'.\n"
-                            "3. Enable access for Terminal / Python."
-                        )
-                    else:
-                        messagebox.showwarning("Permission Denied", f"Access denied to '{folder}'.")
+                    messagebox.showwarning("Permission Notice", str(e))
                 self.root.after(0, alert_permission)
                 return
 
             def update_ui():
+                self._is_busy = False
                 self.current_plan = plan
                 for idx, item in enumerate(plan):
                     try:
@@ -589,8 +586,18 @@ class ByteSiftApp:
         threading.Thread(target=run_scan, daemon=True).start()
 
     def on_organize(self):
+        if self._is_busy:
+            return
+
         if not self.current_plan:
             messagebox.showinfo("Information", "No files scheduled to organize.")
+            return
+
+        folder_str = self.selected_folder.get().strip()
+        folder = Path(folder_str)
+        safe, err = is_safe_target_directory(folder)
+        if not safe:
+            messagebox.showerror("Security Warning", err)
             return
 
         count = len(self.current_plan)
@@ -601,7 +608,6 @@ class ByteSiftApp:
         if not confirm:
             return
 
-        folder = Path(self.selected_folder.get().strip())
         config = OrganizerConfig(
             strategy=self.strategy_var.get(),
             group_by_date=self.group_date_var.get(),
@@ -610,12 +616,23 @@ class ByteSiftApp:
         )
         organizer = Organizer(config)
 
+        self._is_busy = True
         self.status_var.set("Relocating files...")
         self.organize_btn.config(state=tk.DISABLED)
 
         def run_move():
-            moved = organizer.execute_plan(folder, self.current_plan)
+            try:
+                moved = organizer.execute_plan(folder, self.current_plan)
+            except PermissionError as e:
+                def alert_err():
+                    self._is_busy = False
+                    self.organize_btn.config(state=tk.NORMAL)
+                    messagebox.showerror("Security Warning", str(e))
+                self.root.after(0, alert_err)
+                return
+
             def done():
+                self._is_busy = False
                 messagebox.showinfo("Complete", f"Successfully organized {moved} file(s).")
                 self.tree.delete(*self.tree.get_children())
                 self.current_plan = []
@@ -625,14 +642,18 @@ class ByteSiftApp:
         threading.Thread(target=run_move, daemon=True).start()
 
     def on_undo(self):
+        if self._is_busy:
+            return
+
         folder_str = self.selected_folder.get().strip()
         if not folder_str:
             messagebox.showwarning("Notice", "Please select a target folder.")
             return
 
         folder = Path(folder_str)
-        if not folder.is_dir():
-            messagebox.showerror("Error", f"Folder does not exist:\n{folder_str}")
+        safe, err = is_safe_target_directory(folder)
+        if not safe:
+            messagebox.showerror("Security Warning", err)
             return
 
         confirm = messagebox.askyesno(
@@ -642,18 +663,22 @@ class ByteSiftApp:
         if not confirm:
             return
 
-        mgr = TransactionManager(folder)
-        reverted, errors = mgr.undo_last_session()
+        self._is_busy = True
+        try:
+            mgr = TransactionManager(folder)
+            reverted, errors = mgr.undo_last_session()
 
-        if errors:
-            msg = "\n".join(errors[:4])
-            messagebox.showwarning("Notice", f"Rollback completed with warnings:\n{msg}")
+            if errors:
+                msg = "\n".join(errors[:4])
+                messagebox.showwarning("Notice", f"Rollback completed with warnings:\n{msg}")
 
-        if reverted > 0:
-            messagebox.showinfo("Rollback Complete", f"Successfully restored {reverted} file(s) to original paths.")
-            self.on_scan()
-        else:
-            messagebox.showinfo("Notice", "No previous session records found to undo.")
+            if reverted > 0:
+                messagebox.showinfo("Rollback Complete", f"Successfully restored {reverted} file(s) to original paths.")
+                self.on_scan()
+            else:
+                messagebox.showinfo("Notice", "No previous session records found to undo.")
+        finally:
+            self._is_busy = False
 
 def launch_gui(initial_folder: Optional[str] = None, force_macos: bool = False):
     root = tk.Tk()

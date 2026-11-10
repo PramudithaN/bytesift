@@ -1,6 +1,7 @@
 """
 ByteSift In-App Updater
 Lightweight, zero-dependency update checker using GitHub Releases API.
+Includes strict URL verification to prevent protocol hijacking or MITM redirects.
 """
 
 from dataclasses import dataclass
@@ -16,6 +17,11 @@ from bytesift import __version__
 
 GITHUB_API_LATEST = "https://api.github.com/repos/PramudithaN/bytesift/releases/latest"
 GITHUB_RELEASES_WEB = "https://github.com/PramudithaN/bytesift/releases/latest"
+ALLOWED_UPDATE_PREFIXES = (
+    "https://github.com/",
+    "https://pramudithan.github.io/",
+    "https://objects.githubusercontent.com/",
+)
 
 @dataclass
 class UpdateInfo:
@@ -28,6 +34,12 @@ class UpdateInfo:
     download_url: Optional[str] = None
     published_at: str = ""
 
+def is_safe_update_url(url: Optional[str]) -> bool:
+    """Verifies that an update URL strictly uses HTTPS and originates from trusted endpoints."""
+    if not url or not isinstance(url, str):
+        return False
+    return any(url.startswith(prefix) for prefix in ALLOWED_UPDATE_PREFIXES)
+
 def parse_version(v_str: str) -> Tuple[int, ...]:
     """
     Parses semantic version string into a comparable tuple of integers.
@@ -39,7 +51,6 @@ def parse_version(v_str: str) -> Tuple[int, ...]:
     if not v_str:
         return (0, 0, 0)
     cleaned = v_str.strip().lstrip("vV")
-    # Extract leading numbers separated by dots
     numbers = []
     for part in re.split(r"[.\-_]", cleaned):
         if part.isdigit():
@@ -61,7 +72,7 @@ def select_best_asset_url(assets: List[dict]) -> Optional[str]:
     for asset in assets:
         name = asset.get("name", "").lower()
         url = asset.get("browser_download_url")
-        if not url:
+        if not is_safe_update_url(url):
             continue
 
         if os_name == "win32" and "setup" in name and name.endswith(".exe"):
@@ -73,7 +84,7 @@ def select_best_asset_url(assets: List[dict]) -> Optional[str]:
     for asset in assets:
         name = asset.get("name", "").lower()
         url = asset.get("browser_download_url")
-        if not url:
+        if not is_safe_update_url(url):
             continue
 
         if os_name == "win32":
@@ -86,10 +97,10 @@ def select_best_asset_url(assets: List[dict]) -> Optional[str]:
             if name.endswith(".tar.gz") or name.endswith(".zip") or name.endswith(".appimage"):
                 return url
 
-    # Pass 3: Any asset if available
+    # Pass 3: Any validated asset
     for asset in assets:
         url = asset.get("browser_download_url")
-        if url:
+        if is_safe_update_url(url):
             return url
 
     return None
@@ -103,7 +114,7 @@ def check_for_updates(current_version: str = __version__, timeout: float = 4.0) 
         req = urllib.request.Request(
             GITHUB_API_LATEST,
             headers={
-                "User-Agent": f"ByteSift/{current_version} ({platform.system()} {platform.release()})",
+                "User-Agent": f"ByteSift/{current_version}",
                 "Accept": "application/vnd.github.v3+json",
             }
         )
@@ -122,7 +133,8 @@ def check_for_updates(current_version: str = __version__, timeout: float = 4.0) 
 
         has_update = latest_tuple > current_tuple
 
-        html_url = data.get("html_url") or GITHUB_RELEASES_WEB
+        raw_html_url = data.get("html_url")
+        html_url = raw_html_url if is_safe_update_url(raw_html_url) else GITHUB_RELEASES_WEB
         release_name = data.get("name") or f"ByteSift v{clean_latest}"
         release_notes = data.get("body", "").strip()
         published_at = data.get("published_at", "")
